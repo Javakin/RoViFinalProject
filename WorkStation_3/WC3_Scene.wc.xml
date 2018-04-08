@@ -1,0 +1,84 @@
+<WorkCell name="SceneUR">
+
+<Frame name="Table" refframe="WORLD">  
+	<RPY> 0 0 0 </RPY> <Pos> 0 0 0 </Pos>
+	<Drawable name="Table">
+          <Polytope file="Geometry/Table" />
+     </Drawable>
+ </Frame>
+
+ <Frame name="Robot" refframe="Table">
+    <RPY> 180 0 0 </RPY> <Pos> 0.495 0.47 0.748</Pos>
+ </Frame>
+ <Include file="UR/UR.wc.xml" />
+ 
+
+
+ <Frame name="Gripper" refframe="UR1.TCP">
+	<RPY> 0 0 -90 </RPY> <Pos> 0 0 0.0 </Pos>
+</Frame>
+   <Include file="WSG50/WSG50.wc.xml" />
+
+
+ <Frame name="Conveyour" refframe="Table">
+     <RPY> -45 0 90 </RPY> <Pos> 0 0 0.833 </Pos>
+     <Drawable name="Conveyour" refframe="Conveyour">
+         <Polytope file="Geometry/Conveyor01.ac" />
+     </Drawable>
+</Frame>
+
+
+  <Frame name="Floor" refframe="WORLD">
+     <RPY> 0 0 90 </RPY> <Pos> 0.8 1.2 0 </Pos>
+     <Drawable name="Floor" refframe="Floor">
+         <Polytope file="Geometry/Fence3x2" />
+     </Drawable>
+</Frame>
+
+  <Frame name="Fence" refframe="WORLD">
+     <RPY> 0 0 90 </RPY> <Pos> 2 1.42 0 </Pos>
+     <Drawable name="Fence" refframe="Fence">
+         <Polytope file="Geometry/Cage" />
+     </Drawable>
+</Frame>
+
+
+
+  <Frame name="Computer" refframe="Table">
+     <RPY> 180 0 0 </RPY> <Pos> -0.425 -0.27 0.748 </Pos>
+     <Drawable name="Computer" refframe="Computer">
+         <Polytope file="Geometry/Computer" />
+     </Drawable>
+</Frame>
+
+  <Frame name="Camera" refframe="Table">
+     <RPY> 45 0 -130 </RPY> <Pos> 0.725 -0.7 1.5 </Pos>
+     <Drawable name="Camera" refframe="Camera">
+         <Polytope file="Geometry/Camera" />
+     </Drawable>
+</Frame>
+
+<Frame name="CameraSimLeft" refframe="Camera">
+    <RPY> 0 0 180</RPY>
+    <Pos> -0.06 0 0</Pos>
+    <Property name="Camera">50 1032 776</Property>
+  </Frame>
+
+<Frame name="CameraSimRight" refframe="Camera">
+    <RPY>0 0 180</RPY>
+    <Pos> 0.06 0 0</Pos>
+    <Property name="Camera">50 1032 776</Property>
+  </Frame>
+
+
+ <Frame name="LegoYellow" refframe="WORLD" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 0 0 1 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+  
+  
+<CollisionSetup file="CollisionSetup.xml"/>
+
+</WorkCell>

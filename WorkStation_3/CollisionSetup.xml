@@ -1,0 +1,10 @@
+
+<CollisionSetup>
+    <Exclude>
+    <FramePair first="Table" second="UR1.Joint1"/>     
+    <FramePair first="Table" second="Computer"/>  	
+    <FramePair first="Table" second="Conveyour" />
+    <FramePair first="WSG50.Base" second="UR1.Joint6" />
+	<FramePair first="Table" second="Floor" />	
+    </Exclude>
+</CollisionSetup>
