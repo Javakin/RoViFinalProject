@@ -1,0 +1,3 @@
+/home/daniel/Desktop/RoViFinalProject/RoVi-finalProject/SamplePluginPA10/build/CMakeFiles/edit_cache.dir
+/home/daniel/Desktop/RoViFinalProject/RoVi-finalProject/SamplePluginPA10/build/CMakeFiles/rebuild_cache.dir
+/home/daniel/Desktop/RoViFinalProject/RoVi-finalProject/SamplePluginPA10/build/CMakeFiles/RoVi1PluginPA10.dir

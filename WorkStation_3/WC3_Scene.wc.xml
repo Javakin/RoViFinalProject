@@ -28,6 +28,11 @@
 </Frame>
 
 
+ <Frame name="ConveyourPlane" refframe="WORLD">
+     <RPY> -45 0 0 </RPY> <Pos> 0 0 0.891 </Pos>
+</Frame>
+
+
   <Frame name="Floor" refframe="WORLD">
      <RPY> 0 0 90 </RPY> <Pos> 0.8 1.2 0 </Pos>
      <Drawable name="Floor" refframe="Floor">
@@ -71,8 +76,8 @@
   </Frame>
 
 
- <Frame name="LegoYellow" refframe="WORLD" type="Movable">
-     <RPY> 0 0 0 </RPY> <Pos> 0 0 1 </Pos>
+ <Frame name="LegoYellow" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 0 0 0 </Pos>
      <Drawable name="LegoYellow" refframe="LegoYellow">
          <Polytope file="Geometry/LegoBrickYellow.ac" />
      </Drawable>
