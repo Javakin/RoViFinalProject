@@ -1,3 +1,0 @@
-/home/student/Desktop/7.semester/RoVi-finalProject/FeatureExtraction/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/student/Desktop/7.semester/RoVi-finalProject/FeatureExtraction/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/student/Desktop/7.semester/RoVi-finalProject/FeatureExtraction/cmake-build-debug/CMakeFiles/FeatureExtraction.dir

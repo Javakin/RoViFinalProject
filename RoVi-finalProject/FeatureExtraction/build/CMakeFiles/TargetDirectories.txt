@@ -1,3 +1,0 @@
-/home/tera/Desktop/7.semester.git/RoVi-finalProject/FeatureExtraction/build/CMakeFiles/edit_cache.dir
-/home/tera/Desktop/7.semester.git/RoVi-finalProject/FeatureExtraction/build/CMakeFiles/rebuild_cache.dir
-/home/tera/Desktop/7.semester.git/RoVi-finalProject/FeatureExtraction/build/CMakeFiles/FeatureExtraction.dir
