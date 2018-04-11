@@ -6,5 +6,16 @@
     <FramePair first="Table" second="Conveyour" />
     <FramePair first="WSG50.Base" second="UR1.Joint6" />
 	<FramePair first="Table" second="Floor" />	
+	<FramePair first="Conveyour" second="LegoYellow01" />
+	<FramePair first="Conveyour" second="LegoYellow02" />
+	<FramePair first="Conveyour" second="LegoYellow03" />
+	<FramePair first="Conveyour" second="LegoYellow04" />
+	<FramePair first="Conveyour" second="LegoYellow05" />
+	<FramePair first="Conveyour" second="LegoYellow06" />	
+	<FramePair first="Conveyour" second="LegoYellow07" />
+	<FramePair first="Conveyour" second="LegoYellow08" />
+	<FramePair first="Conveyour" second="LegoYellow09" />
+	<FramePair first="Conveyour" second="LegoYellow10" />
+
     </Exclude>
 </CollisionSetup>

@@ -76,8 +76,71 @@
   </Frame>
 
 
- <Frame name="LegoYellow" refframe="ConveyourPlane" type="Movable">
-     <RPY> 0 0 0 </RPY> <Pos> 0 0 0 </Pos>
+<Frame name="LegoYellow01" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.025 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow02" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.05 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow03" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.075 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow04" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.100 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow05" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.125 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow06" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.15 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow07" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.175 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow08" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.2 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow09" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.225 0 0 </Pos>
+     <Drawable name="LegoYellow" refframe="LegoYellow">
+         <Polytope file="Geometry/LegoBrickYellow.ac" />
+     </Drawable>
+</Frame>
+
+<Frame name="LegoYellow10" refframe="ConveyourPlane" type="Movable">
+     <RPY> 0 0 0 </RPY> <Pos> 1.25 0 0 </Pos>
      <Drawable name="LegoYellow" refframe="LegoYellow">
          <Polytope file="Geometry/LegoBrickYellow.ac" />
      </Drawable>
