@@ -19,7 +19,7 @@ ObjectAvoidance::ObjectAvoidance():
     QWidget *dockWidgetContent = new QWidget(this);
     QVBoxLayout *verticalLayout = new QVBoxLayout(dockWidgetContent);
 
-    
+
     //create stuff we want in the plug in here
     _markerButtons = createModeButtons();
     _cams = createCamSetup();
