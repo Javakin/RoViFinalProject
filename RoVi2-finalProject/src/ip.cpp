@@ -268,7 +268,7 @@ std::vector<cv::Point2i> ip::marker3Function(const rw::sensor::Image& image, cv:
     double max_dist = 0; double min_dist = 100;
 
     //-- Quick calculation of max and min distances between keypoints
-    for( int i = 0; i < _descriptors_object.rows; i++ )
+    for(unsigned int i = 0; i < _descriptors_object.rows; i++ )
     {
         double dist = matches[i].distance;
         if( dist < min_dist )
@@ -279,7 +279,7 @@ std::vector<cv::Point2i> ip::marker3Function(const rw::sensor::Image& image, cv:
     //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
     std::vector< cv::DMatch > good_matches;
 
-    for( int i = 0; i < _descriptors_object.rows; i++ )
+    for(unsigned int i = 0; i < _descriptors_object.rows; i++ )
     {
         if( matches[i].distance < 3*min_dist)
             good_matches.push_back( matches[i]);
@@ -288,7 +288,7 @@ std::vector<cv::Point2i> ip::marker3Function(const rw::sensor::Image& image, cv:
     //-- Localize the object
     std::vector<cv::Point2f> obj;
     std::vector<cv::Point2f> scene;
-    for( int i = 0; i < good_matches.size(); i++ )
+    for(unsigned int i = 0; i < good_matches.size(); i++ )
     {
         //-- Get the keypoints from the good matches
         obj.push_back( _keypoints_object[ good_matches[i].queryIdx ].pt );
@@ -314,7 +314,7 @@ std::vector<cv::Point2i> ip::marker3Function(const rw::sensor::Image& image, cv:
     perspectiveTransform( obj_corners, scene_corners, H);
 
     std::vector<cv::Point2i> points;
-    for (int i = 0; i < scene_corners.size(); i++) {
+    for (unsigned int i = 0; i < scene_corners.size(); i++) {
         points.push_back(scene_corners[i]);
     }
     points = toRobotPoints(points, imflip);
