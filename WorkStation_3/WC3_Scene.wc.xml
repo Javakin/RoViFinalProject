@@ -69,7 +69,7 @@
     <Property name="Camera">50 1032 776</Property>
   </Frame>
 
-<Frame name="CameraSimRight" refframe="Camera">
+<Frame name="CameraSimRigth" refframe="Camera">
     <RPY>0 0 180</RPY>
     <Pos> 0.06 0 0</Pos>
     <Property name="Camera">50 1032 776</Property>

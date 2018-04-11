@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>pa_icon.png</file>
+    <file>../icons/mode1.png</file>
+    <file>../icons/mode2.png</file>
+    <file>../icons/mode3.png</file>
+</qresource>
+</RCC>
