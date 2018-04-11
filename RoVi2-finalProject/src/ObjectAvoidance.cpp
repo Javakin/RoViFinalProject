@@ -24,11 +24,13 @@ ObjectAvoidance::ObjectAvoidance():
     _markerButtons = createModeButtons();
     _cams = createCamSetup();
     _initButton = new QPushButton("Init");
+    _runButton = new QPushButton("Run");
 
 
     //add them to the layout here
     verticalLayout->addWidget(_initButton);
     verticalLayout->addWidget(_markerButtons);
+    verticalLayout->addWidget(_runButton);
     verticalLayout->addWidget(_cams);
     verticalLayout->addStretch(0);
 
@@ -47,6 +49,8 @@ ObjectAvoidance::~ObjectAvoidance(){
 
 void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
+    _framegrabberLeft = NULL;
+    _framegrabberRigth = NULL;
 }
 
 void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
@@ -153,23 +157,21 @@ QWidget* ObjectAvoidance::createModeButtons(){
 QWidget* ObjectAvoidance::createCamSetup() {
 
     QWidget* cams = new QWidget();
-    QGridLayout *layout = new QGridLayout(cams);
+    QHBoxLayout *layout = new QHBoxLayout(cams);
 
     _leftCam = new QLabel();
     _rightCam = new QLabel();
 
-    layout->addWidget(_leftCam,0,0);
-    layout->addWidget(_rightCam,0,1);
+    layout->addWidget(_leftCam);
+    layout->addWidget(_rightCam);
 
     cams->setLayout(layout);
+    cams->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 
     return cams;
 }
 
 void ObjectAvoidance::init() {
-
-    _framegrabberLeft = NULL;
-    _framegrabberRigth = NULL;
 
     if (_workcell != NULL) {
         // Create a GLFrameGrabber if there is a camera frame with a Camera property set

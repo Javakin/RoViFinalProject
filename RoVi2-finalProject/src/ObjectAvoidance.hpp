@@ -25,6 +25,7 @@
 #include <QScrollArea>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QHBoxLayout>
 
 
 class ObjectAvoidance: public rws::RobWorkStudioPlugin
@@ -61,6 +62,7 @@ private:
     QLabel* _leftCam;
     QLabel* _rightCam;
     QPushButton* _initButton;
+    QPushButton* _runButton;
     rwlibs::simulation::GLFrameGrabber* _framegrabberLeft;
     rwlibs::simulation::GLFrameGrabber* _framegrabberRigth;
 
