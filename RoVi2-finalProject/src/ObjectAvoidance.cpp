@@ -51,6 +51,7 @@ void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
+
 }
 
 void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
@@ -131,14 +132,17 @@ QWidget* ObjectAvoidance::createModeButtons(){
 
     btns[0] = new QToolButton();
     btns[0]->setIcon(QIcon(":icons/mode1.png"));
+    btns[0]->setToolTip("Mode 1");
     btns[0]->setIconSize(QSize(64,64));
 
     btns[1] = new QToolButton();
     btns[1]->setIcon(QIcon(":icons/mode2.png"));
+    btns[1]->setToolTip("Mode 2");
     btns[1]->setIconSize(QSize(64,64));
 
     btns[2] = new QToolButton();
     btns[2]->setIcon(QIcon(":icons/mode3.png"));
+    btns[2]->setToolTip("Mode 3");
     btns[2]->setIconSize(QSize(64,64));
 
 
