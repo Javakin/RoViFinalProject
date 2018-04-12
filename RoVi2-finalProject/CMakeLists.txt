@@ -85,7 +85,7 @@ ELSE()
 ENDIF()
 
 # Add the source files to build
-SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H})
+SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H} src/Lego.h src/Lego.cpp src/Lego.h)
 
 # The shared library to build:
 ADD_LIBRARY(ObjectAvoidance MODULE ${SrcFiles} ${MocSrcFiles}  ${RccSrcFiles})

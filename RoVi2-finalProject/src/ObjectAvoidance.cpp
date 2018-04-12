@@ -8,6 +8,7 @@
 #include <rw/kinematics.hpp>
 
 #include "ip.h"
+#include "Lego.h"
 
 
 
