@@ -178,6 +178,8 @@ QWidget* ObjectAvoidance::createCamSetup() {
 
 void ObjectAvoidance::init() {
 
+    std::cout << "Test" << std::endl;
+
     if (_workcell != NULL) {
         // Create a GLFrameGrabber if there is a camera frame with a Camera property set
         rw::kinematics::Frame* cameraFrameLeft = _workcell->findFrame("CameraSimLeft");
