@@ -10,7 +10,7 @@
 #include "ip.h"
 #include "Lego.h"
 
-
+using namespace std;
 
 ObjectAvoidance::ObjectAvoidance():
         RobWorkStudioPlugin("ObjectAvoidance", QIcon(":/pa_icon.png"))
@@ -41,6 +41,7 @@ ObjectAvoidance::ObjectAvoidance():
     this->setWidget(widg);
 
     connect(_initButton, SIGNAL(pressed()), this, SLOT(init()));
+    connect(_runButton, SIGNAL(pressed()), this, SLOT(run()));
 
 }
 
@@ -216,8 +217,16 @@ void ObjectAvoidance::init() {
 
     }
 
+
     capture();
+
+    // inisiate the position of the legobricks
+
 }
 
+void ObjectAvoidance::run(){
+    cout << "this is a test" << endl;
+    // start the timer
+}
 
 

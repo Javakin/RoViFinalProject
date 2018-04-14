@@ -71,6 +71,7 @@ private slots:
     void stateChangedListener(const rw::kinematics::State& state);
     void capture();
     void init();
+    void run();
 };
 
 #endif
