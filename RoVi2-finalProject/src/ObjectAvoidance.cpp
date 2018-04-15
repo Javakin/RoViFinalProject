@@ -20,9 +20,9 @@ ObjectAvoidance::ObjectAvoidance():
     _runButton = new QPushButton("Run");
 
     // setting up the timer
-    /*QTimer *_timer = new QTimer(this);
+    _timer = new QTimer(this);
     connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-    _timer->start(1000);*/
+    _timer->start(1000);
 
 
     //add them to the layout here
@@ -50,7 +50,7 @@ void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
-    //LegoHandle = NULL;
+    LegoHandle = NULL;
 
 }
 
@@ -62,8 +62,9 @@ void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
 void ObjectAvoidance::close(){
 
     // Stop the timer
-    //_timer->stop();
-    //delete _timer;
+    //if(_timer->isActive())
+    //    _timer->stop();
+
 
     // Delete the old framegrabber
     if (_framegrabberLeft != NULL && _framegrabberRigth != NULL) {
@@ -72,7 +73,9 @@ void ObjectAvoidance::close(){
     }
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
-    _workcell = NULL;
+
+
+
 }
 
 void ObjectAvoidance::capture() {
@@ -222,25 +225,27 @@ void ObjectAvoidance::init() {
     // inisiate the position of the legobricks
 
 }
-/*
+
 void ObjectAvoidance::run(){
-    cout << "this is a test" << endl;
+    cout << "this is a test or is it" << endl;
     // start the timer
 
     // Stop the timer
-    if(_timer->isActive() == 1){
+    if(_timer->isActive()){
+        cout << "stopping the timer\n" << _timer->isActive();
         _timer->stop();
-        cout << "starting the timer\n";
+
     }else{
+        cout << "stopping the timer\n" << _timer->isActive();
         _timer->start(DELTA_T_SIM);
-        cout << "stopping the timer\n";
+
     }
-
-
+    //_timer->start(DELTA_T_SIM);
+    //_timer->stop();
 }
 
 
 void ObjectAvoidance::update(){
     cout << " så er der gået et sekundt\n"<< endl;
 
-}*/
+}
