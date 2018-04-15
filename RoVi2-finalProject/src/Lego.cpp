@@ -4,7 +4,7 @@
 
 #include "Lego.hpp"
 
-/*
+
 Lego::Lego() {
     // Finde all lego bricks in the workspace
     rw::models::WorkCell::Ptr _wc;
@@ -36,4 +36,4 @@ vector<MovableFrame *> Lego::getFrames() {
 
 MovableFrame *Lego::getFrame(int iLegoID) {
     return nullptr;
-}*/
+}

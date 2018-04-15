@@ -7,13 +7,32 @@
 #define OBJECTAVOIDANCE_LEGO_H
 
 // ------------------- includes ----------------------------
-//#include <rw/rw.hpp>
-//#include <rws/RobWorkStudio.hpp>
-//#include <rwlibs/simulation/GLFrameGrabber.hpp>
+//RobWork includes
+#include <rw/models/WorkCell.hpp>
+#include <rw/kinematics/State.hpp>
+#include <rwlibs/opengl/RenderImage.hpp>
+#include <rwlibs/simulation/GLFrameGrabber.hpp>
+#include <rw/kinematics/MovableFrame.hpp>
+
+#include <rw/math.hpp> // Pi, Deg2Rad
+#include <rw/math/Q.hpp>
+#include <rw/math/Transform3D.hpp>
+#include <rw/math/RPY.hpp>
+#include <rw/math/Vector3D.hpp>
+#include <rw/math/EAA.hpp>
+#include <rw/loaders/ImageLoader.hpp>
+#include <rw/loaders/WorkCellFactory.hpp>
+
+//RobWork studio includes
+#include <RobWorkStudioConfig.hpp> // For RWS_USE_QT5 definition
+#include <rws/RobWorkStudioPlugin.hpp>
+
+#include <rws/RobWorkStudio.hpp>
+
 #include <vector>
 
 // --------------------  namespaces ----------------------------
-/*using namespace rw::common;
+using namespace rw::common;
 using namespace rw::graphics;
 using namespace rw::kinematics;
 using namespace rw::loaders;
@@ -25,7 +44,7 @@ using namespace rwlibs::opengl;
 using namespace rwlibs::simulation;
 
 using namespace std;
-using namespace rws;*/
+using namespace rws;
 
 
 // -----------------------   defines ----------------------------
@@ -37,7 +56,7 @@ using namespace rws;*/
 
 
 
-/*
+
 class Lego {
 
 public:
@@ -47,17 +66,17 @@ public:
 
     void removeFromView();
     void removeFromView(int iLegoID);
-    //vector<MovableFrame*> getFrames();
-    //MovableFrame* getFrame(int iLegoID);
+    vector<MovableFrame*> getFrames();
+    MovableFrame* getFrame(int iLegoID);
 
 
 
 private:
-    //vector<MovableFrame*> vLegoFrames;
+    vector<MovableFrame*> vLegoFrames;
 
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _wc;
 };
 
-*/
+
 #endif //OBJECTAVOIDANCE_LEGO_H

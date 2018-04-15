@@ -50,7 +50,7 @@ void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
-    //LegoHandle = NULL;
+    LegoHandle = NULL;
 
 }
 
@@ -222,7 +222,7 @@ void ObjectAvoidance::init() {
     // inisiate the position of the legobricks
 
 }
-/*
+
 void ObjectAvoidance::run(){
     cout << "this is a test" << endl;
     // start the timer
@@ -244,4 +244,3 @@ void ObjectAvoidance::update(){
     cout << " så er der gået et sekundt\n"<< endl;
 
 }
- */
