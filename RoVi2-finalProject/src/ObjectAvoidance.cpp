@@ -1,16 +1,8 @@
 #include "ObjectAvoidance.hpp"
 
-#include <boost/filesystem.hpp>
-#include <boost/bind.hpp>
 
-#include <QDialog>
-#include <QtWidgets/QFileDialog>
-#include <rw/kinematics.hpp>
 
-#include "ip.h"
-#include "Lego.h"
-
-using namespace std;
+#define DELTA_T_SIM    1000     // time in miliseconds
 
 ObjectAvoidance::ObjectAvoidance():
         RobWorkStudioPlugin("ObjectAvoidance", QIcon(":/pa_icon.png"))
@@ -26,6 +18,11 @@ ObjectAvoidance::ObjectAvoidance():
     _cams = createCamSetup();
     _initButton = new QPushButton("Init");
     _runButton = new QPushButton("Run");
+
+    // setting up the timer
+    QTimer *_timer = new QTimer(this);
+    connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
+
 
 
     //add them to the layout here
@@ -53,6 +50,7 @@ void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
+    //LegoHandle = NULL;
 
 }
 
@@ -64,7 +62,8 @@ void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
 void ObjectAvoidance::close(){
 
     // Stop the timer
-    //_timer->stop();
+    _timer->stop();
+    delete _timer;
 
     // Delete the old framegrabber
     if (_framegrabberLeft != NULL && _framegrabberRigth != NULL) {
@@ -223,10 +222,26 @@ void ObjectAvoidance::init() {
     // inisiate the position of the legobricks
 
 }
-
+/*
 void ObjectAvoidance::run(){
     cout << "this is a test" << endl;
     // start the timer
+
+    // Stop the timer
+    if(_timer->isActive() == 1){
+        _timer->stop();
+        cout << "starting the timer\n";
+    }else{
+        _timer->start(DELTA_T_SIM);
+        cout << "stopping the timer\n";
+    }
+
+
 }
 
 
+void ObjectAvoidance::update(){
+    cout << " så er der gået et sekundt\n"<< endl;
+
+}
+ */

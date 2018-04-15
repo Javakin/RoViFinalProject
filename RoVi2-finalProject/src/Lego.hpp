@@ -1,18 +1,19 @@
 //
 // Created by daniel on 4/11/18.
 //
+#pragma once
 
 #ifndef OBJECTAVOIDANCE_LEGO_H
 #define OBJECTAVOIDANCE_LEGO_H
 
 // ------------------- includes ----------------------------
-#include <rw/rw.hpp>
-#include <rws/RobWorkStudio.hpp>
-#include <rwlibs/simulation/GLFrameGrabber.hpp>
+//#include <rw/rw.hpp>
+//#include <rws/RobWorkStudio.hpp>
+//#include <rwlibs/simulation/GLFrameGrabber.hpp>
 #include <vector>
 
 // --------------------  namespaces ----------------------------
-using namespace rw::common;
+/*using namespace rw::common;
 using namespace rw::graphics;
 using namespace rw::kinematics;
 using namespace rw::loaders;
@@ -24,7 +25,7 @@ using namespace rwlibs::opengl;
 using namespace rwlibs::simulation;
 
 using namespace std;
-using namespace rws;
+using namespace rws;*/
 
 
 // -----------------------   defines ----------------------------
@@ -36,7 +37,7 @@ using namespace rws;
 
 
 
-
+/*
 class Lego {
 
 public:
@@ -46,14 +47,17 @@ public:
 
     void removeFromView();
     void removeFromView(int iLegoID);
-    vector<MovableFrame*> getFrames();
-    MovableFrame* getFrame(int iLegoID);
+    //vector<MovableFrame*> getFrames();
+    //MovableFrame* getFrame(int iLegoID);
 
 
 
 private:
-    vector<MovableFrame*> vLegoFrames;
+    //vector<MovableFrame*> vLegoFrames;
+
+    rw::kinematics::State* _state;
+    rw::models::WorkCell::Ptr _wc;
 };
 
-
+*/
 #endif //OBJECTAVOIDANCE_LEGO_H

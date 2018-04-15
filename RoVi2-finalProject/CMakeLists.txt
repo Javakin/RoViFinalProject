@@ -72,9 +72,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # MOC
 IF(RWS_USE_QT5)
-	QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.h)
+	QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp)
 ELSE()
-	QT4_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.h)
+	QT4_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp)
 ENDIF()
 
 # Rcc the files:
@@ -85,7 +85,7 @@ ELSE()
 ENDIF()
 
 # Add the source files to build
-SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H} src/Lego.cpp src/Lego.h)
+SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H} src/Lego.cpp src/Lego.hpp)
 
 # The shared library to build:
 ADD_LIBRARY(ObjectAvoidance MODULE ${SrcFiles} ${MocSrcFiles}  ${RccSrcFiles})

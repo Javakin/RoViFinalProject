@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef OBJECTAVOIDANCE_HPP
 #define OBJECTAVOIDANCE_HPP_HPP
 
@@ -26,6 +28,21 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QHBoxLayout>
+
+// content from the cpp file
+
+#include <boost/filesystem.hpp>
+#include <boost/bind.hpp>
+
+#include <QDialog>
+
+#include <QtWidgets/QFileDialog>
+#include <rw/kinematics.hpp>
+
+//Constructed files
+#include "ip.h"
+#include "Lego.hpp"
+
 
 
 class ObjectAvoidance: public rws::RobWorkStudioPlugin
@@ -65,13 +82,16 @@ private:
     QPushButton* _runButton;
     rwlibs::simulation::GLFrameGrabber* _framegrabberLeft;
     rwlibs::simulation::GLFrameGrabber* _framegrabberRigth;
+    //Lego* LegoHandle;
+
 
 
 private slots:
     void stateChangedListener(const rw::kinematics::State& state);
     void capture();
     void init();
-    void run();
+    //void run();
+    //void update();
 };
 
 #endif
