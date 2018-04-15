@@ -62,18 +62,20 @@ class Lego {
 public:
     Lego();
     Lego(State* _state, WorkCell::Ptr _workcell);
+    void initializeTestSetup();
+    void trackLego(unsigned int iLegoID);
     void move(int iLegoID, double dx);
     void move(double dx);
 
     void removeFromView();
     void removeFromView(int iLegoID);
     vector<MovableFrame*> getFrames();
-    MovableFrame* getFrame(int iLegoID);
 
 
 
 private:
     vector<MovableFrame*> vLegoFrames;
+    vector<int> isTracked;
 
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _workcell;

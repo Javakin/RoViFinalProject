@@ -223,12 +223,17 @@ void ObjectAvoidance::init() {
         LegoHandle = new Lego(&_state, _workcell);
         getRobWorkStudio()->setState(_state);
 
+        cout << "initialize\n";
+        //for simulation make a lego brick configuration
+        LegoHandle->initializeTestSetup();
+        getRobWorkStudio()->setState(_state);
+
     }
 
 
     capture();
 
-    // inisiate the position of the legobricks
+
 
 }
 
@@ -253,5 +258,7 @@ void ObjectAvoidance::run(){
 
 void ObjectAvoidance::update(){
     cout << " så er der gået et sekundt\n"<< endl;
+    LegoHandle->move(0.05);
+    getRobWorkStudio()->setState(_state);
 
 }
