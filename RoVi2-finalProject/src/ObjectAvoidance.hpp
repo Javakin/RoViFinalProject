@@ -41,8 +41,10 @@
 
 //Constructed files
 #include "ip.h"
-#include "Lego.hpp"
+//#include "Lego.hpp"
 
+
+using namespace std;
 
 
 class ObjectAvoidance: public rws::RobWorkStudioPlugin
@@ -82,7 +84,7 @@ private:
     QPushButton* _runButton;
     rwlibs::simulation::GLFrameGrabber* _framegrabberLeft;
     rwlibs::simulation::GLFrameGrabber* _framegrabberRigth;
-    Lego* LegoHandle;
+    //Lego* LegoHandle;
 
 
 
@@ -90,8 +92,8 @@ private slots:
     void stateChangedListener(const rw::kinematics::State& state);
     void capture();
     void init();
-    void run();
-    void update();
+    //void run();
+    //void update();
 };
 
 #endif

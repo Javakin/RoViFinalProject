@@ -20,9 +20,9 @@ ObjectAvoidance::ObjectAvoidance():
     _runButton = new QPushButton("Run");
 
     // setting up the timer
-    QTimer *_timer = new QTimer(this);
+    /*QTimer *_timer = new QTimer(this);
     connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-
+    _timer->start(1000);*/
 
 
     //add them to the layout here
@@ -50,7 +50,7 @@ void ObjectAvoidance::initialize(){
     getRobWorkStudio()->stateChangedEvent().add(boost::bind(&ObjectAvoidance::stateChangedListener, this, _1), this);
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
-    LegoHandle = NULL;
+    //LegoHandle = NULL;
 
 }
 
@@ -62,8 +62,8 @@ void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
 void ObjectAvoidance::close(){
 
     // Stop the timer
-    _timer->stop();
-    delete _timer;
+    //_timer->stop();
+    //delete _timer;
 
     // Delete the old framegrabber
     if (_framegrabberLeft != NULL && _framegrabberRigth != NULL) {
@@ -222,7 +222,7 @@ void ObjectAvoidance::init() {
     // inisiate the position of the legobricks
 
 }
-
+/*
 void ObjectAvoidance::run(){
     cout << "this is a test" << endl;
     // start the timer
@@ -243,4 +243,4 @@ void ObjectAvoidance::run(){
 void ObjectAvoidance::update(){
     cout << " så er der gået et sekundt\n"<< endl;
 
-}
+}*/

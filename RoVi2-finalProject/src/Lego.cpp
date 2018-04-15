@@ -7,7 +7,7 @@
 
 Lego::Lego() {
     // Finde all lego bricks in the workspace
-    rw::models::WorkCell::Ptr _wc;
+    rw::models::WorkCell::Ptr _wc = NULL;
 
     // set them to the appropriat place
 
