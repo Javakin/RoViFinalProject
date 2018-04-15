@@ -2,7 +2,7 @@
 
 
 
-#define DELTA_T_SIM    1000     // time in miliseconds
+#define DELTA_T_SIM    50     // time in miliseconds
 
 ObjectAvoidance::ObjectAvoidance():
         RobWorkStudioPlugin("ObjectAvoidance", QIcon(":/pa_icon.png"))
@@ -257,8 +257,7 @@ void ObjectAvoidance::run(){
 
 
 void ObjectAvoidance::update(){
-    cout << " så er der gået et sekundt\n"<< endl;
-    LegoHandle->move(0.05);
+    LegoHandle->move(0.0015);
     getRobWorkStudio()->setState(_state);
 
 }

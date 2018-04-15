@@ -5,6 +5,8 @@
 #include "Lego.hpp"
 #include <string>
 
+
+
 #define BRICK_BASE_NAME     "LegoYellow"
 #define NUMBER_OF_BRICKS    10
 #define NUMBER_OF_NUMBERS   2
@@ -58,16 +60,19 @@ void Lego::move(int iLegoID, double dx){
 }
 
 void Lego::move(double dx) {
+    Frame *ConvayerPlaneFrame = _workcell->findFrame("ConveyourPlane");
+
+
     // Move all active the legobricks one step of dx
     for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
         if(isTracked[ID]) {
             // Move one step of dx
-            Transform3D<> CurrentPose = vLegoFrames[ID]->getTransform(*_state);
+            Frame *LegoFrame = vLegoFrames[ID];
 
-            Vector3D<> vec(dx, 0, 0);
-            RPY<> ang(0, 0, 0);
+            Transform3D<> motion = ConvayerPlaneFrame->fTf(LegoFrame, *_state) * Transform3D<>(Vector3D<> (dx, 0, 0), RPY<>(0, 0, 0).toRotation3D());
 
-            CurrentPose = CurrentPose * Transform3D<>(vec, ang.toRotation3D());
+            Transform3D<> CurrentPose = vLegoFrames[ID]->getTransform(*_state)*motion;
+
 
             // Enable wraparound
             if(CurrentPose.P()[0] > X_RANGE){
@@ -76,6 +81,13 @@ void Lego::move(double dx) {
             if(CurrentPose.P()[0] < -X_RANGE){
                 CurrentPose.P()[0] = CurrentPose.P()[0] + X_RANGE*2;
             }
+            if(CurrentPose.P()[1] > Y_RANGE){
+                CurrentPose.P()[1] = CurrentPose.P()[0] - Y_RANGE*2;
+            }
+            if(CurrentPose.P()[1] < -Y_RANGE){
+                CurrentPose.P()[1] = CurrentPose.P()[0] + Y_RANGE*2;
+            }
+            CurrentPose.P()[2] = 0;
 
             vLegoFrames[ID]->setTransform(CurrentPose, *_state);
         }
@@ -103,13 +115,27 @@ void Lego::trackLego(unsigned int iLegoID) {
 
 void Lego::initializeTestSetup() {
     // set all lego bricks to be tracked
-    cout << "here";
     for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
         isTracked[ID] = 1;
     }
 
     // place all lego bricks so that non of them is tuching each other
-    cout << "here";
+    /* initialize random seed: */
+    srand (20);
+
+
+    for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
+        if(isTracked[ID]){
+            // Place blocks randomly
+
+            Vector3D<> vec((((double)rand()/RAND_MAX)*2-1)*X_RANGE, (((double)rand()/RAND_MAX)*2-1)*Y_RANGE, 0);
+            RPY<> ang((((double)rand()/RAND_MAX)*2-1)*R_RANGE, 0, 0);
+
+
+
+            vLegoFrames[ID]->setTransform(Transform3D<>(vec, ang.toRotation3D()), *_state);
+        }
+    }
 }
 
 

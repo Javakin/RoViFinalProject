@@ -30,6 +30,7 @@
 #include <rws/RobWorkStudio.hpp>
 
 #include <vector>
+#include <stdlib.h>     /* srand, rand */
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
@@ -50,7 +51,8 @@ using namespace rws;
 // -----------------------   defines ----------------------------
 #define NUM_OF_LEGOBRICKS   10
 #define X_RANGE             0.58
-#define Y_RANGE             0.15
+#define Y_RANGE             0.1         // max is 0.15
+#define R_RANGE             3.14
 
 
 
