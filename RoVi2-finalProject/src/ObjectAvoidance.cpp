@@ -22,7 +22,7 @@ ObjectAvoidance::ObjectAvoidance():
     // setting up the timer
     _timer = new QTimer(this);
     connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-    _timer->start(1000);
+
 
 
     //add them to the layout here
@@ -43,7 +43,7 @@ ObjectAvoidance::ObjectAvoidance():
 }
 
 ObjectAvoidance::~ObjectAvoidance(){
-
+    delete LegoHandle;
 }
 
 void ObjectAvoidance::initialize(){
@@ -57,6 +57,7 @@ void ObjectAvoidance::initialize(){
 void ObjectAvoidance::open(rw::models::WorkCell* workcell) {
     _workcell = workcell;
     _state = _workcell->getDefaultState();
+
 }
 
 void ObjectAvoidance::close(){
@@ -217,6 +218,11 @@ void ObjectAvoidance::init() {
             }
         }
 
+        // Setting up legoHandler object
+        cout << "Setting up LegoHandler\n";
+        LegoHandle = new Lego(&_state, _workcell);
+        getRobWorkStudio()->setState(_state);
+
     }
 
 
@@ -232,11 +238,11 @@ void ObjectAvoidance::run(){
 
     // Stop the timer
     if(_timer->isActive()){
-        cout << "stopping the timer\n" << _timer->isActive();
+        cout << "stopping the timer\n";
         _timer->stop();
 
     }else{
-        cout << "stopping the timer\n" << _timer->isActive();
+        cout << "stopping the timer\n";
         _timer->start(DELTA_T_SIM);
 
     }

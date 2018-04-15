@@ -61,6 +61,7 @@ class Lego {
 
 public:
     Lego();
+    Lego(State* _state, WorkCell::Ptr _workcell);
     void move(int iLegoID, double dx);
     void move(double dx);
 
@@ -75,7 +76,7 @@ private:
     vector<MovableFrame*> vLegoFrames;
 
     rw::kinematics::State* _state;
-    rw::models::WorkCell::Ptr _wc;
+    rw::models::WorkCell::Ptr _workcell;
 };
 
 
