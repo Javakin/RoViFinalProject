@@ -60,7 +60,7 @@ void Lego::move(int iLegoID, double dx){
 }
 
 void Lego::move(double dx) {
-    Frame *ConvayerPlaneFrame = _workcell->findFrame("ConveyourPlane");
+    Frame *F_Conv = _workcell->findFrame("ConveyourPlane");
 
 
     // Move all active the legobricks one step of dx
@@ -68,10 +68,17 @@ void Lego::move(double dx) {
         if(isTracked[ID]) {
             // Move one step of dx
             Frame *LegoFrame = vLegoFrames[ID];
+            Transform3D<> T_Conv_Lego = F_Conv->fTf(LegoFrame, *_state);
+            cout << "T_conv_lego\n" << T_Conv_Lego << endl;
 
-            Transform3D<> motion = ConvayerPlaneFrame->fTf(LegoFrame, *_state) * Transform3D<>(Vector3D<> (dx, 0, 0), RPY<>(0, 0, 0).toRotation3D());
 
-            Transform3D<> CurrentPose = vLegoFrames[ID]->getTransform(*_state)*motion;
+
+            Transform3D<> Tdx_Conv = Transform3D<>(Vector3D<> (dx, 0, 0), RPY<>(0, 0, 0).toRotation3D());
+            cout << "converteret til pos i legoframen\n" <<  T_Conv_Lego*Tdx_Conv << endl;
+
+
+
+            Transform3D<> CurrentPose = Tdx_Conv*T_Conv_Lego;
 
 
             // Enable wraparound
