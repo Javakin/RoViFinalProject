@@ -21,15 +21,15 @@
 
 
  <Frame name="Conveyour" refframe="Table">
-     <RPY> -45 0 90 </RPY> <Pos> 0 0 0.833 </Pos>
+     <RPY> -70 0 90 </RPY> <Pos> 0.15 0 0.833 </Pos>
      <Drawable name="Conveyour" refframe="Conveyour">
          <Polytope file="Geometry/Conveyor01.ac" />
      </Drawable>
 </Frame>
 
 
- <Frame name="ConveyourPlane" refframe="WORLD">
-     <RPY> -45 0 0 </RPY> <Pos> 0 0 0.891 </Pos>
+ <Frame name="ConveyourPlane" refframe="Conveyour">
+     <RPY> 0 0 -90 </RPY> <Pos> 0 0.058 0 </Pos>
 </Frame>
 
 
