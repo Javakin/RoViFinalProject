@@ -42,6 +42,8 @@
 //Constructed files
 #include "ip.h"
 #include "Lego.hpp"
+#include "Planning.hpp"
+
 
 
 using namespace std;
@@ -85,6 +87,7 @@ private:
     rwlibs::simulation::GLFrameGrabber* _framegrabberLeft;
     rwlibs::simulation::GLFrameGrabber* _framegrabberRigth;
     Lego* LegoHandle;
+    Planning* PlannerHandle;
 
 
 

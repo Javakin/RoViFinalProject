@@ -55,6 +55,7 @@ public:
     Planning();
     ~Planning();
 private:
+
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _workcell;
 
