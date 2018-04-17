@@ -49,7 +49,13 @@ using namespace rws;
 
 
 class Robot {
-
+public:
+    Robot();
+    Robot(State* _state, WorkCell::Ptr _workcell);
+    ~Robot();
+private:
+    rw::kinematics::State* _state;
+    rw::models::WorkCell::Ptr _workcell;
 };
 
 

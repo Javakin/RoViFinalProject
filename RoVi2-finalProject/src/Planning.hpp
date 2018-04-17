@@ -53,8 +53,12 @@ class Planning {
 public:
 
     Planning();
+    Planning(State* _state, WorkCell::Ptr _workcell);
     ~Planning();
+
+
 private:
+
 
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _workcell;

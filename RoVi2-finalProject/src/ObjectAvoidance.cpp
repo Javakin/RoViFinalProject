@@ -228,6 +228,11 @@ void ObjectAvoidance::init() {
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
 
+        // Setting up the path planner
+        PlannerHandle  = new Planning(&_state, _workcell);
+
+        // Setting up the robotHandler
+        RobotHandle = new Robot(&_state, _workcell);
     }
 
 
@@ -238,7 +243,6 @@ void ObjectAvoidance::init() {
 }
 
 void ObjectAvoidance::run(){
-    cout << "this is a test or is it" << endl;
     // start the timer
 
     // Stop the timer

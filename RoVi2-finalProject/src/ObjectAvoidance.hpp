@@ -89,6 +89,7 @@ private:
     rwlibs::simulation::GLFrameGrabber* _framegrabberRigth;
     Lego* LegoHandle;
     Planning* PlannerHandle;
+    Robot* RobotHandle;
 
 
 
