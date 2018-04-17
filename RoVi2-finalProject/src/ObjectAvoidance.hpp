@@ -43,6 +43,7 @@
 #include "ip.h"
 #include "Lego.hpp"
 #include "Planning.hpp"
+#include "Robot.hpp"
 
 
 
