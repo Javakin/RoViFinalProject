@@ -158,7 +158,7 @@ QWidget* ObjectAvoidance::createModeButtons(){
 
 
     connect(btns[0], SIGNAL(pressed()), this, SLOT(simpleMazeRunner()));
-
+    connect(btns[1], SIGNAL(pressed()), this, SLOT(printConfig()));
 
     markerButtons->setLayout(layout);
     widg->setWidget(markerButtons);
@@ -281,6 +281,10 @@ void ObjectAvoidance::update(){
 void ObjectAvoidance::simpleMazeRunner() {
     // Initialize stuff for the run mode
 
+}
 
+void ObjectAvoidance::printConfig() {
+    Device::Ptr device = _workcell->findDevice("UR1");
+    std::cout << "Robot Config: " << device->getQ(_state) << std::endl;
 
 }

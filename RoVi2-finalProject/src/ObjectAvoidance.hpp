@@ -99,6 +99,7 @@ private slots:
     void init();
     void run();
     void simpleMazeRunner();
+    void printConfig();
     void update();
 };
 
