@@ -29,6 +29,10 @@
 #include <rws/RobWorkStudio.hpp>
 
 
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+#include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
+
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
 using namespace rw::graphics;
@@ -60,7 +64,9 @@ public:
 
 private:
 
-    VelocityScrew6D<> Compute_Task_Error(Q qSample);
+    VelocityScrew6D<> computeTaskError(Q qSample);
+    bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
+    Q randomDisplacement(Q dMax);
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;
@@ -69,6 +75,7 @@ private:
 
     VelocityScrew6D<> C;
     rw::trajectory::QPath path;
+    rw::proximity::CollisionDetector::Ptr detector;
 
 };
 

@@ -17,6 +17,12 @@ Planning::Planning(WorkCell::Ptr _workcell) {
     device = this->_workcell->findDevice("UR1");
     gripper = this->_workcell->findDevice("WSG50");
 
+    // initialize random function
+    srand (time(NULL));
+
+    // set up collision detector
+    detector = new rw::proximity::CollisionDetector(_workcell, rwlibs::proximitystrategies::ProximityStrategyFactory::makeDefaultCollisionStrategy());
+
 }
 
 Planning::~Planning() {
@@ -24,7 +30,7 @@ Planning::~Planning() {
 
 }
 
-VelocityScrew6D<> Planning::Compute_Task_Error(Q qSample) {
+VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
 
     Frame* TaskFrame = _workcell->findFrame("TaskFrame");
 
@@ -51,8 +57,8 @@ VelocityScrew6D<> Planning::Compute_Task_Error(Q qSample) {
         dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
     }
 
-    cout << "deltaX: " << dx << endl;
-    cout << "dx_error: " << dx_error << endl;
+    //cout << "deltaX: " << dx << endl;
+    //cout << "dx_error: " << dx_error << endl;
 
     return dx_error;
 }
@@ -60,8 +66,70 @@ VelocityScrew6D<> Planning::Compute_Task_Error(Q qSample) {
 rw::trajectory::QPath Planning::getConstraintPath(State _state, Q QGoal, Q qRobot) {
     this->_state = _state;
 
-    Compute_Task_Error(qRobot);
+    Q dMax = Q(6,0.03,0.03,0.03,0.03,0.03,0.03);
+    RGDNewConfig(QGoal, dMax, 50,50,0.001);
 
 
     return rw::trajectory::QPath();
+}
+
+Q Planning::randomDisplacement(Q dMax) {
+
+    Q qOut(6,0,0,0,0,0,0);
+    for(unsigned int i = 0; i<dMax[0]; i++){
+        qOut[i+1] = ((double)rand()/RAND_MAX)*2-1*dMax[i+1];
+    }
+
+    return qOut;
+}
+
+bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
+    // setting up variables
+    cout << "starting\n";
+    int i = 0; int j = 0;
+    VelocityScrew6D<> dx_error = computeTaskError(qs);
+    VelocityScrew6D<> dx_error_prime;
+    Q qs_prime;
+
+
+    // Constraint the configuration
+    while (i < MaxI && j < MaxJ &&  dx_error.norm2() > eps){
+        j++;
+
+        qs_prime = qs + randomDisplacement(dMax);
+        dx_error_prime = computeTaskError(qs_prime);
+
+        //cout << j << ": " << dx_error << endl;
+
+        if(dx_error_prime.norm2() < dx_error.norm2()){
+            // a better guess was found
+
+            i++;
+            qs = qs_prime;
+            dx_error = dx_error_prime;
+            cout << i  << "," << j << ": " << dx_error.norm2() << endl;
+            j = 0;
+        }
+
+    }
+    cout << j << endl;
+
+    cout << "ending\n";
+
+
+    // check that the solution is good
+
+
+    if(dx_error.norm2() <= eps){
+        rw::proximity::CollisionDetector::QueryResult data;
+        device->setQ(qs, _state);
+        bool collision = detector->inCollision(_state, &data);
+        if(collision)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    return false;
 }
