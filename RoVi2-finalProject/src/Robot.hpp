@@ -51,6 +51,7 @@ using namespace rws;
 class Robot {
 public:
     Robot();
+    void setQ(Q qRobot);
     Robot(State* _state, WorkCell::Ptr _workcell);
     ~Robot();
 private:

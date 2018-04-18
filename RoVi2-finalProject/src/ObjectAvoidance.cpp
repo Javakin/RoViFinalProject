@@ -236,6 +236,10 @@ void ObjectAvoidance::init() {
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
+        RobotHandle->setQ( Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513));
+
+
+        getRobWorkStudio()->setState(_state);
     }
 
 

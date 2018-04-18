@@ -19,3 +19,10 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
 Robot::~Robot() {
 
 }
+
+void Robot::setQ(Q qRobot) {
+    Device::Ptr device;
+    device = _workcell->findDevice("UR1");
+    device->setQ(qRobot, *_state);
+
+}
