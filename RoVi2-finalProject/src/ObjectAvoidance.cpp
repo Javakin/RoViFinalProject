@@ -232,7 +232,7 @@ void ObjectAvoidance::init() {
         getRobWorkStudio()->setState(_state);
 
         // Setting up the path planner
-        PlannerHandle  = new Planning(&_state, _workcell);
+        PlannerHandle  = new Planning(_workcell);
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
@@ -280,6 +280,16 @@ void ObjectAvoidance::update(){
 
 void ObjectAvoidance::simpleMazeRunner() {
     // Initialize stuff for the run mode
+    // the desired q valuse
+    Q q1 =  Q(6,0.586,5.207, -2.218, -1.422, -4.715, 1.808);
+    //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
+
+    RobotHandle->setQ( q1);
+
+
+    getRobWorkStudio()->setState(_state);
+    PlannerHandle->getConstraintPath(_state, q1, q1);
+
 
 }
 

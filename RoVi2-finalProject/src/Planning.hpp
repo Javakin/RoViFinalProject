@@ -53,15 +53,22 @@ class Planning {
 public:
 
     Planning();
-    Planning(State* _state, WorkCell::Ptr _workcell);
+    Planning(WorkCell::Ptr _workcell);
+    rw::trajectory::QPath getConstraintPath(State _state, Q QGoal, Q qRobot);
     ~Planning();
 
 
 private:
 
+    VelocityScrew6D<> Compute_Task_Error(Q qSample);
 
-    rw::kinematics::State* _state;
+    rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;
+    Device::Ptr device;
+    Device::Ptr gripper;
+
+    VelocityScrew6D<> C;
+    rw::trajectory::QPath path;
 
 };
 
