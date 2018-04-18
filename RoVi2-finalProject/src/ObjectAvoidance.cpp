@@ -157,6 +157,9 @@ QWidget* ObjectAvoidance::createModeButtons(){
     layout->addWidget(btns[2],0,2);
 
 
+    connect(btns[0], SIGNAL(pressed()), this, SLOT(simpleMazeRunner()));
+
+
     markerButtons->setLayout(layout);
     widg->setWidget(markerButtons);
     widg->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
@@ -268,5 +271,12 @@ void ObjectAvoidance::update(){
     // the desired q valuse
     //Q q1 =  Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513);
     //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
+
+}
+
+void ObjectAvoidance::simpleMazeRunner() {
+    // Initialize stuff for the run mode
+
+
 
 }

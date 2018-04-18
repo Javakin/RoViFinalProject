@@ -98,6 +98,7 @@ private slots:
     void capture();
     void init();
     void run();
+    void simpleMazeRunner();
     void update();
 };
 
