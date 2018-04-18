@@ -283,13 +283,13 @@ void ObjectAvoidance::simpleMazeRunner() {
     // the desired q valuse
     Q q1 =  Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533);
 
-    //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
+    Q q2 =  Q(6,0.540684, 5.16658, -2.06083, -1.59957, -4.65449, 1.53858);
 
     RobotHandle->setQ( q1);
 
 
     getRobWorkStudio()->setState(_state);
-    PlannerHandle->getConstraintPath(_state, q1, q1);
+    PlannerHandle->getConstraintPath(_state, q2, q2);
 
 
 }

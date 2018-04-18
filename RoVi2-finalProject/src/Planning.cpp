@@ -31,20 +31,12 @@ VelocityScrew6D<> Planning::Compute_Task_Error(Q qSample) {
 
     Transform3D<> wTt = TaskFrame->wTf(_state);
     Transform3D<> tTw = inverse(wTt);
-    cout << "tTw" << tTw << endl;
-
 
 
     device->setQ(qSample, _state);
-    //device->baseTend(_state);
-    device->worldTbase(_state);
     Frame* EndEffector = _workcell->findFrame("EndEff");
-    cout << EndEffector->getName() << endl;
     Transform3D<> wTe = EndEffector->wTf(_state);
     Transform3D<> eTt = tTw*wTe;
-
-    cout << "wTe" << wTe << endl;
-    cout << "eTt" << eTt << endl;
 
 
 
