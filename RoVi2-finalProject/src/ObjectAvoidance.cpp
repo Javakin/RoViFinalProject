@@ -281,7 +281,8 @@ void ObjectAvoidance::update(){
 void ObjectAvoidance::simpleMazeRunner() {
     // Initialize stuff for the run mode
     // the desired q valuse
-    Q q1 =  Q(6,0.586,5.207, -2.218, -1.422, -4.715, 1.808);
+    Q q1 =  Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533);
+
     //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
 
     RobotHandle->setQ( q1);

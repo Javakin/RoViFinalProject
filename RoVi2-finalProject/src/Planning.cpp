@@ -14,8 +14,8 @@ Planning::Planning(WorkCell::Ptr _workcell) {
     this->_workcell = _workcell;
     C =  VelocityScrew6D<>(0,0,1,1,1,0);
 
-    device = _workcell->findDevice("UR1");
-    gripper = _workcell->findDevice("WSG50");
+    device = this->_workcell->findDevice("UR1");
+    gripper = this->_workcell->findDevice("WSG50");
 
 }
 
@@ -29,24 +29,37 @@ VelocityScrew6D<> Planning::Compute_Task_Error(Q qSample) {
     Frame* TaskFrame = _workcell->findFrame("TaskFrame");
 
 
-    Transform3D<> wTt = inverse(TaskFrame->wTf(_state));
+    Transform3D<> wTt = TaskFrame->wTf(_state);
+    Transform3D<> tTw = inverse(wTt);
+    cout << "tTw" << tTw << endl;
+
 
 
     device->setQ(qSample, _state);
-    Frame* EndEffector = _workcell->findFrame("EndEffektor");
-    Transform3D<> eTw = EndEffector->wTf(_state);
-    Transform3D<> eTt = wTt*eTw;
+    //device->baseTend(_state);
+    device->worldTbase(_state);
+    Frame* EndEffector = _workcell->findFrame("EndEff");
+    cout << EndEffector->getName() << endl;
+    Transform3D<> wTe = EndEffector->wTf(_state);
+    Transform3D<> eTt = tTw*wTe;
 
-    cout << "deltaX: " << eTt << endl;
+    cout << "wTe" << wTe << endl;
+    cout << "eTt" << eTt << endl;
 
-    //caclulate the dx_error
 
+
+    //calculate the dx_error
     VelocityScrew6D<> dx_error =  VelocityScrew6D<>(0,0,0,0,0,0);
+    VelocityScrew6D<> dx =  VelocityScrew6D<>(0,0,0,0,0,0);
     for (unsigned int i = 0; i<3; i++){
+        dx[i] = eTt.P()[i];
+        dx[3+i] = (RPY<>(eTt.R()))[i];
+
         dx_error[i] = C[i]*eTt.P()[i];
         dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
     }
 
+    cout << "deltaX: " << dx << endl;
     cout << "dx_error: " << dx_error << endl;
 
     return dx_error;
