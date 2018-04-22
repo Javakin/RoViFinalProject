@@ -272,6 +272,8 @@ void ObjectAvoidance::update(){
     LegoHandle->move(0.0015);
     getRobWorkStudio()->setState(_state);
 
+   
+
     // the desired q valuse
     //Q q1 =  Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513);
     //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
