@@ -66,8 +66,8 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
 rw::trajectory::QPath Planning::getConstraintPath(State _state, Q QGoal, Q qRobot) {
     this->_state = _state;
 
-    Q dMax = Q(6,0.001,0.001,0.001,0.001,0.001,0.001);
-    RGDNewConfig(QGoal, dMax, 500,500,0.001);
+    Q dMax = Q(6,0.01,0.01,0.01,0.01,0.01,0.01);
+    RGDNewConfig(QGoal, dMax, 5000,500,0.001);
 
 
     return rw::trajectory::QPath();
@@ -115,6 +115,7 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     cout << i  << "," << j << ": " << dx_error.norm2() << endl;
 
     cout << "ending\n";
+    cout << qs << endl;
 
 
     // check that the solution is good
