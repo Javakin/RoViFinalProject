@@ -12,7 +12,7 @@ Planning::Planning() {
 
 Planning::Planning(WorkCell::Ptr _workcell) {
     this->_workcell = _workcell;
-    C =  VelocityScrew6D<>(0,0,1,1,1,0);
+    C =  VelocityScrew6D<>(0,0,1,0,1,1);
 
     device = this->_workcell->findDevice("UR1");
     gripper = this->_workcell->findDevice("WSG50");
