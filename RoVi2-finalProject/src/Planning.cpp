@@ -71,10 +71,10 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     //Q dMax1 = Q(6,MAX_JOINT_ROTATION);
     //cout << randomDisplacement(dMax1) << endl;
 
-    Q dMax = Q(6,0.01,0.01,0.01,0.01,0.01,0.01);
-    //RGDNewConfig(QGoal, dMax, 5000,500,0.001);
+    Q dMax = Q(6,Q0_WEIGHT,Q1_WEIGHT,Q2_WEIGHT,Q3_WEIGHT,Q4_WEIGHT,Q5_WEIGHT);
+    RGDNewConfig(qGoal, dMax*0.1, 5000,500,0.001);
 
-
+/*
     // compute a path for testing if the robot
     path.clear();
 
@@ -90,7 +90,10 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         path.push_back(currentPos);
         //cout << (currentPos-qGoal).norm2() << endl;
     }
+
     path.push_back(qGoal);
+*/
+
 
     return path;
 }

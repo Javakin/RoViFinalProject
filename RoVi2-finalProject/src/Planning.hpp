@@ -54,6 +54,14 @@ using namespace rws;
 #define MAX_JOINT_ROTATION  6.2
 #define GOAL_EBS            0.005
 
+#define Q0_WEIGHT           0.0086
+#define Q1_WEIGHT           0.0086
+#define Q2_WEIGHT           0.0162
+#define Q3_WEIGHT           0.0832
+#define Q4_WEIGHT           0.0955
+#define Q5_WEIGHT           0.7879
+
+
 
 class Planning {
 public:
@@ -69,6 +77,7 @@ private:
     VelocityScrew6D<> computeTaskError(Q qSample);
     bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
     Q randomDisplacement(Q dMax);
+    rw::trajectory::QPath pathOptimization(rw::trajectory::QPath aPath);
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;
