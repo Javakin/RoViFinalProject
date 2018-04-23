@@ -272,7 +272,7 @@ void ObjectAvoidance::update(){
     LegoHandle->move(0.0015);
     getRobWorkStudio()->setState(_state);
 
-   
+
 
     // the desired q valuse
     //Q q1 =  Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513);
@@ -288,11 +288,15 @@ void ObjectAvoidance::simpleMazeRunner() {
     Q q2 =  Q(6,0.540684, 5.16658, -2.06083, -1.59957, -4.65449, 1.53858);
 
     Q off = Q(6,3.35713, -1.19249, -5.01995, 4.83301, 4.29128, 4.69564);
-    RobotHandle->setQ( off);
 
 
     getRobWorkStudio()->setState(_state);
-    PlannerHandle->getConstraintPath(_state, off, q2);
+    rw::trajectory::QPath aPath;
+
+    aPath= PlannerHandle->getConstraintPath(_state, q1, q2);
+    RobotHandle->setPath(aPath);
+
+
 
 
 }

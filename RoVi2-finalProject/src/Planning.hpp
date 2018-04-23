@@ -52,7 +52,7 @@ using namespace rws;
 
 // -----------------------   defines ----------------------------
 #define MAX_JOINT_ROTATION  6.2
-#define GOAL_EBS            0.01
+#define GOAL_EBS            0.05
 
 
 class Planning {

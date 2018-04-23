@@ -54,9 +54,17 @@ public:
     void setQ(Q qRobot);
     Robot(State* _state, WorkCell::Ptr _workcell);
     ~Robot();
+
+    int nextState();
+    void setPath(rw::trajectory::QPath aPath);
+    Q getQRobot();
+    Q getQRobot(double dTime);
+    Q parabolicBlend(Q q1, Q q2, double V1, double V2, double T_blendingTime, double t);
+
 private:
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _workcell;
+    rw::trajectory::QPath path;
 };
 
 

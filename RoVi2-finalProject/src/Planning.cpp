@@ -82,7 +82,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
     Q currentPos = qRobot;
     Q qDir = (qGoal-qRobot)/(qGoal-qRobot).norm2();
-    while((currentPos-qGoal).norm2() < GOAL_EBS){
+    while((currentPos-qGoal).norm2() < GOAL_EBS*2){
         Q qDir = (qGoal-currentPos)/(qGoal-currentPos).norm2();
         currentPos +=qDir*GOAL_EBS;
         path.push_back(currentPos);

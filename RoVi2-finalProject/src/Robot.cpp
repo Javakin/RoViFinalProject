@@ -26,3 +26,7 @@ void Robot::setQ(Q qRobot) {
     device->setQ(qRobot, *_state);
 
 }
+
+void Robot::setPath(rw::trajectory::QPath aPath) {
+    path = aPath;
+}
