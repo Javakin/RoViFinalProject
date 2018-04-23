@@ -72,9 +72,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # MOC
 IF(RWS_USE_QT5)
-	QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Planning.hpp src/Robot.hpp)
+	QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Planning.hpp src/Robot.hpp src/QTrees.hpp)
 ELSE()
-	QT4_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Planning.hpp src/Robot.hpp)
+	QT4_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Planning.hpp src/Robot.hpp src/QTrees.hpp)
 ENDIF()
 
 # Rcc the files:
@@ -85,7 +85,7 @@ ELSE()
 ENDIF()
 
 # Add the source files to build
-SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H} src/Lego.cpp src/Lego.hpp src/Planning.cpp src/Planning.hpp src/Robot.cpp src/Robot.hpp)
+SET(SrcFiles src/ObjectAvoidance.cpp src/ip.cpp ${UIS_OUT_H} src/Lego.cpp src/Lego.hpp src/Planning.cpp src/Planning.hpp src/Robot.cpp src/Robot.hpp src/QTrees.cpp src/QTrees.hpp)
 
 # The shared library to build:
 ADD_LIBRARY(ObjectAvoidance MODULE ${SrcFiles} ${MocSrcFiles}  ${RccSrcFiles})

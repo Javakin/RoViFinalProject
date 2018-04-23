@@ -77,6 +77,9 @@ private:
     rw::trajectory::QPath path;
     rw::proximity::CollisionDetector::Ptr detector;
 
+
+
+
 };
 
 
