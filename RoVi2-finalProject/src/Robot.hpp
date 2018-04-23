@@ -60,11 +60,15 @@ public:
     Q getQRobot();
     Q getQRobot(double dTime);
     Q parabolicBlend(Q q1, Q q2, double V1, double V2, double T_blendingTime, double t);
+    double estimateTravilTime(Q q1, Q q2);
 
 private:
     rw::kinematics::State* _state;
+    Device::Ptr device;
     rw::models::WorkCell::Ptr _workcell;
     rw::trajectory::QPath path;
+
+    unsigned int uiPathIterator;
 };
 
 

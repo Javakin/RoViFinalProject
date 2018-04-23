@@ -69,12 +69,12 @@ void Lego::move(double dx) {
             // Move one step of dx
             Frame *LegoFrame = vLegoFrames[ID];
             Transform3D<> T_Conv_Lego = F_Conv->fTf(LegoFrame, *_state);
-            cout << "T_conv_lego\n" << T_Conv_Lego << endl;
+            //cout << "T_conv_lego\n" << T_Conv_Lego << endl;
 
 
 
             Transform3D<> Tdx_Conv = Transform3D<>(Vector3D<> (dx, 0, 0), RPY<>(0, 0, 0).toRotation3D());
-            cout << "converteret til pos i legoframen\n" <<  T_Conv_Lego*Tdx_Conv << endl;
+            //cout << "converteret til pos i legoframen\n" <<  T_Conv_Lego*Tdx_Conv << endl;
 
 
 

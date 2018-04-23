@@ -258,7 +258,7 @@ void ObjectAvoidance::run(){
         _timer->stop();
 
     }else{
-        cout << "stopping the timer\n";
+        cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
 
     }
@@ -270,13 +270,12 @@ void ObjectAvoidance::run(){
 
 void ObjectAvoidance::update(){
     LegoHandle->move(0.0015);
+
+    RobotHandle->nextState();
+
+
+
     getRobWorkStudio()->setState(_state);
-
-
-
-    // the desired q valuse
-    //Q q1 =  Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513);
-    //Q q2 =  Q(6,3.059,-2.037,-4.063, 4.529, 4.712,4.281);
 
 }
 
@@ -285,18 +284,22 @@ void ObjectAvoidance::simpleMazeRunner() {
     // the desired q valuse
     Q q1 =  Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533);
 
-    Q q2 =  Q(6,0.540684, 5.16658, -2.06083, -1.59957, -4.65449, 1.53858);
+    //Q q2 =  Q(6,0.540684, 5.16658, -2.06083, -1.59957, -4.65449, 1.53858);
+    Q q2 = Q(6,0.450686, 4.26424, -1.29639, -1.39805, -4.71229, 1.67142);
 
     Q off = Q(6,3.35713, -1.19249, -5.01995, 4.83301, 4.29128, 4.69564);
 
-
+    cout << "make the path" << endl;
     getRobWorkStudio()->setState(_state);
     rw::trajectory::QPath aPath;
 
-    aPath= PlannerHandle->getConstraintPath(_state, q1, q2);
+    aPath = PlannerHandle->getConstraintPath(_state, q2, q1);
     RobotHandle->setPath(aPath);
 
+    for(unsigned int i = 0; i < aPath.size(); i++){
 
+        cout << i << ": " << aPath[i] << endl;
+    }
 
 
 }
