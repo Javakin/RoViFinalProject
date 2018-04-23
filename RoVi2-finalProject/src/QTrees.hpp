@@ -22,24 +22,27 @@ using namespace std;
 
 
 // --------------------  defines ----------------------------
-
+#define MAX_DISTANCE    1000
 
 
 
 class QTrees {
 public:
     QTrees();
+    QTrees(Q qInit);
     ~QTrees();
 
-    bool addVertex(Q vertex);
-    bool addEdge(unsigned int p1, unsigned int p2);
+    unsigned int addVertex(Q vertex);
+    void addEdge(unsigned int p1, unsigned int p2);
+    int nearestVertex(Q qNew);
+    Q getVertex(unsigned int uiVertex);
 
     void clear();
 
 private:
     //The tree
     vector<Q> qVertex;
-    vector<pair<unsigned int,unsigned int>> qTree;
+    vector<pair<unsigned int,unsigned int> > qTree;
 };
 
 

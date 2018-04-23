@@ -63,14 +63,32 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
     return dx_error;
 }
 
-rw::trajectory::QPath Planning::getConstraintPath(State _state, Q QGoal, Q qRobot) {
+rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot) {
     this->_state = _state;
 
+
+
+    Q dMax1 = Q(6,MAX_JOINT_ROTATION);
+    cout << randomDisplacement(dMax1) << endl;
+
     Q dMax = Q(6,0.01,0.01,0.01,0.01,0.01,0.01);
-    RGDNewConfig(QGoal, dMax, 5000,500,0.001);
+    //RGDNewConfig(QGoal, dMax, 5000,500,0.001);
 
 
-    return rw::trajectory::QPath();
+    // compute a path for testing if the robot
+    path = rw::trajectory::QPath();
+
+    path.push_back(qRobot);
+
+    Q currentPos = qRobot;
+    Q qDir = (qGoal-qRobot)/(qGoal-qRobot).norm2();
+    while((currentPos-qGoal).norm2() < GOAL_EBS){
+        Q qDir = (qGoal-currentPos)/(qGoal-currentPos).norm2();
+        currentPos +=qDir*GOAL_EBS;
+        path.push_back(currentPos);
+    }
+
+    return path;
 }
 
 Q Planning::randomDisplacement(Q dMax) {

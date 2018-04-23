@@ -32,6 +32,7 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
+#include "QTrees.hpp"
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
@@ -50,7 +51,8 @@ using namespace rws;
 
 
 // -----------------------   defines ----------------------------
-
+#define MAX_JOINT_ROTATION  6.2
+#define GOAL_EBS            0.01
 
 
 class Planning {
@@ -58,7 +60,7 @@ public:
 
     Planning();
     Planning(WorkCell::Ptr _workcell);
-    rw::trajectory::QPath getConstraintPath(State _state, Q QGoal, Q qRobot);
+    rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot);
     ~Planning();
 
 
