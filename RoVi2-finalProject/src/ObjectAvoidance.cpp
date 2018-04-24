@@ -269,13 +269,48 @@ void ObjectAvoidance::run(){
 
 
 void ObjectAvoidance::update(){
-    LegoHandle->move(0.0015);
 
+    LegoHandle->move(0.003);
     RobotHandle->nextState();
-
-
-
     getRobWorkStudio()->setState(_state);
+
+    // Construct a video sequence
+    /*
+    if (_framegrabberLeft != NULL) {
+        // Get the image as a RW image
+        rw::kinematics::Frame* cameraFrame = _workcell->findFrame("CameraSimLeft");
+        _framegrabberLeft->grab(cameraFrame, _state);
+        const rw::sensor::Image& image = _framegrabberLeft->getImage();
+
+        // Convert to OpenCV image
+        cv::Mat im = ip::toOpenCVImage(image);
+        cv::Mat imflip;
+        cv::flip(im, imflip, 0);
+        imflip.copyTo(im);
+        cvtColor(im, im, CV_RGB2BGR);
+        cv::imwrite("Desktop/images/ImageLeft" + to_string(iVideoIterator) + ".png",im);
+
+
+    }
+
+    if (_framegrabberRigth != NULL) {
+        // Get the image as a RW image
+        rw::kinematics::Frame* cameraFrame = _workcell->findFrame("CameraSimRigth");
+        _framegrabberRigth->grab(cameraFrame, _state);
+        const rw::sensor::Image& image = _framegrabberRigth->getImage();
+
+        // Convert to OpenCV image
+        cv::Mat im = ip::toOpenCVImage(image);
+        cv::Mat imflip;
+        cv::flip(im, imflip, 0);
+        imflip.copyTo(im);
+        cvtColor(im, im, CV_RGB2BGR);
+        cv::imwrite("Desktop/images/ImageRight" + to_string(iVideoIterator) + ".png",im);
+
+
+    }*/
+
+
 
 }
 

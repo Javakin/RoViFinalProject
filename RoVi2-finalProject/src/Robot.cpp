@@ -33,7 +33,6 @@ void Robot::setPath(rw::trajectory::QPath aPath) {
 int Robot::nextState() {
     int statusSignal = 0;
 
-    cout << "move robot\n";
     //precondition
     if (path.size() == 0)
         return -1;
@@ -41,7 +40,6 @@ int Robot::nextState() {
     // return 0 if path is fully executed else return 1
     if(uiPathIterator < path.size() - 1){
         statusSignal = 1;
-        cout << "moved robot\n";
         uiPathIterator++;
         setQ(path[uiPathIterator]);
     }
