@@ -36,6 +36,7 @@ public:
     void addEdge(unsigned int p1, unsigned int p2);
     int nearestVertex(Q qNew);
     Q getVertex(unsigned int uiVertex);
+    Q getParent(unsigned int uiVertex);
 
     void clear();
 

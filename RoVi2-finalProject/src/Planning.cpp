@@ -12,7 +12,7 @@ Planning::Planning() {
 
 Planning::Planning(WorkCell::Ptr _workcell) {
     this->_workcell = _workcell;
-    C =  VelocityScrew6D<>(0,0,1,0,1,1);
+    C =  VelocityScrew6D<>(0,0,1,1,1,1);
 
     device = this->_workcell->findDevice("UR1");
     gripper = this->_workcell->findDevice("WSG50");
@@ -74,7 +74,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     Q dMax = Q(6,Q0_WEIGHT,Q1_WEIGHT,Q2_WEIGHT,Q3_WEIGHT,Q4_WEIGHT,Q5_WEIGHT);
     RGDNewConfig(qGoal, dMax*0.1, 5000,500,0.001);
 
-/*
+
     // compute a path for testing if the robot
     path.clear();
 
@@ -92,7 +92,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     }
 
     path.push_back(qGoal);
-*/
+
 
 
     return path;

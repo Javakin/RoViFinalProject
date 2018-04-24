@@ -293,7 +293,7 @@ void ObjectAvoidance::simpleMazeRunner() {
     getRobWorkStudio()->setState(_state);
     rw::trajectory::QPath aPath;
 
-    aPath = PlannerHandle->getConstraintPath(_state, off, q1);
+    aPath = PlannerHandle->getConstraintPath(_state, q2, q1);
     RobotHandle->setPath(aPath);
 
     for(unsigned int i = 0; i < aPath.size(); i++){
