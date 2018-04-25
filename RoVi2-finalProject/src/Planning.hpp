@@ -21,6 +21,7 @@
 #include <rw/math/EAA.hpp>
 #include <rw/loaders/ImageLoader.hpp>
 #include <rw/loaders/WorkCellFactory.hpp>
+#include <rw/pathplanning.hpp>
 
 //RobWork studio includes
 #include <RobWorkStudioConfig.hpp> // For RWS_USE_QT5 definition
@@ -50,9 +51,12 @@ using namespace std;
 using namespace rws;
 
 
+
+
 // -----------------------   defines ----------------------------
 #define MAX_JOINT_ROTATION  6.2
 #define GOAL_EBS            0.005
+#define GOAL_SAMPLING_PROB  0.1
 
 #define Q0_WEIGHT           0.0086
 #define Q1_WEIGHT           0.0086
@@ -63,20 +67,25 @@ using namespace rws;
 
 
 
+
+
+
+
 class Planning {
 public:
 
     Planning();
     Planning(WorkCell::Ptr _workcell);
-    rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot);
+    rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
     ~Planning();
-
 
 private:
 
     VelocityScrew6D<> computeTaskError(Q qSample);
     bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
     Q randomDisplacement(Q dMax);
+    Q sampler(Q qGoal);
+
     rw::trajectory::QPath pathOptimization(rw::trajectory::QPath aPath);
 
     rw::kinematics::State _state;
@@ -87,7 +96,7 @@ private:
     VelocityScrew6D<> C;
     rw::trajectory::QPath path;
     rw::proximity::CollisionDetector::Ptr detector;
-
+    rw::pathplanning::QSampler::Ptr qSamples;
 
 
 

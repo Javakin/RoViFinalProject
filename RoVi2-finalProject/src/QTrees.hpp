@@ -10,40 +10,47 @@
 // --------------------  includes ----------------------------
 //RobWork includes
 #include <rw/math/Q.hpp>
-
+#include <rwlibs/pathplanners/rrt/RRTTree.hpp>
+#include <rw/common/PropertyType.hpp>
 
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
 using namespace rw::math;
-
 using namespace std;
-
+using namespace rwlibs::pathplanners;
 
 
 // --------------------  defines ----------------------------
 #define MAX_DISTANCE    1000
 
+namespace
+{
+    typedef RRTNode<rw::math::Q> Node;
+    typedef RRTTree<rw::math::Q> Tree;
+}
 
+
+//template <class X>
 
 class QTrees {
 public:
+    //typedef X value_type;
+    //typedef RRTNode<X> node_type;
+
     QTrees();
     QTrees(Q qInit);
     ~QTrees();
 
-    unsigned int addVertex(Q vertex);
-    void addEdge(unsigned int p1, unsigned int p2);
-    int nearestVertex(Q qNew);
-    Q getVertex(unsigned int uiVertex);
-    Q getParent(unsigned int uiVertex);
 
-    void clear();
+
+    void add(Q qNew, Node* nParent);
+    Node* nearestNeighbor(Q qRand);
+    //void getRootPath(node_type& lastNode, rw::trajectory::QPath& aPath);
+
 
 private:
-    //The tree
-    vector<Q> qVertex;
-    vector<pair<unsigned int,unsigned int> > qTree;
+    Tree* qTree;
 };
 
 

@@ -4,6 +4,10 @@
 
 #include "Planning.hpp"
 
+
+
+
+
 Planning::Planning() {
     _workcell = NULL;
     C =  VelocityScrew6D<>(0,0,1,1,1,0);
@@ -23,6 +27,8 @@ Planning::Planning(WorkCell::Ptr _workcell) {
     // set up collision detector
     detector = new rw::proximity::CollisionDetector(_workcell, rwlibs::proximitystrategies::ProximityStrategyFactory::makeDefaultCollisionStrategy());
 
+    // construct a QSampler
+    qSamples = rw::pathplanning::QSampler::makeUniform(device);
 }
 
 Planning::~Planning() {
@@ -63,35 +69,23 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
     return dx_error;
 }
 
-rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot) {
+rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot, double eps) {
     this->_state = _state;
 
+    QTrees T = QTrees(qGoal);
+    Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
 
-    //Q dMax1 = Q(6,MAX_JOINT_ROTATION);
-    //cout << randomDisplacement(dMax1) << endl;
-
-    Q dMax = Q(6,Q0_WEIGHT,Q1_WEIGHT,Q2_WEIGHT,Q3_WEIGHT,Q4_WEIGHT,Q5_WEIGHT);
-    RGDNewConfig(qGoal, dMax*0.1, 5000,500,0.001);
-
-
-    // compute a path for testing if the robot
-    path.clear();
-
-    path.push_back(qRobot);
-    //cout << path[0] << endl;
-
-    Q currentPos = qRobot;
-    //cout << (currentPos-qGoal).norm2() << endl;
-    while((currentPos-qGoal).norm2() > GOAL_EBS*2){
-        Q qDir = (qGoal-currentPos)/(qGoal-currentPos).norm2();
-        currentPos += qDir*GOAL_EBS;
-        RGDNewConfig(currentPos, dMax, 5000,500,0.001);
-        path.push_back(currentPos);
-        //cout << (currentPos-qGoal).norm2() << endl;
+    for(unsigned int N = 0; N< 100; N++){
+        Q qRand = sampler(qGoal);
+        Node* nearestNode= T.nearestNeighbor(qRand);
+        Q qNear = nearestNode->getValue();
+        Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
+        Q qS = qNear + qDir*eps;
+        if(RGDNewConfig(qS, dMax, 500,500,0.001)){
+            T.add(qS, nearestNode);
+        }
     }
-
-    path.push_back(qGoal);
 
 
 
@@ -158,4 +152,18 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
         return true;
     }
     return false;
+}
+
+Q Planning::sampler(Q qGoal) {
+    Q outPut = qGoal;
+
+    if (((double)rand()/RAND_MAX) < GOAL_SAMPLING_PROB){
+        return qSamples->sample();
+    }
+
+    return qGoal;
+}
+
+rw::trajectory::QPath Planning::pathOptimization(rw::trajectory::QPath aPath) {
+    return aPath;
 }
