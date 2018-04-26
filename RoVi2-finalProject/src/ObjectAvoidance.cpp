@@ -236,7 +236,7 @@ void ObjectAvoidance::init() {
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
-        RobotHandle->setQ( Q(6,3.291,-1.161,-4.915, 4.503, 4.712,4.513));
+        RobotHandle->setQ( Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533) );
 
 
         getRobWorkStudio()->setState(_state);
@@ -270,7 +270,7 @@ void ObjectAvoidance::run(){
 
 void ObjectAvoidance::update(){
 
-    LegoHandle->move(0.003);
+    //LegoHandle->move(0.003);
     RobotHandle->nextState();
     getRobWorkStudio()->setState(_state);
 
@@ -331,6 +331,8 @@ void ObjectAvoidance::simpleMazeRunner() {
     aPath = PlannerHandle->getConstraintPath(_state, q2, q1, 0.01);
     RobotHandle->setPath(aPath);
 
+
+    //print path
     for(unsigned int i = 0; i < aPath.size(); i++){
 
         cout << i << ": " << aPath[i] << endl;

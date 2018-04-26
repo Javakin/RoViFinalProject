@@ -28,6 +28,7 @@ void Robot::setQ(Q qRobot) {
 
 void Robot::setPath(rw::trajectory::QPath aPath) {
     path = aPath;
+    uiPathIterator = 0;
 }
 
 int Robot::nextState() {

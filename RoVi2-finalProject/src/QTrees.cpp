@@ -38,5 +38,19 @@ Node *QTrees::nearestNeighbor(Q qRand) {
     return minNode;
 }
 
+void QTrees::getRootPath(Node &lastNode, rw::trajectory::QPath &aPath) {
+    // get the full path
+    vector<Q> vPath;
+    qTree->getRootPath(lastNode, vPath);
+
+    // translate to QPath data type
+    aPath.clear();
+    for (unsigned int i = 0; i <vPath.size(); i++){
+        aPath.push_back(vPath[i]);
+    }
+
+
+}
+
 
 

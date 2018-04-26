@@ -12,7 +12,10 @@
 #include <rw/math/Q.hpp>
 #include <rwlibs/pathplanners/rrt/RRTTree.hpp>
 #include <rw/common/PropertyType.hpp>
+#include <rw/trajectory.hpp>
 
+//std libs
+#include <vector>
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
@@ -46,7 +49,7 @@ public:
 
     void add(Q qNew, Node* nParent);
     Node* nearestNeighbor(Q qRand);
-    //void getRootPath(node_type& lastNode, rw::trajectory::QPath& aPath);
+    void getRootPath(Node& lastNode, rw::trajectory::QPath& aPath);
 
 
 private:

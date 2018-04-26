@@ -63,9 +63,6 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
         dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
     }
 
-    //cout << "deltaX: " << dx << endl;
-    //cout << "dx_error: " << dx_error << endl;
-
     return dx_error;
 }
 
@@ -76,8 +73,8 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
 
-    for(unsigned int N = 0; N< 100; N++){
-        Q qRand = sampler(qGoal);
+    for(unsigned int N = 0; N< 10000; N++){
+        Q qRand = sampler(qRobot);
         Node* nearestNode= T.nearestNeighbor(qRand);
         Q qNear = nearestNode->getValue();
         Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
@@ -87,7 +84,11 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         }
     }
 
+    cout << "RRT done \n";
 
+    Node* nearestNode= T.nearestNeighbor(qRobot);
+
+    T.getRootPath(*nearestNode, path);
 
     return path;
 }
@@ -104,7 +105,7 @@ Q Planning::randomDisplacement(Q dMax) {
 
 bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // setting up variables
-    cout << "starting\n";
+    //cout << endl << "initial Q: " << qs << endl;
     int i = 0; int j = 0;
     VelocityScrew6D<> dx_error = computeTaskError(qs);
     VelocityScrew6D<> dx_error_prime;
@@ -126,26 +127,25 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
             i++;
             qs = qs_prime;
             dx_error = dx_error_prime;
-            cout << i  << "," << j << ": " << dx_error.norm2() << endl;
+            //cout << i  << "," << j << ": " << dx_error.norm2() << endl;
             j = 0;
         }
 
     }
-    cout << i  << "," << j << ": " << dx_error.norm2() << endl;
+    //cout << i  << "," << j << ": " << dx_error.norm2() << endl;
 
-    cout << "ending\n";
-    cout << qs << endl;
+    //cout << "ending\n";
+    //cout << "constrained Q: " << qs << endl;
 
 
     // check that the solution is good
-
-
     if(dx_error.norm2() <= eps){
         rw::proximity::CollisionDetector::QueryResult data;
         device->setQ(qs, _state);
         bool collision = detector->inCollision(_state, &data);
         if(collision)
         {
+            cout << "in collision" << endl;
             return false;
         }
 
@@ -157,11 +157,11 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 Q Planning::sampler(Q qGoal) {
     Q outPut = qGoal;
 
-    if (((double)rand()/RAND_MAX) < GOAL_SAMPLING_PROB){
-        return qSamples->sample();
+    if (((double)rand()/RAND_MAX) > GOAL_SAMPLING_PROB){
+        outPut = qSamples->sample();
     }
 
-    return qGoal;
+    return outPut;
 }
 
 rw::trajectory::QPath Planning::pathOptimization(rw::trajectory::QPath aPath) {
