@@ -22,7 +22,7 @@ void QTrees::add(Q qNew, Node *nParent) {
 
 Node *QTrees::nearestNeighbor(Q qRand) {
     Q conf;
-    Node* minNode;
+    Node* minNode = NULL;
     double dMinDist = 10000;
     double length;
     BOOST_FOREACH(Node* node, qTree->getNodes())

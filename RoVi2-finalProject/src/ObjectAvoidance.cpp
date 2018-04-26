@@ -3,10 +3,17 @@
 
 
 #define DELTA_T_SIM    50     // time in miliseconds
+#define WORKCELL_PATH "/home/anders/Desktop/workspace/RoVi2/RoViFinalProject/WorkStation_3/WC3_Scene.wc.xml"
 
 ObjectAvoidance::ObjectAvoidance():
         RobWorkStudioPlugin("ObjectAvoidance", QIcon(":/pa_icon.png"))
 {
+    // initialize ros to start without running roslaunch or rosrun
+    char** argv = NULL;
+    int argc = 0;
+    ros::init(argc, argv,"object_avoidance");
+
+    // setpu GUI
     QScrollArea *widg = new QScrollArea(this);
     widg->setWidgetResizable(true);
     QWidget *dockWidgetContent = new QWidget(this);
@@ -51,6 +58,11 @@ void ObjectAvoidance::initialize(){
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
     LegoHandle = NULL;
+
+    // Auto load workcell
+    rw::models::WorkCell::Ptr wc = rw::loaders::WorkCellLoader::Factory::load(WORKCELL_PATH);
+    std::cout << "tried to load workcell" << std::endl;
+    getRobWorkStudio()->setWorkCell(wc);
 
 }
 
@@ -159,6 +171,7 @@ QWidget* ObjectAvoidance::createModeButtons(){
 
     connect(btns[0], SIGNAL(pressed()), this, SLOT(simpleMazeRunner()));
     connect(btns[1], SIGNAL(pressed()), this, SLOT(printConfig()));
+    connect(btns[2], SIGNAL(pressed()), this, SLOT(moveHome()));
 
     markerButtons->setLayout(layout);
     widg->setWidget(markerButtons);
@@ -236,8 +249,10 @@ void ObjectAvoidance::init() {
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
-        RobotHandle->setQ( Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533) );
+        RobotHandle->start();
+        //RobotHandle->moveQ( Q(6,  0.408407, -1.56048, -1.66375, -1.45061, 1.53413, -0.18797) );
 
+        RobotHandle->moveQ( Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533) );
 
         getRobWorkStudio()->setState(_state);
     }
@@ -344,5 +359,11 @@ void ObjectAvoidance::simpleMazeRunner() {
 void ObjectAvoidance::printConfig() {
     Device::Ptr device = _workcell->findDevice("UR1");
     std::cout << "Robot Config: " << device->getQ(_state) << std::endl;
+
+}
+
+void ObjectAvoidance::moveHome() {
+
+    RobotHandle->moveHome();
 
 }

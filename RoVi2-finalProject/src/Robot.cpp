@@ -4,10 +4,20 @@
 
 #include "Robot.hpp"
 
+
 Robot::Robot() {
     _workcell = NULL;
     _state = NULL;
 
+    // setup ROS
+    // Subscribe to caros robot state
+    ROS_INFO("Connected to roscore");
+
+    _sub = _nh.subscribe(SUBSCRIBER, 1, &Robot::stateCallback, this);
+
+    _robot = new caros::SerialDeviceSIProxy(_nh, "caros_universalrobot");
+
+    quitfromgui = false;
 }
 
 Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
@@ -15,6 +25,17 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
     this->_workcell = _workcell;
     device = _workcell->findDevice("UR1");
     uiPathIterator = 0;
+
+
+    // setup ROS
+    // Subscribe to caros robot state
+    ROS_INFO("Connected to roscore");
+
+    _sub = _nh.subscribe(SUBSCRIBER, 1, &Robot::stateCallback, this);
+
+    _robot = new caros::SerialDeviceSIProxy(_nh, "caros_universalrobot");
+
+    quitfromgui = false;
 
 }
 
@@ -46,4 +67,46 @@ int Robot::nextState() {
     }
 
     return statusSignal;
+}
+
+void Robot::stateCallback(const caros_control_msgs::RobotState &msg) {
+    // Extract configuration from RobotState message
+    caros_common_msgs::Q conf = msg.q;
+
+    // Convert from ROS msg to Robwork Q
+    rw::math::Q conf_rw = caros::toRw(conf);
+
+    // update the robots configuration
+    setQ(conf_rw);
+}
+
+void Robot::moveHome()
+{
+    ROS_INFO("Called move home");
+    float speed = 0.1;
+    rw::math::Q home = rw::math::Q(6, 0, -M_PI/2.0, 0, -M_PI/2.0, 0, 0);
+    _robot->moveServoQ(home, speed);
+}
+
+void Robot::moveQ(Q q)
+{
+    ROS_INFO("Called move to a configuration");
+    float speed = 0.1;
+    _robot->moveServoQ(q, speed);
+}
+
+void Robot::run()
+{
+    while(ros::ok() && !quitfromgui)
+    {
+        ros::spinOnce();
+
+        // Adjust the sleep to, according to how often you will check ROS for new messages
+        ros::Duration(0.1).sleep();
+    }
+    if (!quitfromgui)
+    {
+        //emit rosQuits();
+        ROS_INFO("ROS-Node Terminated\n");
+    }
 }

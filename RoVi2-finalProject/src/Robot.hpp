@@ -27,6 +27,14 @@
 
 #include <rws/RobWorkStudio.hpp>
 
+//Ros includes
+#include <ros/ros.h>
+#include <caros_control_msgs/RobotState.h>
+#include <caros/serial_device_si_proxy.h>
+#include <caros_common_msgs/Q.h>
+#include <caros/common_robwork.h>
+#include <QThread>
+#include <QObject>
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
@@ -45,10 +53,13 @@ using namespace rws;
 
 
 // -----------------------   defines ----------------------------
+#define SUBSCRIBER "/caros_universalrobot/caros_serial_device_service_interface/robot_state"
+#define ROBOT_MAX_SPEED     0.1
 
 
+class Robot: public QThread  {
+Q_OBJECT
 
-class Robot {
 public:
     Robot();
     void setQ(Q qRobot);
@@ -61,6 +72,11 @@ public:
     Q getQRobot(double dTime);
     Q parabolicBlend(Q q1, Q q2, double V1, double V2, double T_blendingTime, double t);
     double estimateTravilTime(Q q1, Q q2);
+    void moveHome();
+    void moveQ(Q q);
+    /// This method contains the ROS event loop. Feel free to modify
+    void run();
+
 
 private:
     rw::kinematics::State* _state;
@@ -69,6 +85,15 @@ private:
     rw::trajectory::QPath path;
 
     unsigned int uiPathIterator;
+
+    /// Callback function
+    void stateCallback(const caros_control_msgs::RobotState & msg);
+
+    bool quitfromgui;
+
+    ros::NodeHandle _nh;
+    ros::Subscriber _sub;
+    caros::SerialDeviceSIProxy* _robot;
 };
 
 

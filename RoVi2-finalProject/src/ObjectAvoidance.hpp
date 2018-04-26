@@ -101,6 +101,7 @@ private slots:
     void simpleMazeRunner();
     void printConfig();
     void update();
+    void moveHome();
 };
 
 #endif
