@@ -91,6 +91,8 @@ private:
     Planning* PlannerHandle;
     Robot* RobotHandle;
 
+    int robotDirection;
+
 
 
 private slots:

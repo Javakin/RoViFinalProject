@@ -4,6 +4,7 @@
 
 #include "Robot.hpp"
 
+#include <opencv2/highgui/highgui.hpp>
 
 Robot::Robot() {
     _workcell = NULL;
@@ -52,6 +53,11 @@ void Robot::setPath(rw::trajectory::QPath aPath) {
     uiPathIterator = 0;
 }
 
+void Robot::update(){
+
+    nextState();
+}
+
 int Robot::nextState() {
     int statusSignal = 0;
 
@@ -60,16 +66,18 @@ int Robot::nextState() {
         return -1;
 
     // return 0 if path is fully executed else return 1
-    if(uiPathIterator < path.size() - 1){
+    if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1){
         statusSignal = 1;
         uiPathIterator++;
-        setQ(path[uiPathIterator]);
+        moveQ(path[uiPathIterator]);
     }
 
     return statusSignal;
 }
 
-void Robot::stateCallback(const caros_control_msgs::RobotState &msg) {
+
+void Robot::stateCallback(const caros_control_msgs::RobotState &msg)
+{
     // Extract configuration from RobotState message
     caros_common_msgs::Q conf = msg.q;
 
@@ -82,7 +90,7 @@ void Robot::stateCallback(const caros_control_msgs::RobotState &msg) {
 
 void Robot::moveHome()
 {
-    ROS_INFO("Called move home");
+    //ROS_INFO("Called move home");
     float speed = 0.1;
     rw::math::Q home = rw::math::Q(6, 0, -M_PI/2.0, 0, -M_PI/2.0, 0, 0);
     _robot->moveServoQ(home, speed);
@@ -90,9 +98,10 @@ void Robot::moveHome()
 
 void Robot::moveQ(Q q)
 {
-    ROS_INFO("Called move to a configuration");
+    //ROS_INFO("Called move to a configuration");
     float speed = 0.1;
     _robot->moveServoQ(q, speed);
+
 }
 
 void Robot::run()
@@ -109,4 +118,19 @@ void Robot::run()
         //emit rosQuits();
         ROS_INFO("ROS-Node Terminated\n");
     }
+}
+
+Q Robot::getQRobot() {
+    return device->getQ(*_state);
+}
+
+
+bool Robot::pathCompleted(){
+    bool statusSignal = 1;
+
+    if(uiPathIterator < path.size() - 1){
+        statusSignal = 0;
+    }
+
+    return statusSignal;
 }

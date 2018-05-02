@@ -12,6 +12,9 @@
 #include <rwlibs/opengl/RenderImage.hpp>
 #include <rwlibs/simulation/GLFrameGrabber.hpp>
 #include <rw/kinematics/MovableFrame.hpp>
+#include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
+#include <rwlibs/pathplanners/rrt/RRTPlanner.hpp>
+#include <rwlibs/pathplanners/rrt/RRTQToQPlanner.hpp>
 
 #include <rw/math.hpp> // Pi, Deg2Rad
 #include <rw/math/Q.hpp>
@@ -47,8 +50,13 @@ using namespace rw::math;
 using namespace rwlibs::opengl;
 using namespace rwlibs::simulation;
 
+using namespace rwlibs::proximitystrategies;
+
 using namespace std;
 using namespace rws;
+
+using namespace rw::trajectory;
+using namespace rw::proximity;
 
 
 
@@ -56,7 +64,7 @@ using namespace rws;
 // -----------------------   defines ----------------------------
 #define MAX_JOINT_ROTATION  6.2
 #define GOAL_EBS            0.005
-#define GOAL_SAMPLING_PROB  0.1
+
 
 #define Q0_WEIGHT           0.0086
 #define Q1_WEIGHT           0.0086
@@ -65,7 +73,7 @@ using namespace rws;
 #define Q4_WEIGHT           0.0955
 #define Q5_WEIGHT           0.7879
 
-
+#define MAXTIME 10
 
 
 
@@ -77,6 +85,8 @@ public:
     Planning();
     Planning(WorkCell::Ptr _workcell);
     rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
+
+    rw::trajectory::QPath RRTConnect(State _state, Q qGoal, Q qRobot, double epsilon);
     ~Planning();
 
 private:
@@ -84,9 +94,12 @@ private:
     VelocityScrew6D<> computeTaskError(Q qSample);
     bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
     Q randomDisplacement(Q dMax);
-    Q sampler(Q qGoal);
+    Q sampler(Q qGoal, double goalSampleProb);
 
-    rw::trajectory::QPath pathOptimization(rw::trajectory::QPath aPath);
+
+    bool expandedBinarySearch(Q StartConf, Q EndConf, double eps);
+
+    bool inCollision(Device::Ptr device, const State &state, const rw::proximity::CollisionDetector &detector, const Q &q);
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;
@@ -94,7 +107,6 @@ private:
     Device::Ptr gripper;
 
     VelocityScrew6D<> C;
-    rw::trajectory::QPath path;
     rw::proximity::CollisionDetector::Ptr detector;
     rw::pathplanning::QSampler::Ptr qSamples;
 

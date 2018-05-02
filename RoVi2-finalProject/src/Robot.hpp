@@ -66,17 +66,16 @@ public:
     Robot(State* _state, WorkCell::Ptr _workcell);
     ~Robot();
 
+    void update();
     int nextState();
     void setPath(rw::trajectory::QPath aPath);
     Q getQRobot();
-    Q getQRobot(double dTime);
-    Q parabolicBlend(Q q1, Q q2, double V1, double V2, double T_blendingTime, double t);
-    double estimateTravilTime(Q q1, Q q2);
+
     void moveHome();
     void moveQ(Q q);
     /// This method contains the ROS event loop. Feel free to modify
     void run();
-
+    bool pathCompleted();
 
 private:
     rw::kinematics::State* _state;

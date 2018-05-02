@@ -198,8 +198,6 @@ QWidget* ObjectAvoidance::createCamSetup() {
 
 void ObjectAvoidance::init() {
 
-    std::cout << "Test" << std::endl;
-
     if (_workcell != NULL) {
         // Create a GLFrameGrabber if there is a camera frame with a Camera property set
         rw::kinematics::Frame* cameraFrameLeft = _workcell->findFrame("CameraSimLeft");
@@ -235,11 +233,9 @@ void ObjectAvoidance::init() {
         }
 
         // Setting up legoHandler object
-        cout << "Setting up LegoHandler\n";
         LegoHandle = new Lego(&_state, _workcell);
         getRobWorkStudio()->setState(_state);
 
-        cout << "initialize\n";
         //for simulation make a lego brick configuration
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
@@ -250,9 +246,22 @@ void ObjectAvoidance::init() {
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
         RobotHandle->start();
-        //RobotHandle->moveQ( Q(6,  0.408407, -1.56048, -1.66375, -1.45061, 1.53413, -0.18797) );
 
-        RobotHandle->moveQ( Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533) );
+
+        // move robot to start configuration
+        cout << "setting the path igen\n";
+        Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
+        Q qRobot = RobotHandle->getQRobot();
+        rw::trajectory::QPath aPath = PlannerHandle->RRTConnect(_state, qRobot, qGoal, 0.01);
+        cout << "så er der path\n";
+        //print path
+        for(unsigned int i = 0; i < aPath.size(); i++){
+
+            cout << i << ": " << aPath[i] << endl;
+        }
+        RobotHandle->setPath(aPath);
+        robotDirection = 0;
+
 
         getRobWorkStudio()->setState(_state);
     }
@@ -260,14 +269,10 @@ void ObjectAvoidance::init() {
 
     capture();
 
-
-
 }
 
 void ObjectAvoidance::run(){
-    // start the timer
-
-    // Stop the timer
+    // this button is for tuggling the timer
     if(_timer->isActive()){
         cout << "stopping the timer\n";
         _timer->stop();
@@ -277,82 +282,64 @@ void ObjectAvoidance::run(){
         _timer->start(DELTA_T_SIM);
 
     }
-    //_timer->start(DELTA_T_SIM);
-    //_timer->stop();
 
 }
-
+Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
 void ObjectAvoidance::update(){
 
-    //LegoHandle->move(0.003);
-    RobotHandle->nextState();
+    // update workspace
+    LegoHandle->move(0.003);
+    RobotHandle->update();
+
     getRobWorkStudio()->setState(_state);
 
-    // Construct a video sequence
-    /*
-    if (_framegrabberLeft != NULL) {
-        // Get the image as a RW image
-        rw::kinematics::Frame* cameraFrame = _workcell->findFrame("CameraSimLeft");
-        _framegrabberLeft->grab(cameraFrame, _state);
-        const rw::sensor::Image& image = _framegrabberLeft->getImage();
 
-        // Convert to OpenCV image
-        cv::Mat im = ip::toOpenCVImage(image);
-        cv::Mat imflip;
-        cv::flip(im, imflip, 0);
-        imflip.copyTo(im);
-        cvtColor(im, im, CV_RGB2BGR);
-        cv::imwrite("Desktop/images/ImageLeft" + to_string(iVideoIterator) + ".png",im);
-
-
+    // move back and forth
+    rw::trajectory::QPath aPath;
+    if((RobotHandle->pathCompleted() == 1) && (robotDirection == 0)){
+        cout << "first" << endl;
+        aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
+        if (aPath.size() != 0){
+            robotDirection = 1;
+            RobotHandle->setPath(aPath);
+            cout << "path was set" << endl;
+        }
     }
 
-    if (_framegrabberRigth != NULL) {
-        // Get the image as a RW image
-        rw::kinematics::Frame* cameraFrame = _workcell->findFrame("CameraSimRigth");
-        _framegrabberRigth->grab(cameraFrame, _state);
-        const rw::sensor::Image& image = _framegrabberRigth->getImage();
-
-        // Convert to OpenCV image
-        cv::Mat im = ip::toOpenCVImage(image);
-        cv::Mat imflip;
-        cv::flip(im, imflip, 0);
-        imflip.copyTo(im);
-        cvtColor(im, im, CV_RGB2BGR);
-        cv::imwrite("Desktop/images/ImageRight" + to_string(iVideoIterator) + ".png",im);
-
-
-    }*/
-
+    if((RobotHandle->pathCompleted() == 1) && (robotDirection == 1)){
+        cout << "second" << endl;
+        aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
+        if (aPath.size() != 0){
+            robotDirection = 0;
+            RobotHandle->setPath(aPath);
+            cout << "path was set" << endl;
+        }
+    }
 
 
 }
 
+
+
 void ObjectAvoidance::simpleMazeRunner() {
-    // Initialize stuff for the run mode
-    // the desired q valuse
-    Q q1 =  Q(6,0.583604, 5.20944, -2.21689, -1.42175, -4.71239, 1.80533);
-
-    //Q q2 =  Q(6,0.540684, 5.16658, -2.06083, -1.59957, -4.65449, 1.53858);
-    Q q2 = Q(6,0.450686, 4.26424, -1.29639, -1.39805, -4.71229, 1.67142);
-
-    Q off = Q(6,3.35713, -1.19249, -5.01995, 4.83301, 4.29128, 4.69564);
-
+    // draw the path
     cout << "make the path" << endl;
     getRobWorkStudio()->setState(_state);
     rw::trajectory::QPath aPath;
 
-    aPath = PlannerHandle->getConstraintPath(_state, q2, q1, 0.01);
+    aPath = PlannerHandle->getConstraintPath(_state, q2, q1, 0.1);
     RobotHandle->setPath(aPath);
 
+    cout << "done\n";
 
     //print path
-    for(unsigned int i = 0; i < aPath.size(); i++){
+    /*for(unsigned int i = 0; i < aPath.size(); i++){
 
         cout << i << ": " << aPath[i] << endl;
     }
-
+*/
 
 }
 
