@@ -80,6 +80,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
         Q qS = qNear + qDir*eps;
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
+            //check if qS is stepping past qNear?
             T.add(qS, nearestNode);
         }
     }
@@ -141,6 +142,7 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // check that the solution is good
     if(dx_error.norm2() <= eps){
         rw::proximity::CollisionDetector::QueryResult data;
+        //edge collision detection ??
         device->setQ(qs, _state);
         bool collision = detector->inCollision(_state, &data);
         if(collision)
