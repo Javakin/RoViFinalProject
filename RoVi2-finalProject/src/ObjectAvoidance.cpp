@@ -2,7 +2,7 @@
 
 
 
-#define DELTA_T_SIM    50     // time in miliseconds
+#define DELTA_T_SIM    500     // time in miliseconds
 #define WORKCELL_PATH "/home/daniel/catkin_ws/src/RoViFinalProject/WorkStation_3/WC3_Scene.wc.xml"
 
 ObjectAvoidance::ObjectAvoidance():
@@ -302,12 +302,13 @@ void ObjectAvoidance::update(){
 
     // update workspace
     //LegoHandle->move(0.003);
-
     RobotHandle->update();
 
 
-/*
-    // move back and forth
+
+    cout << RobotHandle->pathCompleted() << endl;    // move back and forth
+
+    /*
     rw::trajectory::QPath aPath;
     if((RobotHandle->pathCompleted() == 1) && (robotDirection == 0)){
         cout << "first" << endl;
@@ -328,8 +329,8 @@ void ObjectAvoidance::update(){
             cout << "path was set" << endl;
         }
     }
-*/
 
+*/
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
 }

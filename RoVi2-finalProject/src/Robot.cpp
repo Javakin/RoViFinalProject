@@ -26,6 +26,7 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
     this->_workcell = _workcell;
     device = _workcell->findDevice("UR1");
     uiPathIterator = 0;
+    path = rw::trajectory::QPath();
 
 
     // setup ROS
@@ -37,6 +38,10 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
     _robot = new caros::SerialDeviceSIProxy(_nh, "caros_universalrobot");
 
     quitfromgui = false;
+
+
+    // to initialize the robot
+    moveHome();
 
 }
 
@@ -67,7 +72,7 @@ int Robot::nextState() {
 
     // return 0 if path is fully executed else return 1
     if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1){
-        cout << "Pathiterator" << uiPathIterator << endl;
+        //cout << "Pathiterator" << uiPathIterator << endl;
         statusSignal = 1;
         uiPathIterator++;
         moveQ(path[uiPathIterator]);
@@ -127,11 +132,11 @@ Q Robot::getQRobot() {
 
 
 bool Robot::pathCompleted(){
-    bool statusSignal = 1;
+    //cout << uiPathIterator << "int " << path.size() - 1 << "and" <<  ((getQRobot()-path[uiPathIterator]).norm2() < 0.1) << endl;
 
-    if(uiPathIterator < path.size() - 1){
-        statusSignal = 0;
-    }
-
-    return statusSignal;
+    if (path.size() == 0)
+        return 1;
+    if (uiPathIterator >= path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1)
+        return 1;
+    return 0;
 }
