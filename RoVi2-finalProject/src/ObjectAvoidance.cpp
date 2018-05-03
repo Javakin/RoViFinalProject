@@ -245,7 +245,7 @@ void ObjectAvoidance::init() {
 */
         // Setting up the path planner
         PlannerHandle  = new Planning(_workcell);
-/*
+
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
         RobotHandle->start();
@@ -253,21 +253,13 @@ void ObjectAvoidance::init() {
 
         // move robot to start configuration
         cout << "Move robot to start configuration\n";
-*/
+
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
-        //Q qRobot = RobotHandle->getQRobot();
-        Q qRobot = Q(6, 0.45, -2.019, -1.296, -1.4, 1.5706, 1.672);
+        Q qRobot = RobotHandle->getQRobot();
         cout << qGoal << endl << qRobot << endl;
 
-        //rw::trajectory::QPath aPath = PlannerHandle->RRTConnect(_state, qRobot, qGoal, 0.01);
+        rw::trajectory::QPath aPath = PlannerHandle->RRT(_state, qRobot, qGoal, 0.01);
 
-        double aTime = 20;
-        double aEps = 0.1;
-        Device::Ptr device = _workcell->findDevice("UR1");
-
-        rw::trajectory::QPath aPath = PlannerHandle->createNewPath(aTime, aEps, 50,_workcell, device, _state);
-
-        //rw::trajectory::QPath aPath = PlannerHandle->getConstraintPath(_state, qGoal, qRobot,0.01);
 
         //print path
         cout << "Printing path:\n";
@@ -360,11 +352,12 @@ void ObjectAvoidance::simpleMazeRunner() {
 }
 
 void ObjectAvoidance::printConfig() {
-    cout << RobotHandle->getQRobot() << endl;
+    // do not use the robot clase since this isnt nesesary up to date
+    Device::Ptr device = _workcell->findDevice("UR1");
+    cout << device->getQ(_state) << endl;
 }
 
 void ObjectAvoidance::moveHome() {
-
     RobotHandle->moveHome();
 
 }

@@ -76,7 +76,7 @@ using namespace rwlibs::proximitystrategies;
 #define Q4_WEIGHT           0.0955
 #define Q5_WEIGHT           0.7879
 
-#define MAXTIME 10
+#define MAX_RRT_ITERATIONS 10000
 
 
 
@@ -89,9 +89,9 @@ public:
     Planning(WorkCell::Ptr _workcell);
     rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
 
-    rw::trajectory::QPath RRTConnect(State _state, Q qGoal, Q qRobot, double epsilon);
+    rw::trajectory::QPath RRT(State state, Q qGoal, Q qRobot, double epsilon);
 
-    QPath createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state);
+    //QPath createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state);
 
     ~Planning();
 
@@ -105,8 +105,7 @@ private:
 
     bool expandedBinarySearch(Q StartConf, Q EndConf, double eps);
 
-    //bool checkCollisions(Device::Ptr device, const State &state, const CollisionDetector &detector, const Q &q
-    bool inCollision(Device::Ptr device, const State &state, const CollisionDetector &detector, const Q &q);
+    bool inCollision(const Q &q);
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;

@@ -36,34 +36,72 @@ Planning::~Planning() {
 
 }
 
-VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
 
-    Frame* TaskFrame = _workcell->findFrame("TaskFrame");
-
-
-    Transform3D<> wTt = TaskFrame->wTf(_state);
-    Transform3D<> tTw = inverse(wTt);
-
-
-    device->setQ(qSample, _state);
-    Frame* EndEffector = _workcell->findFrame("EndEff");
-    Transform3D<> wTe = EndEffector->wTf(_state);
-    Transform3D<> eTt = tTw*wTe;
+rw::trajectory::QPath Planning::RRT(State state, Q qRobot, Q qGoal, double epsilon) {
+    // setup the initial varables
+    _state = state;
+    QPath path;
+    QTrees T = QTrees(qGoal);
+    Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
 
+    cout << "check for constraints" << endl;
+    // initial conditions
+    if(inCollision(qRobot))
+        return path;
 
-    //calculate the dx_error
-    VelocityScrew6D<> dx_error =  VelocityScrew6D<>(0,0,0,0,0,0);
-    VelocityScrew6D<> dx =  VelocityScrew6D<>(0,0,0,0,0,0);
-    for (unsigned int i = 0; i<3; i++){
-        dx[i] = eTt.P()[i];
-        dx[3+i] = (RPY<>(eTt.R()))[i];
+    if(inCollision(qGoal))
+        return path;
 
-        dx_error[i] = C[i]*eTt.P()[i];
-        dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
+
+    // construct the tree to the destination
+    Q qRand, qNear, qDir, qS;
+    unsigned int N = 0;
+
+    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
+        qRand = sampler(qRobot, 0.2);
+        Node* nearestNode= T.nearestNeighbor(qRand);
+        qNear = nearestNode->getValue();
+        qDir  = (qRand-qNear)/((qRand-qNear).norm2());
+
+        // Extend the point
+        qS    = qNear + qDir*epsilon;
+
+        if (epsilon < (qNear-qRand).norm2()){
+            qS = qNear + qDir;
+        }
+
+        // check for edge colliitons
+        if(expandedBinarySearch(qS, qNear, 0.001)){
+            T.add(qS, nearestNode);
+
+            //nearestNode = T.nearestNeighbor(qRobot);
+            //cout << N  << (nearestNode->getValue() - qRobot).norm2()<< endl;
+
+
+            // has the goal been reached
+            if((qS - qRobot).norm2() < 0.1){
+                // goal is close end loop
+                cout <<  "N: " << N << endl;
+                break;
+            }
+        }
+
+
+
+
+    }
+    if (N == MAX_RRT_ITERATIONS)
+    {
+        cout << "RRT failed! No solutions found" << endl;
+        return path;
     }
 
-    return dx_error;
+    cout << "RRT done\n";
+
+
+
+    return path;
 }
 
 rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot, double eps) {
@@ -141,6 +179,47 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     return path;
 }
 
+
+
+
+// ******************************************************************
+//
+// Private functions
+//
+// ******************************************************************
+
+
+VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
+
+    Frame* TaskFrame = _workcell->findFrame("TaskFrame");
+
+
+    Transform3D<> wTt = TaskFrame->wTf(_state);
+    Transform3D<> tTw = inverse(wTt);
+
+
+    device->setQ(qSample, _state);
+    Frame* EndEffector = _workcell->findFrame("EndEff");
+    Transform3D<> wTe = EndEffector->wTf(_state);
+    Transform3D<> eTt = tTw*wTe;
+
+
+
+    //calculate the dx_error
+    VelocityScrew6D<> dx_error =  VelocityScrew6D<>(0,0,0,0,0,0);
+    VelocityScrew6D<> dx =  VelocityScrew6D<>(0,0,0,0,0,0);
+    for (unsigned int i = 0; i<3; i++){
+        dx[i] = eTt.P()[i];
+        dx[3+i] = (RPY<>(eTt.R()))[i];
+
+        dx_error[i] = C[i]*eTt.P()[i];
+        dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
+    }
+
+    return dx_error;
+}
+
+
 Q Planning::randomDisplacement(Q dMax) {
 
     Q qOut(6,0,0,0,0,0,0);
@@ -208,97 +287,20 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
 }
 
 
-QPath Planning::createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state) {
-    rw::math::Math::seed(seed);
 
 
-    PlannerConstraint constraint = PlannerConstraint::make(detector,device,state);
-
-    QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
-
-    QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, qSamples, metric, epsilon, RRTPlanner::RRTConnect);
-
-
-    Q from = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-    Q to = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
-
-    device->setQ(from, state);
-    if (!inCollision(device, state, *detector, from))
-        return 0;
-    if (!inCollision(device, state, *detector, to))
-        return 0;
-
-
-    cout << "Planning from " << from << " to " << to << endl;
-
-    QPath path;
-    Timer t;
-    t.resetAndResume();
-    if(planner->query(from,to,path,MAXTIME)){
-        cout << "A good path was found";
+bool Planning::inCollision(const Q &q) {
+    rw::proximity::CollisionDetector::QueryResult data;
+    device->setQ(q, _state);
+    bool collision = detector->inCollision(_state, &data);
+    cout << "checking " << endl;
+    if(collision)
+    {
+        cout << "in collision" << q << endl;
+        return true;
     }
 
-    t.pause();
-    outTime = t.getTime();
-    return path;
-}
-
-
-rw::trajectory::QPath Planning::RRTConnect(State state, Q from, Q to, double epsilon) {
-
-    this->_state = state;
-
-
-    rw::math::Math::seed(time(NULL));
-
-    rw::pathplanning::PlannerConstraint constraint = rw::pathplanning::PlannerConstraint::make(detector,device, _state);
-
-    QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
-    double extend = epsilon;
-
-    rw::pathplanning::QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, qSamples, metric, extend, RRTPlanner::RRTConnect);
-
-    // check for collision in the initial points
-    if (!inCollision(device, _state, *detector, from))
-        return 0;
-
-    if (!inCollision(device, _state, *detector, to))
-        return 0;
-
-
-    rw::trajectory::QPath path;
-
-    cout << "Empty path:\n";
-    for(unsigned int i = 0; i < path.size(); i++)
-        cout << i << ": " << path[i] << endl;
-
-    planner->query(from,to,path,MAXTIME);
-
-    cout << "Printing path:\n";
-    for(unsigned int i = 0; i < path.size(); i++)
-        cout << i << ": " << path[i] << endl;
-
-    return path;
-}
-
-bool Planning::inCollision(Device::Ptr device, const State &state, const CollisionDetector &detector, const Q &q) {
-    State testState;
-    CollisionDetector::QueryResult data;
-    bool colFrom;
-
-    testState = state;
-    device->setQ(q,testState);
-    colFrom = detector.inCollision(testState,&data);
-    if (colFrom) {
-        cerr << "Configuration in collision: " << q << endl;
-        cerr << "Colliding frames: " << endl;
-        FramePairSet fps = data.collidingFrames;
-        for (FramePairSet::iterator it = fps.begin(); it != fps.end(); it++) {
-            cerr << (*it).first->getName() << " " << (*it).second->getName() << endl;
-        }
-        return false;
-    }
-    return true;
+    return false;
 }
 
 bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double eps){
