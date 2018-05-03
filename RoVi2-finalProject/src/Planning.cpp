@@ -210,26 +210,34 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
 
 QPath Planning::createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state) {
     rw::math::Math::seed(seed);
-    CollisionDetector detector(wc, ProximityStrategyFactory::makeDefaultCollisionStrategy());
-    PlannerConstraint constraint = PlannerConstraint::make(&detector,device,state);
-    QSampler::Ptr sampler = QSampler::makeConstrained(QSampler::makeUniform(device),constraint.getQConstraintPtr());
+
+
+    PlannerConstraint constraint = PlannerConstraint::make(detector,device,state);
+
     QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
-    double extend = epsilon;
-    QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, sampler, metric, extend, RRTPlanner::RRTConnect);
 
-    Q from(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-    Q to(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+    QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, qSamples, metric, epsilon, RRTPlanner::RRTConnect);
 
-    if (!inCollision(device, state, detector, from))
+
+    Q from = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+    Q to = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+
+    device->setQ(from, state);
+    if (!inCollision(device, state, *detector, from))
         return 0;
-    if (!inCollision(device, state, detector, to))
+    if (!inCollision(device, state, *detector, to))
         return 0;
 
-    //cout << "Planning from " << from << " to " << to << endl;
+
+    cout << "Planning from " << from << " to " << to << endl;
+
     QPath path;
     Timer t;
     t.resetAndResume();
-    planner->query(from,to,path,MAXTIME);
+    if(planner->query(from,to,path,MAXTIME)){
+        cout << "A good path was found";
+    }
+
     t.pause();
     outTime = t.getTime();
     return path;

@@ -201,6 +201,7 @@ QWidget* ObjectAvoidance::createCamSetup() {
 void ObjectAvoidance::init() {
 
     if (_workcell != NULL) {
+/*
         // Create a GLFrameGrabber if there is a camera frame with a Camera property set
         rw::kinematics::Frame* cameraFrameLeft = _workcell->findFrame("CameraSimLeft");
         rw::kinematics::Frame* cameraFrameRight = _workcell->findFrame("CameraSimRigth");
@@ -232,8 +233,8 @@ void ObjectAvoidance::init() {
                 rw::graphics::SceneViewer::Ptr gldrawer = getRobWorkStudio()->getView()->getSceneViewer();
                 _framegrabberRigth->init(gldrawer);
             }
-        }
-
+        }*/
+/*
         // Setting up legoHandler object
         LegoHandle = new Lego(&_state, _workcell);
         getRobWorkStudio()->setState(_state);
@@ -241,10 +242,10 @@ void ObjectAvoidance::init() {
         //for simulation make a lego brick configuration
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
-
+*/
         // Setting up the path planner
         PlannerHandle  = new Planning(_workcell);
-
+/*
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
         RobotHandle->start();
@@ -252,18 +253,21 @@ void ObjectAvoidance::init() {
 
         // move robot to start configuration
         cout << "Move robot to start configuration\n";
-
+*/
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
-        Q qRobot = RobotHandle->getQRobot();
-
+        //Q qRobot = RobotHandle->getQRobot();
+        Q qRobot = Q(6, 0.45, -2.019, -1.296, -1.4, 1.5706, 1.672);
         cout << qGoal << endl << qRobot << endl;
 
         //rw::trajectory::QPath aPath = PlannerHandle->RRTConnect(_state, qRobot, qGoal, 0.01);
 
-        double aTime;
+        double aTime = 20;
+        double aEps = 0.1;
         Device::Ptr device = _workcell->findDevice("UR1");
 
-        rw::trajectory::QPath aPath = PlannerHandle->createNewPath(aTime, 0.01, 20,_workcell, device, _state);
+        rw::trajectory::QPath aPath = PlannerHandle->createNewPath(aTime, aEps, 50,_workcell, device, _state);
+
+        //rw::trajectory::QPath aPath = PlannerHandle->getConstraintPath(_state, qGoal, qRobot,0.01);
 
         //print path
         cout << "Printing path:\n";
@@ -275,7 +279,7 @@ void ObjectAvoidance::init() {
         //RobotHandle->setPath(aPath);
         //robotDirection = 0;
 
-        getRobWorkStudio()->setState(_state);
+        //getRobWorkStudio()->setState(_state);
     }
 
 
@@ -303,9 +307,9 @@ void ObjectAvoidance::update(){
 
     // update workspace
     //LegoHandle->move(0.003);
-    RobotHandle->update();
+    //RobotHandle->update();
 
-    getRobWorkStudio()->setState(_state);
+    //getRobWorkStudio()->setState(_state);
 
 /*
     // move back and forth
@@ -337,7 +341,7 @@ void ObjectAvoidance::update(){
 
 void ObjectAvoidance::simpleMazeRunner() {
     // draw the path
-    cout << "make the path" << endl;
+/*    cout << "make the path" << endl;
     getRobWorkStudio()->setState(_state);
     rw::trajectory::QPath aPath;
 
@@ -345,7 +349,7 @@ void ObjectAvoidance::simpleMazeRunner() {
     RobotHandle->setPath(aPath);
 
     cout << "done\n";
-
+*/
     //print path
     /*for(unsigned int i = 0; i < aPath.size(); i++){
 
@@ -356,9 +360,7 @@ void ObjectAvoidance::simpleMazeRunner() {
 }
 
 void ObjectAvoidance::printConfig() {
-    Device::Ptr device = _workcell->findDevice("UR1");
-    std::cout << "Robot Config: " << device->getQ(_state) << std::endl;
-
+    cout << RobotHandle->getQRobot() << endl;
 }
 
 void ObjectAvoidance::moveHome() {
