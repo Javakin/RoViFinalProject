@@ -87,13 +87,14 @@ public:
 
     Planning();
     Planning(WorkCell::Ptr _workcell);
-    rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
+    ~Planning();
 
-    rw::trajectory::QPath RRT(State state, Q qGoal, Q qRobot, double epsilon);
-
+    QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
+    QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
+    //QPath RRT(double epsilon, int seed, State state);
     //QPath createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state);
 
-    ~Planning();
+
 
 private:
 

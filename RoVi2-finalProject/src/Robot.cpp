@@ -67,6 +67,7 @@ int Robot::nextState() {
 
     // return 0 if path is fully executed else return 1
     if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1){
+        cout << "Pathiterator" << uiPathIterator << endl;
         statusSignal = 1;
         uiPathIterator++;
         moveQ(path[uiPathIterator]);

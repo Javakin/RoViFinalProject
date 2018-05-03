@@ -201,7 +201,7 @@ QWidget* ObjectAvoidance::createCamSetup() {
 void ObjectAvoidance::init() {
 
     if (_workcell != NULL) {
-/*
+
         // Create a GLFrameGrabber if there is a camera frame with a Camera property set
         rw::kinematics::Frame* cameraFrameLeft = _workcell->findFrame("CameraSimLeft");
         rw::kinematics::Frame* cameraFrameRight = _workcell->findFrame("CameraSimRigth");
@@ -233,8 +233,8 @@ void ObjectAvoidance::init() {
                 rw::graphics::SceneViewer::Ptr gldrawer = getRobWorkStudio()->getView()->getSceneViewer();
                 _framegrabberRigth->init(gldrawer);
             }
-        }*/
-/*
+        }
+
         // Setting up legoHandler object
         LegoHandle = new Lego(&_state, _workcell);
         getRobWorkStudio()->setState(_state);
@@ -242,7 +242,7 @@ void ObjectAvoidance::init() {
         //for simulation make a lego brick configuration
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
-*/
+
         // Setting up the path planner
         PlannerHandle  = new Planning(_workcell);
 
@@ -255,10 +255,11 @@ void ObjectAvoidance::init() {
         cout << "Move robot to start configuration\n";
 
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
-        Q qRobot = RobotHandle->getQRobot();
+        //Q qGoal = Q(6,0.437, -2.325,-1.06,-1.331,1.571,1.662);
+        Q qRobot =  RobotHandle->getQRobot();
         cout << qGoal << endl << qRobot << endl;
 
-        rw::trajectory::QPath aPath = PlannerHandle->RRT(_state, qRobot, qGoal, 0.01);
+        rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
 
 
         //print path
@@ -268,16 +269,18 @@ void ObjectAvoidance::init() {
             cout << i << ": " << aPath[i] << endl;
         }
 
-        //RobotHandle->setPath(aPath);
+        RobotHandle->setPath(aPath);
         //robotDirection = 0;
 
-        //getRobWorkStudio()->setState(_state);
+        getRobWorkStudio()->setState(_state);
     }
 
 
     capture();
 
 }
+
+
 
 void ObjectAvoidance::run(){
     // this button is for tuggling the timer
@@ -299,9 +302,9 @@ void ObjectAvoidance::update(){
 
     // update workspace
     //LegoHandle->move(0.003);
-    //RobotHandle->update();
 
-    //getRobWorkStudio()->setState(_state);
+    RobotHandle->update();
+
 
 /*
     // move back and forth
@@ -327,6 +330,8 @@ void ObjectAvoidance::update(){
     }
 */
 
+    // Update the workcell with the new state
+    getRobWorkStudio()->setState(_state);
 }
 
 

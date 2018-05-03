@@ -36,7 +36,7 @@ Planning::~Planning() {
 
 }
 
-
+/*
 rw::trajectory::QPath Planning::RRT(State state, Q qRobot, Q qGoal, double epsilon) {
     // setup the initial varables
     _state = state;
@@ -103,6 +103,7 @@ rw::trajectory::QPath Planning::RRT(State state, Q qRobot, Q qGoal, double epsil
 
     return path;
 }
+*/
 
 rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot, double eps) {
     // setup variables
@@ -180,6 +181,28 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 }
 
 
+QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
+    _state = astate;
+
+    rw::math::Math::seed(time(NULL));
+
+    //CollisionDetector detector(_workcell, ProximityStrategyFactory::makeDefaultCollisionStrategy());
+    PlannerConstraint constraint = PlannerConstraint::make(detector,device,_state);
+    //QSampler::Ptr sampler = QSampler::makeConstrained(QSampler::makeUniform(device),constraint.getQConstraintPtr());
+    QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
+    QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, qSamples, metric, epsilon, RRTPlanner::RRTConnect);
+
+
+    if (inCollision(qGoal))
+        return 0;
+    if (inCollision(qRobot))
+        return 0;
+
+    cout << "Planning from " << qRobot << " to \n" << qGoal << endl;
+    QPath path;
+    planner->query(qRobot,qGoal,path,30);
+    return path;
+}
 
 
 // ******************************************************************
@@ -286,17 +309,12 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
     return outPut;
 }
 
-
-
-
 bool Planning::inCollision(const Q &q) {
     rw::proximity::CollisionDetector::QueryResult data;
     device->setQ(q, _state);
     bool collision = detector->inCollision(_state, &data);
-    cout << "checking " << endl;
     if(collision)
     {
-        cout << "in collision" << q << endl;
         return true;
     }
 
