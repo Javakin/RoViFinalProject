@@ -3,7 +3,7 @@
 
 
 #define DELTA_T_SIM    50     // time in miliseconds
-#define WORKCELL_PATH "/home/anders/Desktop/workspace/RoVi2/RoViFinalProject/WorkStation_3/WC3_Scene.wc.xml"
+#define WORKCELL_PATH "/home/daniel/catkin_ws/src/RoViFinalProject/WorkStation_3/WC3_Scene.wc.xml"
 
 ObjectAvoidance::ObjectAvoidance():
         RobWorkStudioPlugin("ObjectAvoidance", QIcon(":/pa_icon.png"))
@@ -58,6 +58,8 @@ void ObjectAvoidance::initialize(){
     _framegrabberLeft = NULL;
     _framegrabberRigth = NULL;
     LegoHandle = NULL;
+    PlannerHandle = NULL;
+    RobotHandle = NULL;
 
     // Auto load workcell
     rw::models::WorkCell::Ptr wc = rw::loaders::WorkCellLoader::Factory::load(WORKCELL_PATH);
@@ -249,19 +251,29 @@ void ObjectAvoidance::init() {
 
 
         // move robot to start configuration
-        cout << "setting the path igen\n";
+        cout << "Move robot to start configuration\n";
+
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
         Q qRobot = RobotHandle->getQRobot();
-        rw::trajectory::QPath aPath = PlannerHandle->RRTConnect(_state, qRobot, qGoal, 0.01);
-        cout << "så er der path\n";
+
+        cout << qGoal << endl << qRobot << endl;
+
+        //rw::trajectory::QPath aPath = PlannerHandle->RRTConnect(_state, qRobot, qGoal, 0.01);
+
+        double aTime;
+        Device::Ptr device = _workcell->findDevice("UR1");
+
+        rw::trajectory::QPath aPath = PlannerHandle->createNewPath(aTime, 0.01, 20,_workcell, device, _state);
+
         //print path
+        cout << "Printing path:\n";
         for(unsigned int i = 0; i < aPath.size(); i++){
 
             cout << i << ": " << aPath[i] << endl;
         }
-        RobotHandle->setPath(aPath);
-        robotDirection = 0;
 
+        //RobotHandle->setPath(aPath);
+        //robotDirection = 0;
 
         getRobWorkStudio()->setState(_state);
     }
@@ -284,18 +296,18 @@ void ObjectAvoidance::run(){
     }
 
 }
-Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
 void ObjectAvoidance::update(){
+    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
     // update workspace
-    LegoHandle->move(0.003);
+    //LegoHandle->move(0.003);
     RobotHandle->update();
 
     getRobWorkStudio()->setState(_state);
 
-
+/*
     // move back and forth
     rw::trajectory::QPath aPath;
     if((RobotHandle->pathCompleted() == 1) && (robotDirection == 0)){
@@ -317,7 +329,7 @@ void ObjectAvoidance::update(){
             cout << "path was set" << endl;
         }
     }
-
+*/
 
 }
 

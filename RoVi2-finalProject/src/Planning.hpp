@@ -57,6 +57,9 @@ using namespace rws;
 
 using namespace rw::trajectory;
 using namespace rw::proximity;
+using namespace rw::pathplanning;
+using namespace rwlibs::pathplanners;
+using namespace rwlibs::proximitystrategies;
 
 
 
@@ -87,6 +90,9 @@ public:
     rw::trajectory::QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
 
     rw::trajectory::QPath RRTConnect(State _state, Q qGoal, Q qRobot, double epsilon);
+
+    QPath createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state);
+
     ~Planning();
 
 private:
@@ -99,7 +105,8 @@ private:
 
     bool expandedBinarySearch(Q StartConf, Q EndConf, double eps);
 
-    bool inCollision(Device::Ptr device, const State &state, const rw::proximity::CollisionDetector &detector, const Q &q);
+    //bool checkCollisions(Device::Ptr device, const State &state, const CollisionDetector &detector, const Q &q
+    bool inCollision(Device::Ptr device, const State &state, const CollisionDetector &detector, const Q &q);
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;

@@ -208,12 +208,42 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
 }
 
 
-// copied from anders elinge
-rw::trajectory::QPath Planning::RRTConnect(State _state, Q from, Q to, double epsilon) {
+QPath Planning::createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state) {
+    rw::math::Math::seed(seed);
+    CollisionDetector detector(wc, ProximityStrategyFactory::makeDefaultCollisionStrategy());
+    PlannerConstraint constraint = PlannerConstraint::make(&detector,device,state);
+    QSampler::Ptr sampler = QSampler::makeConstrained(QSampler::makeUniform(device),constraint.getQConstraintPtr());
+    QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
+    double extend = epsilon;
+    QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, sampler, metric, extend, RRTPlanner::RRTConnect);
 
-    rw::math::Math::seed(20);
+    Q from(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+    Q to(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
-    rw::pathplanning::PlannerConstraint constraint = rw::pathplanning::PlannerConstraint::make(detector,device,_state);
+    if (!inCollision(device, state, detector, from))
+        return 0;
+    if (!inCollision(device, state, detector, to))
+        return 0;
+
+    //cout << "Planning from " << from << " to " << to << endl;
+    QPath path;
+    Timer t;
+    t.resetAndResume();
+    planner->query(from,to,path,MAXTIME);
+    t.pause();
+    outTime = t.getTime();
+    return path;
+}
+
+
+rw::trajectory::QPath Planning::RRTConnect(State state, Q from, Q to, double epsilon) {
+
+    this->_state = state;
+
+
+    rw::math::Math::seed(time(NULL));
+
+    rw::pathplanning::PlannerConstraint constraint = rw::pathplanning::PlannerConstraint::make(detector,device, _state);
 
     QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
     double extend = epsilon;
@@ -224,15 +254,21 @@ rw::trajectory::QPath Planning::RRTConnect(State _state, Q from, Q to, double ep
     if (!inCollision(device, _state, *detector, from))
         return 0;
 
-    if (!inCollision(device, _state, *detector, from))
+    if (!inCollision(device, _state, *detector, to))
         return 0;
 
 
     rw::trajectory::QPath path;
+
+    cout << "Empty path:\n";
+    for(unsigned int i = 0; i < path.size(); i++)
+        cout << i << ": " << path[i] << endl;
+
     planner->query(from,to,path,MAXTIME);
 
-    cout << "1" << endl;
-
+    cout << "Printing path:\n";
+    for(unsigned int i = 0; i < path.size(); i++)
+        cout << i << ": " << path[i] << endl;
 
     return path;
 }
@@ -255,7 +291,6 @@ bool Planning::inCollision(Device::Ptr device, const State &state, const Collisi
         return false;
     }
     return true;
-
 }
 
 bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double eps){
@@ -300,3 +335,5 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
     }
     return true;
 }
+
+

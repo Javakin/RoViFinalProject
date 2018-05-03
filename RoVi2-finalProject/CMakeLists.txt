@@ -114,7 +114,7 @@ QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Plann
 #{moc-sources}
 #OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
 
-#QT5_ADD_RESOURCES(RccSrcFiles resources.qrc)
+QT5_ADD_RESOURCES(RccSrcFiles src/resources.qrc)
 set(SrcFiles
 		src/ObjectAvoidance.cpp
 		src/ip.cpp src/Lego.cpp
