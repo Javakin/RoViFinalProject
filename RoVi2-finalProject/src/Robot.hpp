@@ -67,7 +67,7 @@ public:
     ~Robot();
 
     int update();
-    int nextState();
+
     void setPath(rw::trajectory::QPath aPath);
     Q getQRobot();
 

@@ -124,7 +124,8 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     cout << "begin RRT\n";
 
     // grow RRT tree
-    for(unsigned int N = 0; N< 10000; N++){
+    unsigned int N;
+    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
         Q qRand = sampler(qRobot, 0.2);
         Node* nearestNode= T.nearestNeighbor(qRand);
         Q qNear = nearestNode->getValue();
@@ -148,7 +149,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 T.add(qS, nearestNode);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                cout << N  << (nearestNode->getValue() - qRobot).norm2()<< endl;
+                //cout << N  << (nearestNode->getValue() - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
@@ -160,11 +161,11 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
             }
 
         }
+    }
 
-        if(N > 900){
-            cout << "No solution found\n";
-            return path;
-        }
+    if(N >= MAX_RRT_ITERATIONS){
+        cout << "No solution found\n";
+        return path;
     }
 
     cout << "RRT done\n";

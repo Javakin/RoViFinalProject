@@ -291,12 +291,13 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
+    cout << "Next update : ";
     if (RobotHandle->update()){
         rw::trajectory::QPath aPath;
 
-        //cout << RobotHandle->pathCompleted() << endl;    // move back and forth
+        cout << RobotHandle->pathCompleted();    // move back and forth
 
-        cout << robotDirection << endl;
+        cout << " with dorection: "<< robotDirection << endl;
 
 
         if(robotDirection == 0){
