@@ -69,7 +69,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
-            nearestNode = T.nearestNeighbor(qS);
+            nearestNode = T.nearestNeighbor(qS, 1, 0, 100000);
 
             qNear = nearestNode->q;
 

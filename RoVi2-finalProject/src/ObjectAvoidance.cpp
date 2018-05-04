@@ -291,7 +291,7 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    cout << "Next update : ";
+    //cout << "Next update : ";
     if (RobotHandle->update()){
         rw::trajectory::QPath aPath;
 

@@ -46,15 +46,15 @@ Node* QTrees::nearestNeighbor(Q qRand) {
     return minNode;
 }
 
-Node* QTrees::nearestNeighbor(Q qRand,  double db, double cb) {
+Node* QTrees::nearestNeighbor(Q qRand,  double db, double cb, double C) {
     // setting up initial variables
     Q conf;
     Node* minNode = qTree[0];
-    double dMinDist = (qTree[0]->q-qRand).norm2(), length;
+    double dMinDist = db*(qTree[0]->q-qRand).norm2() + cb*qTree[0]->nodeCost, length;
 
-    // finde the closest neighbor
+    // Find the closest neighbor
     for(unsigned int i = 1; i < qTree.size(); i++){
-        length = (qTree[i]->q-qRand).norm2();
+        length = db*(qTree[i]->q-qRand).norm2() + cb*qTree[i]->nodeCost;
         if(length < dMinDist){
             // nearer neighbore found update variables
             minNode = qTree[i];
@@ -62,7 +62,11 @@ Node* QTrees::nearestNeighbor(Q qRand,  double db, double cb) {
         }
     }
 
-    return minNode;
+    if (dMinDist < C){
+        return minNode;
+    }
+    return nullptr;
+
 }
 
 void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
