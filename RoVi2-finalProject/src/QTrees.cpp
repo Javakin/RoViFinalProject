@@ -5,19 +5,27 @@
 #include "QTrees.hpp"
 
 QTrees::QTrees() {
-    qTree = NULL;
+    qTree = nullptr;
 }
 
 QTrees::~QTrees() {
+    for (unsigned int i = 0; i<qTree->size(); i++){
+        delete qTree[i];
+    }
+
     delete qTree;
 }
 
 QTrees::QTrees(Q qInit) {
-    qTree = new Tree(qInit);
+    auto* rootNode = new Node(qInit, nullptr, 0);
+
+    qTree = new vector<Node*>;
+    qTree->push_back(rootNode);
 }
 
 void QTrees::add(Q qNew, Node *nParent) {
-    qTree->add(qNew, nParent);
+    auto* newNode = new Node(qNew, nParent, nParent->nodeCost + (qNew-nParent->q).norm2());
+    qTree->push_back(newNode);
 }
 
 Node *QTrees::nearestNeighbor(Q qRand) {
@@ -34,6 +42,24 @@ Node *QTrees::nearestNeighbor(Q qRand) {
             dMinDist = length;
         }
     }
+
+    return minNode;
+}
+
+vector<Node *> QTrees::kNearestNeighbor(Q qRand, unsigned int K) {
+    Q conf;
+    vector<Node*> minNodes = ;
+    double dMinDist = 10000;
+    double length;
+    BOOST_FOREACH(Node* node, qTree->getNodes())
+                {
+                    length = (node->getValue()-qRand).norm2();
+                    if(length < dMinDist){
+                        // nearer neighbore found update variables
+                        minNode = node;
+                        dMinDist = length;
+                    }
+                }
 
     return minNode;
 }
