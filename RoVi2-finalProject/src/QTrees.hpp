@@ -25,7 +25,7 @@ using namespace std;
 
 
 // --------------------  defines ----------------------------
-#define MAX_DISTANCE    1000
+//#define MAX_DISTANCE    1000
 
 /*namespace
 {
@@ -38,22 +38,17 @@ struct Node {
     Q q;
     Node* parent;
     double nodeCost;
-    Node( Q q, Node* parent, double nodeCost){
-        this->q = q;
-        this->parent = parent;
-        this->nodeCost = nodeCost;
+    Node( Q aQ, Node* aParent, double aNodeCost){
+        q = aQ;
+        parent = aParent;
+        nodeCost = aNodeCost;
     }
 };
 
 
 
-//template <class X>
-
 class QTrees {
 public:
-    //typedef X value_type;
-    //typedef RRTNode<X> node_type;
-
     QTrees();
     QTrees(Q qInit);
     ~QTrees();
@@ -62,12 +57,12 @@ public:
 
     void add(Q qNew, Node* nParent);
     Node* nearestNeighbor(Q qRand);
-    vector<Node *> QTrees::kNearestNeighbor(Q qRand, unsigned int K);
-    void getRootPath(Node& lastNode, rw::trajectory::QPath& aPath);
+    Node* kNearestNeighbor(Q qRand, unsigned int K);
+    void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
 
 
 private:
-    vector<Node*>* qTree;
+    vector<Node*> qTree;
 };
 
 

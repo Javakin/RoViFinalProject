@@ -112,31 +112,50 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     QTrees T = QTrees(qGoal);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
+    cout << " Getting qGoal " << qGoal << endl;
+
+    Node* test= T.nearestNeighbor(qGoal);
+
+    cout << "again" << test->q << endl;
+
     // initial conditions
     //Q old = qRobot;
+    cout << qRobot <<  endl;
     if(!RGDNewConfig(qRobot, dMax, 500,500,0.001))
         return path;
-    //cout << (old-qRobot).norm2() <<  endl;
+    cout << qRobot <<  endl;
 
     if(!RGDNewConfig(qGoal, dMax, 500,500,0.001))
         return path;
 
-    cout << "begin RRT\n";
+    cout << "begin RRTconstraint\n";
 
     // grow RRT tree
-    unsigned int N;
-    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
+
+    for(unsigned int N = 0; N <= MAX_RRT_ITERATIONS; N++){
+        cout << " lad det begynde " << qRobot << endl;
+
         Q qRand = sampler(qRobot, 0.2);
+
+        cout << " after sampler ";
         Node* nearestNode= T.nearestNeighbor(qRand);
-        Q qNear = nearestNode->getValue();
+
+        cout << " after node part ";
+
+        Q qNear = nearestNode->q;
+
+        cout << " after qNearest ";
+
         Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
         Q qS = qNear + qDir*eps;
 
+        cout << "stage 1 qNear: " << qNear  << endl << qS << endl;
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
             nearestNode = T.nearestNeighbor(qS);
-            qNear = nearestNode->getValue();
+            qNear = nearestNode->q;
 
+            cout << "After a RGD" << endl;
 
             qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
 
@@ -144,12 +163,14 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 qS = qNear + qDir;
             }
 
+            cout << "After a RGD" << endl;
+
             // check for edge colliitons
             if(expandedBinarySearch(qS, qNear, 0.001)){
                 T.add(qS, nearestNode);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                //cout << N  << (nearestNode->getValue() - qRobot).norm2()<< endl;
+                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
@@ -161,12 +182,14 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
             }
 
         }
+
+        if(N >= MAX_RRT_ITERATIONS){
+            cout << "No solution found\n";
+            return path;
+        }
     }
 
-    if(N >= MAX_RRT_ITERATIONS){
-        cout << "No solution found\n";
-        return path;
-    }
+
 
     cout << "RRT done\n";
 
@@ -174,7 +197,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
     // fetch the path
     Node* nearestNode= T.nearestNeighbor(qRobot);
-    T.getRootPath(*nearestNode, path);
+    T.getRootPath(nearestNode, path);
 
     // add the goal to the path
     //path.push_back(qRobot);
@@ -257,12 +280,12 @@ Q Planning::randomDisplacement(Q dMax) {
 
 bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // setting up variables
-    //cout << endl << "initial Q: " << qs << endl;
+    cout << endl << "initial Q: " << qs << endl;
     int i = 0; int j = 0;
     VelocityScrew6D<> dx_error = computeTaskError(qs);
     VelocityScrew6D<> dx_error_prime;
     Q qs_prime;
-
+    cout << endl << "1 Q: " << qs << endl;
 
     // Constraint the configuration
     while (i < MaxI && j < MaxJ &&  dx_error.norm2() > eps){
@@ -275,7 +298,7 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 
         if(dx_error_prime.norm2() < dx_error.norm2()){
             // a better guess was found
-
+            cout << endl << "2 Q: " << qs << endl;
             i++;
             qs = qs_prime;
             dx_error = dx_error_prime;
@@ -285,10 +308,14 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 
     }
 
+    cout << endl << "Q col: " << qs << endl;
     // check that the solution is good
     if(dx_error.norm2() <= eps){
         rw::proximity::CollisionDetector::QueryResult data;
+        cout << endl << "Q precollision: " << qs << endl;
         device->setQ(qs, _state);
+
+        cout << endl << "Q postcollision: " << qs << endl;
         bool collision = detector->inCollision(_state, &data);
         if(collision)
         {
