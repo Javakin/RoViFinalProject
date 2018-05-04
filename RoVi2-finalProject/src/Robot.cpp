@@ -58,27 +58,25 @@ void Robot::setPath(rw::trajectory::QPath aPath) {
     uiPathIterator = 0;
 }
 
-void Robot::update(){
+int Robot::update(){
 
-    nextState();
+    return nextState();
 }
 
 int Robot::nextState() {
-    int statusSignal = 0;
 
     //precondition
     if (path.size() == 0)
-        return -1;
+        return 1;
 
-    // return 0 if path is fully executed else return 1
     if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1){
-        //cout << "Pathiterator" << uiPathIterator << endl;
-        statusSignal = 1;
+        cout << "Pathiterator" << uiPathIterator << endl;
+
         uiPathIterator++;
         moveQ(path[uiPathIterator]);
     }
 
-    return statusSignal;
+    return pathCompleted();
 }
 
 

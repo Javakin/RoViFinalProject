@@ -2,7 +2,7 @@
 
 
 
-#define DELTA_T_SIM    500     // time in miliseconds
+#define DELTA_T_SIM    50     // time in miliseconds
 #define WORKCELL_PATH "/home/daniel/catkin_ws/src/RoViFinalProject/WorkStation_3/WC3_Scene.wc.xml"
 
 ObjectAvoidance::ObjectAvoidance():
@@ -252,25 +252,13 @@ void ObjectAvoidance::init() {
 
 
         // move robot to start configuration
-        cout << "Move robot to start configuration\n";
-
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
-        //Q qGoal = Q(6,0.437, -2.325,-1.06,-1.331,1.571,1.662);
         Q qRobot =  RobotHandle->getQRobot();
-        cout << qGoal << endl << qRobot << endl;
 
         rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
 
-
-        //print path
-        cout << "Printing path:\n";
-        for(unsigned int i = 0; i < aPath.size(); i++){
-
-            cout << i << ": " << aPath[i] << endl;
-        }
-
         RobotHandle->setPath(aPath);
-        //robotDirection = 0;
+        robotDirection = 0;
 
         getRobWorkStudio()->setState(_state);
     }
@@ -302,35 +290,37 @@ void ObjectAvoidance::update(){
 
     // update workspace
     //LegoHandle->move(0.003);
-    RobotHandle->update();
+
+    if (RobotHandle->update()){
+        rw::trajectory::QPath aPath;
+
+        //cout << RobotHandle->pathCompleted() << endl;    // move back and forth
+
+        cout << robotDirection << endl;
 
 
+        if(robotDirection == 0){
+            cout << "first" << endl;
+            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
+            if (aPath.size() != 0){
+                robotDirection = 1;
+                RobotHandle->setPath(aPath);
+                cout << "path was set" << endl;
+            }
+        }
 
-    cout << RobotHandle->pathCompleted() << endl;    // move back and forth
-
-    /*
-    rw::trajectory::QPath aPath;
-    if((RobotHandle->pathCompleted() == 1) && (robotDirection == 0)){
-        cout << "first" << endl;
-        aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
-        if (aPath.size() != 0){
-            robotDirection = 1;
-            RobotHandle->setPath(aPath);
-            cout << "path was set" << endl;
+        else if(robotDirection == 1){
+            cout << "second" << endl;
+            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
+            if (aPath.size() != 0){
+                robotDirection = 0;
+                RobotHandle->setPath(aPath);
+                cout << "path was set" << endl;
+            }
         }
     }
 
-    if((RobotHandle->pathCompleted() == 1) && (robotDirection == 1)){
-        cout << "second" << endl;
-        aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
-        if (aPath.size() != 0){
-            robotDirection = 0;
-            RobotHandle->setPath(aPath);
-            cout << "path was set" << endl;
-        }
-    }
 
-*/
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
 }

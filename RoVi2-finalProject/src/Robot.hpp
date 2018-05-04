@@ -66,7 +66,7 @@ public:
     Robot(State* _state, WorkCell::Ptr _workcell);
     ~Robot();
 
-    void update();
+    int update();
     int nextState();
     void setPath(rw::trajectory::QPath aPath);
     Q getQRobot();
