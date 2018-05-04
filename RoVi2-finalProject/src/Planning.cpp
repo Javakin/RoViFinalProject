@@ -36,74 +36,6 @@ Planning::~Planning() {
 
 }
 
-/*
-rw::trajectory::QPath Planning::RRT(State state, Q qRobot, Q qGoal, double epsilon) {
-    // setup the initial varables
-    _state = state;
-    QPath path;
-    QTrees T = QTrees(qGoal);
-    Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
-
-
-    cout << "check for constraints" << endl;
-    // initial conditions
-    if(inCollision(qRobot))
-        return path;
-
-    if(inCollision(qGoal))
-        return path;
-
-
-    // construct the tree to the destination
-    Q qRand, qNear, qDir, qS;
-    unsigned int N = 0;
-
-    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
-        qRand = sampler(qRobot, 0.2);
-        Node* nearestNode= T.nearestNeighbor(qRand);
-        qNear = nearestNode->getValue();
-        qDir  = (qRand-qNear)/((qRand-qNear).norm2());
-
-        // Extend the point
-        qS    = qNear + qDir*epsilon;
-
-        if (epsilon < (qNear-qRand).norm2()){
-            qS = qNear + qDir;
-        }
-
-        // check for edge colliitons
-        if(expandedBinarySearch(qS, qNear, 0.001)){
-            T.add(qS, nearestNode);
-
-            //nearestNode = T.nearestNeighbor(qRobot);
-            //cout << N  << (nearestNode->getValue() - qRobot).norm2()<< endl;
-
-
-            // has the goal been reached
-            if((qS - qRobot).norm2() < 0.1){
-                // goal is close end loop
-                cout <<  "N: " << N << endl;
-                break;
-            }
-        }
-
-
-
-
-    }
-    if (N == MAX_RRT_ITERATIONS)
-    {
-        cout << "RRT failed! No solutions found" << endl;
-        return path;
-    }
-
-    cout << "RRT done\n";
-
-
-
-    return path;
-}
-*/
 
 rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot, double eps) {
     // setup variables
@@ -112,50 +44,34 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     QTrees T = QTrees(qGoal);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
-    cout << " Getting qGoal " << qGoal << endl;
-
-    Node* test= T.nearestNeighbor(qGoal);
-
-    cout << "again" << test->q << endl;
-
     // initial conditions
-    //Q old = qRobot;
-    cout << qRobot <<  endl;
     if(!RGDNewConfig(qRobot, dMax, 500,500,0.001))
         return path;
-    cout << qRobot <<  endl;
 
     if(!RGDNewConfig(qGoal, dMax, 500,500,0.001))
         return path;
 
+    // grow RRT tree
     cout << "begin RRTconstraint\n";
 
-    // grow RRT tree
-
-    for(unsigned int N = 0; N <= MAX_RRT_ITERATIONS; N++){
-        cout << " lad det begynde " << qRobot << endl;
+    unsigned int N = 0;
+    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
         Q qRand = sampler(qRobot, 0.2);
 
-        cout << " after sampler ";
         Node* nearestNode= T.nearestNeighbor(qRand);
-
-        cout << " after node part ";
 
         Q qNear = nearestNode->q;
 
-        cout << " after qNearest ";
-
         Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
+
         Q qS = qNear + qDir*eps;
 
-        cout << "stage 1 qNear: " << qNear  << endl << qS << endl;
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
             nearestNode = T.nearestNeighbor(qS);
-            qNear = nearestNode->q;
 
-            cout << "After a RGD" << endl;
+            qNear = nearestNode->q;
 
             qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
 
@@ -163,33 +79,31 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 qS = qNear + qDir;
             }
 
-            cout << "After a RGD" << endl;
 
             // check for edge colliitons
             if(expandedBinarySearch(qS, qNear, 0.001)){
                 T.add(qS, nearestNode);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
+                //cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
                 if((qS - qRobot).norm2() < 0.1){
                     // goal is close end loop
-                    cout <<  "N: " << N << endl;
+                    cout <<  "Goal reached in interations N: " << N << endl;
                     break;
                 }
             }
 
         }
-
-        if(N >= MAX_RRT_ITERATIONS){
-            cout << "No solution found\n";
-            return path;
-        }
     }
 
-
+    // post path planning check
+    if(N >= MAX_RRT_ITERATIONS){
+        cout << "No solution found in " << N << "steps\n";
+        return path;
+    }
 
     cout << "RRT done\n";
 
@@ -280,12 +194,10 @@ Q Planning::randomDisplacement(Q dMax) {
 
 bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // setting up variables
-    cout << endl << "initial Q: " << qs << endl;
     int i = 0; int j = 0;
     VelocityScrew6D<> dx_error = computeTaskError(qs);
     VelocityScrew6D<> dx_error_prime;
     Q qs_prime;
-    cout << endl << "1 Q: " << qs << endl;
 
     // Constraint the configuration
     while (i < MaxI && j < MaxJ &&  dx_error.norm2() > eps){
@@ -298,7 +210,6 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 
         if(dx_error_prime.norm2() < dx_error.norm2()){
             // a better guess was found
-            cout << endl << "2 Q: " << qs << endl;
             i++;
             qs = qs_prime;
             dx_error = dx_error_prime;
@@ -308,14 +219,11 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 
     }
 
-    cout << endl << "Q col: " << qs << endl;
     // check that the solution is good
     if(dx_error.norm2() <= eps){
         rw::proximity::CollisionDetector::QueryResult data;
-        cout << endl << "Q precollision: " << qs << endl;
         device->setQ(qs, _state);
 
-        cout << endl << "Q postcollision: " << qs << endl;
         bool collision = detector->inCollision(_state, &data);
         if(collision)
         {

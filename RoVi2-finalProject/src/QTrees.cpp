@@ -18,12 +18,8 @@ QTrees::~QTrees() {
 QTrees::QTrees(Q qInit) {
     Node* rootNode = new Node(qInit, nullptr, 0);
 
-    cout << "root node:\n";
-    cout << "in the tree root node is:" << rootNode->q << endl;
     qTree.clear();
     qTree.push_back(rootNode);
-
-   
 }
 
 void QTrees::add(Q qNew, Node *nParent) {
@@ -49,11 +45,11 @@ Node* QTrees::nearestNeighbor(Q qRand) {
 
     return minNode;
 }
-/*
-Node * QTrees::nearestNeighbor(Q qRand,  unsigned int K) {
+
+Node* QTrees::nearestNeighbor(Q qRand,  double db, double cb) {
     // setting up initial variables
     Q conf;
-    vector<Node*> minNode = qTree[1];
+    Node* minNode = qTree[0];
     double dMinDist = (qTree[0]->q-qRand).norm2(), length;
 
     // finde the closest neighbor
@@ -67,7 +63,7 @@ Node * QTrees::nearestNeighbor(Q qRand,  unsigned int K) {
     }
 
     return minNode;
-}*/
+}
 
 void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
     // setting up the node

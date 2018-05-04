@@ -56,20 +56,20 @@ void Robot::setQ(Q qRobot) {
 void Robot::setPath(rw::trajectory::QPath aPath) {
     path = aPath;
     uiPathIterator = 0;
-    cout << "path length is: " << path.size() << endl;
+    //cout << "path length is: " << path.size() << endl;
 }
 
 int Robot::update(){
-    cout << "called next state:" << " Pathiterator " << uiPathIterator;
+    //cout << "called next state:" << " Pathiterator " << uiPathIterator;
     //precondition
     if (path.size() == 0){
         cout << "No path to do\n";
         return 1;
     }
 
-    cout << " " << (getQRobot()-path[uiPathIterator]).norm2() << " bool exprecion result; " << ((getQRobot()-path[uiPathIterator]).norm2() < 0.2)  << endl;
+    //cout << " " << (getQRobot()-path[uiPathIterator]).norm2() << " bool exprecion result; " << ((getQRobot()-path[uiPathIterator]).norm2() < 0.2)  << endl;
     if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.2){
-        cout << "next target\n";
+        //cout << "next target\n";
 
         uiPathIterator++;
         moveQ(path[uiPathIterator]);

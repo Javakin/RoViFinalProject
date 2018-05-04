@@ -57,7 +57,7 @@ public:
 
     void add(Q qNew, Node* nParent);
     Node* nearestNeighbor(Q qRand);
-    Node* kNearestNeighbor(Q qRand, unsigned int K);
+    Node* nearestNeighbor(Q qRand,  double db, double cb);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
 
 
