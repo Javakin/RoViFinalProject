@@ -57,12 +57,15 @@ public:
 
     void add(Q qNew, Node* nParent);
     Node* nearestNeighbor(Q qRand);
-    Node* nearestNeighbor(Q qRand,  double db, double cb, double C);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
+    void setC(double C);
 
 
 private:
     vector<Node*> qTree;
+    double db;
+    double cb;
+    double C;
 };
 
 

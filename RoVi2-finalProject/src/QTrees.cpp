@@ -20,6 +20,9 @@ QTrees::QTrees(Q qInit) {
 
     qTree.clear();
     qTree.push_back(rootNode);
+    C = 10000;
+    db = 1;
+    cb = 0;
 }
 
 void QTrees::add(Q qNew, Node *nParent) {
@@ -27,7 +30,7 @@ void QTrees::add(Q qNew, Node *nParent) {
     qTree.push_back(newNode);
 }
 
-Node* QTrees::nearestNeighbor(Q qRand) {
+/*Node* QTrees::nearestNeighbor(Q qRand) {
     // setting up initial variables
     Q conf;
     Node* minNode = qTree[0];
@@ -44,9 +47,9 @@ Node* QTrees::nearestNeighbor(Q qRand) {
     }
 
     return minNode;
-}
+}*/
 
-Node* QTrees::nearestNeighbor(Q qRand,  double db, double cb, double C) {
+Node* QTrees::nearestNeighbor(Q qRand) {
     // setting up initial variables
     Q conf;
     Node* minNode = qTree[0];
@@ -80,6 +83,11 @@ void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
         currentNode= currentNode->parent;
     }
     aPath.push_back(currentNode->q);
+
+}
+
+void QTrees::setC( double C) {
+    this->C = C;
 
 }
 

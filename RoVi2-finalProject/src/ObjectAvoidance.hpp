@@ -45,7 +45,8 @@
 #include "Planning.hpp"
 #include "Robot.hpp"
 
-
+// for multithreading
+#include <pthread.h>
 
 using namespace std;
 
@@ -74,6 +75,8 @@ public:
 private:
     QWidget* createModeButtons();
     QWidget* createCamSetup();
+    void planner();
+
 
     rw::kinematics::State _state;
     rw::models::WorkCell* _workcell;
@@ -93,6 +96,8 @@ private:
 
     int robotDirection;
 
+    //pthread_t plannerThread[1];
+
 
 
 private slots:
@@ -103,6 +108,7 @@ private slots:
     void simpleMazeRunner();
     void printConfig();
     void update();
+
     void moveHome();
 };
 

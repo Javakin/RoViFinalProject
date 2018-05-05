@@ -198,6 +198,19 @@ QWidget* ObjectAvoidance::createCamSetup() {
     return cams;
 }
 
+/*
+void *await(void *t) {
+    int i;
+    long tid;
+
+    tid = (long)t;
+
+    sleep(1);
+    cout << "Sleeping in thread " << endl;
+    cout << "Thread with id : " << tid << "  ...exiting " << endl;
+    pthread_exit(NULL);
+}*/
+
 void ObjectAvoidance::init() {
 
     if (_workcell != NULL) {
@@ -259,7 +272,43 @@ void ObjectAvoidance::init() {
 
         RobotHandle->setPath(aPath);
         robotDirection = 0;
+/*
+        // setting up the planner thread
+        int rc;
+        int i;
+        pthread_t threads[5];
+        pthread_attr_t attr;
+        void *status;
 
+        // Initialize and set thread joinable
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+        for( i = 0; i < 5; i++ ) {
+            cout << "main() : creating thread, " << i << endl;
+            rc = pthread_create(&threads[i], NULL, await, (void *)i );
+
+            if (rc) {
+                cout << "Error:unable to create thread," << rc << endl;
+                exit(-1);
+            }
+        }
+
+        // free attribute and wait for the other threads
+        pthread_attr_destroy(&attr);
+        for( i = 0; i < 5; i++ ) {
+            rc = pthread_join(threads[i], &status);
+            if (rc) {
+                cout << "Error:unable to join," << rc << endl;
+                exit(-1);
+            }
+
+            cout << "Main: completed thread id :" << i ;
+            cout << "  exiting with status :" << status << endl;
+        }
+
+        cout << "Main: program exiting." << endl;
+*/
         getRobWorkStudio()->setState(_state);
     }
 
@@ -279,53 +328,62 @@ void ObjectAvoidance::run(){
     }else{
         cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
-
     }
 
 }
 
 void ObjectAvoidance::update(){
-    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
     // update workspace
-    //LegoHandle->move(0.003);
+    LegoHandle->move(0.003);
 
-    //cout << "Next update : ";
-    if (RobotHandle->update()){
-        rw::trajectory::QPath aPath;
+    RobotHandle->update();
 
-        cout << RobotHandle->pathCompleted();    // move back and forth
-
-        cout << " with dorection: "<< robotDirection << endl;
-
-
-        if(robotDirection == 0){
-            cout << "first" << endl;
-            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
-            if (aPath.size() != 0){
-                robotDirection = 1;
-                RobotHandle->setPath(aPath);
-                cout << "path was set" << endl;
-            }
-        }
-
-        else if(robotDirection == 1){
-            cout << "second" << endl;
-            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
-            if (aPath.size() != 0){
-                robotDirection = 0;
-                RobotHandle->setPath(aPath);
-                cout << "path was set" << endl;
-            }
-        }
-    }
-
+    planner();
 
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
 }
 
+
+void ObjectAvoidance::planner(){
+    // Setup
+    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+
+    cout << "hello world\n";
+    // If the route is complete make a new one
+    if (RobotHandle->pathCompleted()){
+        rw::trajectory::QPath aPath;
+
+        cout << "in loop\n";
+        if(robotDirection == 0){
+            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
+            if (aPath.size() != 0){
+                cout << "first" << endl;
+                robotDirection = 1;
+                RobotHandle->setPath(aPath);
+            }
+        }
+
+        else if(robotDirection == 1){
+            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
+
+            if (aPath.size() != 0){
+            cout << "second" << endl;
+                robotDirection = 0;
+                RobotHandle->setPath(aPath);
+            }
+        }
+        cout << aPath.size();
+    }
+
+    // Check if the path is still valid
+
+
+    // Search for a better solution
+
+}
 
 
 void ObjectAvoidance::simpleMazeRunner() {

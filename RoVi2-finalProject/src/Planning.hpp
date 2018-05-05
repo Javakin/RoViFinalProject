@@ -91,12 +91,11 @@ public:
 
     QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
-    //QPath RRT(double epsilon, int seed, State state);
-    //QPath createNewPath(double &outTime, double epsilon, int seed, WorkCell::Ptr wc, Device::Ptr device, State state);
-
+    QPath updateConstraindPath(State* _state);
 
 
 private:
+
 
     VelocityScrew6D<> computeTaskError(Q qSample);
     bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
@@ -117,7 +116,8 @@ private:
     rw::proximity::CollisionDetector::Ptr detector;
     rw::pathplanning::QSampler::Ptr qSamples;
 
-
+    QTrees T;
+    QTrees R;
 
 };
 

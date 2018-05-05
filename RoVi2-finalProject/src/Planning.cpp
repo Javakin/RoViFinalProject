@@ -51,12 +51,13 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     if(!RGDNewConfig(qGoal, dMax, 500,500,0.001))
         return path;
 
-    // grow RRT tree
-    cout << "begin RRTconstraint\n";
+    cout << "inside the loop\n";
+    // Grow RRT tree
+    //unsigned int N = 0;
+    for(unsigned int N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
-    unsigned int N = 0;
-    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
+        cout << "N: " << N;
         Q qRand = sampler(qRobot, 0.2);
 
         Node* nearestNode= T.nearestNeighbor(qRand);
@@ -69,7 +70,10 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
-            nearestNode = T.nearestNeighbor(qS, 1, 0, 100000);
+
+            cout << "qS " << qS << endl;
+
+            nearestNode = T.nearestNeighbor(qS);
 
             qNear = nearestNode->q;
 
@@ -85,7 +89,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 T.add(qS, nearestNode);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                //cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
+                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
@@ -95,23 +99,26 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                     break;
                 }
             }
-
+        }
+        //cout << "checking the max iterations" << endl;
+        // post path planning check
+        if(N >= MAX_RRT_ITERATIONS){
+            cout << "No solution found \n";
+            return path;
         }
     }
 
-    // post path planning check
-    if(N >= MAX_RRT_ITERATIONS){
-        cout << "No solution found in " << N << "steps\n";
-        return path;
-    }
-
-    cout << "RRT done\n";
 
 
 
     // fetch the path
     Node* nearestNode= T.nearestNeighbor(qRobot);
     T.getRootPath(nearestNode, path);
+
+
+    // update the newest Tree for later use
+    T.setC(nearestNode->nodeCost);
+    R = T;
 
     // add the goal to the path
     //path.push_back(qRobot);
@@ -300,5 +307,7 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
     }
     return true;
 }
+
+
 
 
