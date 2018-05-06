@@ -46,14 +46,17 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
     // initial conditions
-    if(!RGDNewConfig(qRobot, dMax, 500,500,RGD_MIN_ERROR))
+    Q dommy = qRobot;
+    if(!RGDNewConfig(dommy, dMax, 500,500,RGD_MIN_ERROR))
         return path;
 
+    dommy = qGoal;
     if(!RGDNewConfig(qGoal, dMax, 500,500,RGD_MIN_ERROR))
         return path;
 
     cout << "inside the loop\n";
     // Grow RRT tree
+    Q qS;
     unsigned int N = 0;
     for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
@@ -67,7 +70,22 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
         Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
 
-        Q qS = qNear + qDir*eps;
+        // can the sampled point be reached
+        if ((qRand-qNear).norm2() < eps){
+            qS = qRand;
+
+            // Has the goal been reached
+            if((qS - qRobot).norm2() < 0.01){
+                // goal is close end loop
+                cout <<  "Goal reached in interations N: " << N << endl;
+                dx = computeDisplacement(qS);
+                T.add(qS, nearestNode, dx[0], dx[1]);
+                break;
+            }
+        }else{
+            qS = qNear + qDir*eps;
+        }
+
 
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,RGD_MIN_ERROR)){
@@ -90,16 +108,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 dx = computeDisplacement(qS);
                 T.add(qS, nearestNode, dx[0], dx[1]);
 
-                nearestNode = T.nearestNeighbor(qRobot);
-                cout <<(nearestNode->q - qRobot).norm2()<< endl;
 
-
-                // has the goal been reached
-                if((qS - qRobot).norm2() < 0.01){
-                    // goal is close end loop
-                    cout <<  "Goal reached in interations N: " << N << endl;
-                    break;
-                }
             }
         }
     }
@@ -113,16 +122,11 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
 
     // print out the tree in the map
-
     Lego* _LegoHandle = new Lego(&_state, _workcell);
-    cout << "printing" << endl;
 
     vector< vector< double> > v = _LegoHandle->getPoses();
-    cout << endl;
     T.exportTree("Tree", v);
-    cout << "make the print\n";
     delete _LegoHandle;
-    cout << "deleting handler"<< endl;
 
 
     // fetch the path

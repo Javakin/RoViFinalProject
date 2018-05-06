@@ -152,7 +152,6 @@ vector<vector< double > > Lego::getPoses() {
     vector<vector<double> > output;
     vector<double> vBrick;
 
-    cout << "initiate the lego part\n";
     for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
         Transform3D<> tB =  vLegoFrames[ID]->getTransform(*_state);
         vBrick.clear();
@@ -167,7 +166,6 @@ vector<vector< double > > Lego::getPoses() {
 
         output.push_back(vBrick);
     }
-    cout << "completed the legopart\n";
 
     return output;
 }
