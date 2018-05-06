@@ -46,10 +46,10 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
     // initial conditions
-    if(!RGDNewConfig(qRobot, dMax, 500,500,0.001))
+    if(!RGDNewConfig(qRobot, dMax, 500,500,RGD_MIN_ERROR))
         return path;
 
-    if(!RGDNewConfig(qGoal, dMax, 500,500,0.001))
+    if(!RGDNewConfig(qGoal, dMax, 500,500,RGD_MIN_ERROR))
         return path;
 
     cout << "inside the loop\n";
@@ -59,7 +59,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
 
         //cout << "N: " << N;
-        Q qRand = sampler(qRobot, 0.2);
+        Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
 
         Node* nearestNode= T.nearestNeighbor(qRand);
 
@@ -70,7 +70,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         Q qS = qNear + qDir*eps;
 
         // constrain the point
-        if(RGDNewConfig(qS, dMax, 500,500,0.001)){
+        if(RGDNewConfig(qS, dMax, 500,500,RGD_MIN_ERROR)){
 
             //cout << "qS " << qS << endl;
 
@@ -86,16 +86,16 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
 
             // check for edge colliitons
-            if(expandedBinarySearch(qS, qNear, 0.001)){
+            if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
                 dx = computeDisplacement(qS);
                 T.add(qS, nearestNode, dx[0], dx[1]);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                //cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
+                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
-                if((qS - qRobot).norm2() < 0.1){
+                if((qS - qRobot).norm2() < 0.01){
                     // goal is close end loop
                     cout <<  "Goal reached in interations N: " << N << endl;
                     break;

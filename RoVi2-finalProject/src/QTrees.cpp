@@ -81,9 +81,6 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     cout << "stuff \n";
     cv::Mat res(700,1000, CV_8UC3, cv::Scalar(255,255,255));
 
-    // add all the nodes and and edges to the image
-    Node* parent = qTree[0];
-
 
     // create a rectangle for the conveuor belt
     cv::Point p1= cv::Point((unsigned int)(res.cols/2-X_CONVEYOR*PIXEL_MM),(unsigned int)(res.rows/2-Y_CONVEYOR*PIXEL_MM));
@@ -108,6 +105,7 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     }
 
     // Draw the Q Tree
+    Node* parent = qTree[0];
     for (unsigned int i = 0; i<qTree.size(); i++){
         parent = qTree[i];
         int xval = (unsigned int)(parent->x*PIXEL_MM + res.cols/2);
@@ -120,9 +118,14 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     }
 
     // Highlight the goalConfiguration
+    parent = qTree[0];
     p1= cv::Point( (unsigned int)(parent->x*PIXEL_MM + res.cols/2),(unsigned int)(parent->y*PIXEL_MM + res.rows/2));
     cv::circle(res, p1, 4, cv::Scalar(255,0,0), 3);
 
+    // Highlight the robotConfiguration
+    parent = qTree[qTree.size()-1];
+    p1= cv::Point( (unsigned int)(parent->x*PIXEL_MM + res.cols/2),(unsigned int)(parent->y*PIXEL_MM + res.rows/2));
+    cv::circle(res, p1, 4, cv::Scalar(0,0,255), 3);
 
     // save the image to a file
     cv::imshow(fileName, res);

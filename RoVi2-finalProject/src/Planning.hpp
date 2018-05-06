@@ -80,7 +80,10 @@ using namespace rwlibs::proximitystrategies;
 
 #define MAX_RRT_ITERATIONS 4000
 
-
+#define GOAL_SAMPLE_PROB 0.1
+#define RGD_MIN_ERROR 0.001
+#define RGD_MAX_ERROR 0.01
+#define EDGE_CHECK_EBS 0.001
 
 
 
