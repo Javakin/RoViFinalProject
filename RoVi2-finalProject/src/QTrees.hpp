@@ -30,8 +30,8 @@ using namespace std;
 
 
 // --------------------  defines ----------------------------
-#define X_RANGE             0.58
-#define Y_RANGE             0.1         // max is 0.15
+#define X_CONVEYOR             0.58
+#define Y_CONVEYOR             0.15         // max is 0.15
 
 /*namespace
 {

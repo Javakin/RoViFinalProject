@@ -65,6 +65,7 @@ public:
     Lego();
     Lego(State* _state, WorkCell::Ptr _workcell);
     void initializeTestSetup();
+    void sortBricks();
     void trackLego(unsigned int iLegoID);
     void move(int iLegoID, double dx);
     void move(double dx);

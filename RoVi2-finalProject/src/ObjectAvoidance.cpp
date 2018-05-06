@@ -351,7 +351,7 @@ void ObjectAvoidance::planner(){
     Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
     Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
-    cout << "hello world\n";
+    //cout << "hello world\n";
     // If the route is complete make a new one
     if (RobotHandle->pathCompleted()){
         rw::trajectory::QPath aPath;

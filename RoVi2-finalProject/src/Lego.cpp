@@ -43,7 +43,10 @@ Lego::Lego(State *_state, WorkCell::Ptr _workcell) {
         isTracked.push_back(0);
     }
 
-    //cout << "step 2\n";
+
+}
+
+void Lego::sortBricks(){
     // Initialize the lego bricks position out of camera sight and withoute collision
     for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
         Vector3D<> vec(X_OUT_OF_VISION + ID*LEGO_SPACING,0,0);

@@ -79,46 +79,44 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
     // create an image for all the nodes
     cout << "stuff \n";
-
     cv::Mat res(1000,1000, CV_8UC3, cv::Scalar(255,255,255));
 
     // add all the nodes and and edges to the image
-    Node* parent;
-
+    Node* parent = qTree[0];
 
 
     // create a rectangle for the conveuor belt
-    cv::Point p1= cv::Point(500-X_RANGE*PIXEL_MM,500-Y_RANGE*PIXEL_MM);
-    cv::Point p2= cv::Point(500+X_RANGE*PIXEL_MM,500+Y_RANGE*PIXEL_MM);
-    cv::rectangle( res, p1, p2, cv::Scalar( 0, 0, 0 ), 3 , 8 );
+    cv::Point p1= cv::Point((unsigned int)(res.cols/2-X_CONVEYOR*PIXEL_MM),(unsigned int)(res.rows/2-Y_CONVEYOR*PIXEL_MM));
+    cv::Point p2= cv::Point((unsigned int)(res.cols/2+X_CONVEYOR*PIXEL_MM),(unsigned int)(res.rows/2+Y_CONVEYOR*PIXEL_MM));
+    cv::rectangle( res, p1, p2, cv::Scalar( 0, 0, 0 ), 2 , 8 );
 
-    p1= cv::Point(5,6);
-    p2= cv::Point(10,11);
-    cv::rectangle( res, p1, p2, cv::Scalar( 255, 0, 0 ), 3 , 8 );
 
-    cout << "get rect\n ";
+    // Draw the legoBricks
+    for(unsigned int i = 0; i<vBricks.size(); i++){
+        cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f(vBricks[i][0]*PIXEL_MM + res.cols/2,vBricks[i][1]*PIXEL_MM + res.rows/2), cv::Size2f(0.016*PIXEL_MM, 0.048*PIXEL_MM), vBricks[i][3]*180/3.1415);
+        cv::Point2f vertices[4];
+        rRect.points(vertices);
+        for (int i = 0; i < 4; i++)
+            line(res, vertices[i], vertices[(i+1)%4], cv::Scalar(0,255,0));
+    }
 
-    // draw the tree
+
+    // Draw the Q Tree
     for (unsigned int i = 0; i<qTree.size(); i++){
         parent = qTree[i];
-        int xval = (int)(parent->x*PIXEL_MM) + 500;
-        int yval = (int)(parent->y*PIXEL_MM) + 500;
+        int xval = (unsigned int)(parent->x*PIXEL_MM + res.cols/2);
+        int yval = (unsigned int)(parent->y*PIXEL_MM + res.rows/2);
 
-        cout << "xval: " << xval << " "<< (parent->x*PIXEL_MM) << " yval; " << yval << " " << (parent->y*PIXEL_MM)<< endl;
+        //cout << "xval: " << xval << " "<< (parent->x*PIXEL_MM) << " yval; " << yval << " " << (parent->y*PIXEL_MM)<< endl;
         if (xval > 0 && xval < 999 && yval > 0 && yval < 999 ){
-            res.at<cv::Vec3b>(xval, yval) = cv::Vec3b::all(0);
+            res.at<cv::Vec3b>(cv::Point(xval, yval)) = cv::Vec3b::all(0);
         }
     }
 
-    for(unsigned int i = 0; i<vBricks.size(); i++){
+    // Highlight the goalConfiguration
+    p1= cv::Point( (unsigned int)(parent->x*PIXEL_MM + res.cols/2),(unsigned int)(parent->y*PIXEL_MM + res.rows/2));
+    cv::circle(res, p1, 4, cv::Scalar(255,0,0), 3);
 
-        cout << i << ": ";
-        for(unsigned int j = 0; j<vBricks[i].size(); j++){
-            cout << vBricks[i][j] << " ";
-        }
-        cout << endl;
-
-    }
 
     // save the image to a file
     cv::imshow(fileName, res);
