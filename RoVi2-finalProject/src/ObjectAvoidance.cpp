@@ -198,18 +198,6 @@ QWidget* ObjectAvoidance::createCamSetup() {
     return cams;
 }
 
-/*
-void *await(void *t) {
-    int i;
-    long tid;
-
-    tid = (long)t;
-
-    sleep(1);
-    cout << "Sleeping in thread " << endl;
-    cout << "Thread with id : " << tid << "  ...exiting " << endl;
-    pthread_exit(NULL);
-}*/
 
 void ObjectAvoidance::init() {
 

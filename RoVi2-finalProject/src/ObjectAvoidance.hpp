@@ -46,7 +46,7 @@
 #include "Robot.hpp"
 
 // for multithreading
-#include <pthread.h>
+#include <thread>
 
 using namespace std;
 
