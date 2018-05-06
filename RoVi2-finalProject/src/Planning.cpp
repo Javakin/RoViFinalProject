@@ -90,8 +90,8 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 dx = computeDisplacement(qS);
                 T.add(qS, nearestNode, dx[0], dx[1]);
 
-                //nearestNode = T.nearestNeighbor(qRobot);
-                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
+                nearestNode = T.nearestNeighbor(qRobot);
+                cout <<(nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached

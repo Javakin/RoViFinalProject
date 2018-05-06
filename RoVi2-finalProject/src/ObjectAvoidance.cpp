@@ -358,7 +358,7 @@ void ObjectAvoidance::planner(){
 
         cout << "in loop\n";
         if(robotDirection == 0){
-            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.01);
+            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.1);
             if (aPath.size() != 0){
                 cout << "first" << endl;
                 robotDirection = 1;
@@ -367,7 +367,7 @@ void ObjectAvoidance::planner(){
         }
 
         else if(robotDirection == 1){
-            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.01);
+            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.1);
 
             if (aPath.size() != 0){
             cout << "second" << endl;
