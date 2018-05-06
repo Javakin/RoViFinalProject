@@ -41,7 +41,8 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     // setup variables
     this->_state = _state;
     rw::trajectory::QPath path;
-    QTrees T = QTrees(qGoal);
+    VelocityScrew6D<> dx = computeDisplacement(qGoal);
+    QTrees T = QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
     // initial conditions
@@ -53,11 +54,11 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
     cout << "inside the loop\n";
     // Grow RRT tree
-    //unsigned int N = 0;
-    for(unsigned int N = 0; N <= MAX_RRT_ITERATIONS; N++){
+    unsigned int N = 0;
+    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
 
-        cout << "N: " << N;
+        //cout << "N: " << N;
         Q qRand = sampler(qRobot, 0.2);
 
         Node* nearestNode= T.nearestNeighbor(qRand);
@@ -71,7 +72,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         // constrain the point
         if(RGDNewConfig(qS, dMax, 500,500,0.001)){
 
-            cout << "qS " << qS << endl;
+            //cout << "qS " << qS << endl;
 
             nearestNode = T.nearestNeighbor(qS);
 
@@ -86,10 +87,11 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
             // check for edge colliitons
             if(expandedBinarySearch(qS, qNear, 0.001)){
-                T.add(qS, nearestNode);
+                dx = computeDisplacement(qS);
+                T.add(qS, nearestNode, dx[0], dx[1]);
 
                 //nearestNode = T.nearestNeighbor(qRobot);
-                cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
+                //cout << N  << (nearestNode->q - qRobot).norm2()<< endl;
 
 
                 // has the goal been reached
@@ -100,15 +102,16 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 }
             }
         }
-        //cout << "checking the max iterations" << endl;
-        // post path planning check
-        if(N >= MAX_RRT_ITERATIONS){
-            cout << "No solution found \n";
-            return path;
-        }
     }
 
+    cout << "checking the max iterations" << endl;
+    // post path planning check
+    if(N >= MAX_RRT_ITERATIONS){
+        cout << "No solution found \n";
+        return path;
+    }
 
+    T.exportTree("Tree");
 
 
     // fetch the path
@@ -117,8 +120,8 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
 
     // update the newest Tree for later use
-    T.setC(nearestNode->nodeCost);
-    R = T;
+    //T.setC(nearestNode->nodeCost);
+    //R = T;
 
     // add the goal to the path
     //path.push_back(qRobot);
@@ -176,16 +179,34 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
 
     //calculate the dx_error
     VelocityScrew6D<> dx_error =  VelocityScrew6D<>(0,0,0,0,0,0);
-    VelocityScrew6D<> dx =  VelocityScrew6D<>(0,0,0,0,0,0);
     for (unsigned int i = 0; i<3; i++){
-        dx[i] = eTt.P()[i];
-        dx[3+i] = (RPY<>(eTt.R()))[i];
-
         dx_error[i] = C[i]*eTt.P()[i];
         dx_error[3+i] = C[3+i]*(RPY<>(eTt.R()))[i];
     }
 
     return dx_error;
+}
+
+VelocityScrew6D<> Planning::computeDisplacement(Q qSample){
+    Frame* TaskFrame = _workcell->findFrame("TaskFrame");
+
+    Transform3D<> wTt = TaskFrame->wTf(_state);
+    Transform3D<> tTw = inverse(wTt);
+
+    device->setQ(qSample, _state);
+    Frame* EndEffector = _workcell->findFrame("EndEff");
+    Transform3D<> wTe = EndEffector->wTf(_state);
+    Transform3D<> eTt = tTw*wTe;
+
+
+    //calculate the dx_error
+    VelocityScrew6D<> dx =  VelocityScrew6D<>(0,0,0,0,0,0);
+    for (unsigned int i = 0; i<3; i++){
+        dx[i] = eTt.P()[i];
+        dx[3+i] = (RPY<>(eTt.R()))[i];
+    }
+
+    return dx;
 }
 
 

@@ -10,18 +10,22 @@
 // --------------------  includes ----------------------------
 //RobWork includes
 #include <rw/math/Q.hpp>
-//#include <rwlibs/pathplanners/rrt/RRTTree.hpp>
-//#include <rw/common/PropertyType.hpp>
 #include <rw/trajectory.hpp>
+
+
 
 //std libs
 #include <vector>
+#include <string>
+
+//opencv includes for exporting the image
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
 using namespace rw::math;
 using namespace std;
-//using namespace rwlibs::pathplanners;
 
 
 // --------------------  defines ----------------------------
@@ -38,10 +42,14 @@ struct Node {
     Q q;
     Node* parent;
     double nodeCost;
-    Node( Q aQ, Node* aParent, double aNodeCost){
+    double x;
+    double y;
+    Node( Q aQ, Node* aParent, double aNodeCost, double aX, double aY){
         q = aQ;
         parent = aParent;
         nodeCost = aNodeCost;
+        y = aY;
+        x = aX;
     }
 };
 
@@ -50,15 +58,17 @@ struct Node {
 class QTrees {
 public:
     QTrees();
-    QTrees(Q qInit);
+    QTrees(Q qInit, double aX, double ay);
     ~QTrees();
 
 
 
-    void add(Q qNew, Node* nParent);
+    void add(Q qNew, Node* nParent, double aX, double aY);
     Node* nearestNeighbor(Q qRand);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
     void setC(double C);
+
+    void exportTree(string fileName);
 
 
 private:

@@ -76,7 +76,7 @@ using namespace rwlibs::proximitystrategies;
 #define Q4_WEIGHT           0.0955
 #define Q5_WEIGHT           0.7879
 
-#define MAX_RRT_ITERATIONS 10000
+#define MAX_RRT_ITERATIONS 4000
 
 
 
@@ -98,6 +98,8 @@ private:
 
 
     VelocityScrew6D<> computeTaskError(Q qSample);
+    VelocityScrew6D<> computeDisplacement(Q qSample);
+
     bool RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps);
     Q randomDisplacement(Q dMax);
     Q sampler(Q qGoal, double goalSampleProb);
