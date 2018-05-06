@@ -29,6 +29,9 @@ Planning::Planning(WorkCell::Ptr _workcell) {
 
     // construct a QSampler
     qSamples = rw::pathplanning::QSampler::makeUniform(device);
+
+    _T = nullptr;
+    _R = nullptr;
 }
 
 Planning::~Planning() {
@@ -42,7 +45,10 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     this->_state = _state;
     rw::trajectory::QPath path;
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
-    QTrees T = QTrees(qGoal, dx[0], dx[1]);
+    if (_T != nullptr){
+        delete _T;
+    }
+    _T = new QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
     // initial conditions
@@ -64,7 +70,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         //cout << "N: " << N;
         Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
 
-        Node* nearestNode= T.nearestNeighbor(qRand);
+        Node* nearestNode= _T->nearestNeighbor(qRand);
 
         Q qNear = nearestNode->q;
 
@@ -79,7 +85,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
                 // goal is close end loop
                 cout <<  "Goal reached in interations N: " << N << endl;
                 dx = computeDisplacement(qS);
-                T.add(qS, nearestNode, dx[0], dx[1]);
+                _T->add(qS, nearestNode, dx[0], dx[1]);
                 break;
             }
         }else{
@@ -92,7 +98,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
             //cout << "qS " << qS << endl;
 
-            nearestNode = T.nearestNeighbor(qS);
+            nearestNode = _T->nearestNeighbor(qS);
 
             qNear = nearestNode->q;
 
@@ -106,7 +112,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
             // check for edge colliitons
             if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
                 dx = computeDisplacement(qS);
-                T.add(qS, nearestNode, dx[0], dx[1]);
+                _T->add(qS, nearestNode, dx[0], dx[1]);
 
 
             }
@@ -125,21 +131,18 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     Lego* _LegoHandle = new Lego(&_state, _workcell);
 
     vector< vector< double> > v = _LegoHandle->getPoses();
-    T.exportTree("Tree", v);
+    _T->exportTree("Tree", v);
     delete _LegoHandle;
 
 
     // fetch the path
-    Node* nearestNode= T.nearestNeighbor(qRobot);
-    T.getRootPath(nearestNode, path);
+    Node* nearestNode= _T->nearestNeighbor(qRobot);
+    _T->getRootPath(nearestNode, path);
 
 
     // update the newest Tree for later use
     //T.setC(nearestNode->nodeCost);
-    //R = T;
-
-    // add the goal to the path
-    //path.push_back(qRobot);
+    _R = _T;
 
     return path;
 }

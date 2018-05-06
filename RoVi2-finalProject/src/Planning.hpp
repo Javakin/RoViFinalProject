@@ -78,7 +78,7 @@ using namespace rwlibs::proximitystrategies;
 #define Q4_WEIGHT           0.0955
 #define Q5_WEIGHT           0.7879
 
-#define MAX_RRT_ITERATIONS 4000
+#define MAX_RRT_ITERATIONS 500
 
 #define GOAL_SAMPLE_PROB 0.1
 #define RGD_MIN_ERROR 0.001
@@ -123,8 +123,8 @@ private:
     rw::proximity::CollisionDetector::Ptr detector;
     rw::pathplanning::QSampler::Ptr qSamples;
 
-    QTrees T;
-    QTrees R;
+    QTrees* _T;
+    QTrees* _R;
 
 };
 

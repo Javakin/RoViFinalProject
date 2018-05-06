@@ -134,7 +134,7 @@ bool Robot::pathCompleted(){
 
     if (path.size() == 0)
         return 1;
-    if (uiPathIterator >= path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.1)
+    if (uiPathIterator >= path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.01)
         return 1;
     return 0;
 }

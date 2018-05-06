@@ -72,7 +72,7 @@ void QTrees::setC( double C) {
     this->C = C;
 }
 
-// todo add the legobrixks
+
 void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     // setup defines
     double PIXEL_MM = 700;
@@ -116,7 +116,7 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
         //cout << "xval: " << xval << " "<< (parent->x*PIXEL_MM) << " yval; " << yval << " " << (parent->y*PIXEL_MM)<< endl;
         if (xval > 0 && xval < res.cols-1 && yval > 0 && yval < res.rows-1 ){
             // Draw point
-            cv::circle(res, cv::Point(xval, yval), 2, cv::Scalar(255, 0, 0), -1);
+            cv::circle(res, cv::Point(xval, yval), 2, cv::Scalar(0, 0, 0), -1);
             //res.at<cv::Vec3b>(cv::Point(xval, yval)) = cv::Vec3b::all(0);
 
 
