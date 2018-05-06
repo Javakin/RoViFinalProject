@@ -108,12 +108,27 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     Node* parent = qTree[0];
     for (unsigned int i = 0; i<qTree.size(); i++){
         parent = qTree[i];
+
         int xval = (unsigned int)(parent->x*PIXEL_MM + res.cols/2);
         int yval = (unsigned int)(parent->y*PIXEL_MM + res.rows/2);
 
+
         //cout << "xval: " << xval << " "<< (parent->x*PIXEL_MM) << " yval; " << yval << " " << (parent->y*PIXEL_MM)<< endl;
-        if (xval > 0 && xval < 999 && yval > 0 && yval < 999 ){
-            res.at<cv::Vec3b>(cv::Point(xval, yval)) = cv::Vec3b::all(0);
+        if (xval > 0 && xval < res.cols-1 && yval > 0 && yval < res.rows-1 ){
+            // Draw point
+            cv::circle(res, cv::Point(xval, yval), 2, cv::Scalar(255, 0, 0), -1);
+            //res.at<cv::Vec3b>(cv::Point(xval, yval)) = cv::Vec3b::all(0);
+
+
+            if (parent->parent != nullptr) {
+                int xval2 = (unsigned int) (parent->parent->x * PIXEL_MM + res.cols / 2);
+                int yval2 = (unsigned int) (parent->parent->y * PIXEL_MM + res.rows / 2);
+
+                if (xval2 > 0 && xval2 < res.cols - 1 && yval2 > 0 && yval2 < res.rows - 1) {
+                    // Draw line
+                    cv::line(res, cv::Point(xval, yval), cv::Point(xval2, yval2), cv::Scalar(0, 0, 0));
+                }
+            }
         }
     }
 
