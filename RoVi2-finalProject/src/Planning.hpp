@@ -37,6 +37,8 @@
 #include <time.h>       /* time */
 #include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
 #include "QTrees.hpp"
+#include "Lego.hpp"
+#include <vector>
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;

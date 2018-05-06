@@ -111,7 +111,18 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         return path;
     }
 
-    T.exportTree("Tree");
+
+    // print out the tree in the map
+
+    Lego* _LegoHandle = new Lego(&_state, _workcell);
+    cout << "printing" << endl;
+
+    vector< vector< double> > v = _LegoHandle->getPoses();
+    cout << endl;
+    T.exportTree("Tree", v);
+    cout << "make the print\n";
+    delete _LegoHandle;
+    cout << "deleting handler"<< endl;
 
 
     // fetch the path

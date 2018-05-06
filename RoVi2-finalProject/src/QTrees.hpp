@@ -13,14 +13,15 @@
 #include <rw/trajectory.hpp>
 
 
-
 //std libs
 #include <vector>
 #include <string>
 
 //opencv includes for exporting the image
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
+
+// for drawing the workspace
+//#include <Lego.hpp>
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;
@@ -29,7 +30,8 @@ using namespace std;
 
 
 // --------------------  defines ----------------------------
-//#define MAX_DISTANCE    1000
+#define X_RANGE             0.58
+#define Y_RANGE             0.1         // max is 0.15
 
 /*namespace
 {
@@ -68,7 +70,7 @@ public:
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
     void setC(double C);
 
-    void exportTree(string fileName);
+    void exportTree(string fileName, vector< vector<double> > vBricks);
 
 
 private:
@@ -76,6 +78,7 @@ private:
     double db;
     double cb;
     double C;
+
 };
 
 

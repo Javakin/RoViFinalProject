@@ -72,6 +72,7 @@ public:
     void removeFromView();
     void removeFromView(int iLegoID);
     vector<MovableFrame*> getFrames();
+    vector<vector< double > > getPoses();
 
 
 

@@ -72,31 +72,53 @@ void QTrees::setC( double C) {
     this->C = C;
 }
 
-void QTrees::exportTree(string fileName) {
+// todo add the legobrixks
+void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
+    // setup defines
+    double PIXEL_MM = 700;
+
     // create an image for all the nodes
+    cout << "stuff \n";
+
     cv::Mat res(1000,1000, CV_8UC3, cv::Scalar(255,255,255));
 
     // add all the nodes and and edges to the image
     Node* parent;
 
+
+
     // create a rectangle for the conveuor belt
-    double pixel_mm = 700;
+    cv::Point p1= cv::Point(500-X_RANGE*PIXEL_MM,500-Y_RANGE*PIXEL_MM);
+    cv::Point p2= cv::Point(500+X_RANGE*PIXEL_MM,500+Y_RANGE*PIXEL_MM);
+    cv::rectangle( res, p1, p2, cv::Scalar( 0, 0, 0 ), 3 , 8 );
 
+    p1= cv::Point(5,6);
+    p2= cv::Point(10,11);
+    cv::rectangle( res, p1, p2, cv::Scalar( 255, 0, 0 ), 3 , 8 );
 
+    cout << "get rect\n ";
 
+    // draw the tree
     for (unsigned int i = 0; i<qTree.size(); i++){
         parent = qTree[i];
-        int xval = (int)(parent->x*pixel_mm) + 500;
-        int yval = (int)(parent->y*pixel_mm) + 500;
+        int xval = (int)(parent->x*PIXEL_MM) + 500;
+        int yval = (int)(parent->y*PIXEL_MM) + 500;
 
-        cout << "xval: " << xval << " "<< (parent->x*pixel_mm) << " yval; " << yval << " " << (parent->y*pixel_mm)<< endl;
+        cout << "xval: " << xval << " "<< (parent->x*PIXEL_MM) << " yval; " << yval << " " << (parent->y*PIXEL_MM)<< endl;
         if (xval > 0 && xval < 999 && yval > 0 && yval < 999 ){
             res.at<cv::Vec3b>(xval, yval) = cv::Vec3b::all(0);
         }
-
-
     }
 
+    for(unsigned int i = 0; i<vBricks.size(); i++){
+
+        cout << i << ": ";
+        for(unsigned int j = 0; j<vBricks[i].size(); j++){
+            cout << vBricks[i][j] << " ";
+        }
+        cout << endl;
+
+    }
 
     // save the image to a file
     cv::imshow(fileName, res);

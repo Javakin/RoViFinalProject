@@ -145,4 +145,28 @@ void Lego::initializeTestSetup() {
     }
 }
 
+vector<vector< double > > Lego::getPoses() {
+    vector<vector<double> > output;
+    vector<double> vBrick;
+
+    cout << "initiate the lego part\n";
+    for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
+        Transform3D<> tB =  vLegoFrames[ID]->getTransform(*_state);
+        vBrick.clear();
+
+        for (unsigned int i = 0; i<3; i++){
+            vBrick.push_back(tB.P()[i]);
+        }
+
+        for (unsigned int i = 0; i<3; i++){
+            vBrick.push_back(RPY<>(tB.R())[i]);
+        }
+
+        output.push_back(vBrick);
+    }
+    cout << "completed the legopart\n";
+
+    return output;
+}
+
 
