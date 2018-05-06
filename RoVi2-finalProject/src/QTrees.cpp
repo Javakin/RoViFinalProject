@@ -79,7 +79,7 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
     // create an image for all the nodes
     cout << "stuff \n";
-    cv::Mat res(1000,1000, CV_8UC3, cv::Scalar(255,255,255));
+    cv::Mat res(700,1000, CV_8UC3, cv::Scalar(255,255,255));
 
     // add all the nodes and and edges to the image
     Node* parent = qTree[0];
@@ -92,14 +92,20 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
 
     // Draw the legoBricks
-    for(unsigned int i = 0; i<vBricks.size(); i++){
-        cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f(vBricks[i][0]*PIXEL_MM + res.cols/2,vBricks[i][1]*PIXEL_MM + res.rows/2), cv::Size2f(0.016*PIXEL_MM, 0.048*PIXEL_MM), vBricks[i][3]*180/3.1415);
+    for(unsigned int i = 0; i<vBricks.size(); i++) {
+        cv::RotatedRect rRect = cv::RotatedRect(
+                cv::Point2f(vBricks[i][0] * PIXEL_MM + res.cols / 2, vBricks[i][1] * PIXEL_MM + res.rows / 2),
+                cv::Size2f(0.016 * PIXEL_MM, 0.048 * PIXEL_MM), vBricks[i][3] * 180 / 3.1415);
         cv::Point2f vertices[4];
         rRect.points(vertices);
-        for (int i = 0; i < 4; i++)
-            line(res, vertices[i], vertices[(i+1)%4], cv::Scalar(0,255,0));
-    }
+        vector<cv::Point> point;
 
+        for (int j = 0; j < 4; j++) {
+            point.push_back(cv::Point((int)vertices[j].x, (int)vertices[j].y));  //point1
+        }
+
+        cv::fillConvexPoly(res, point, cv::Scalar(0, 200, 255), 8, 0);
+    }
 
     // Draw the Q Tree
     for (unsigned int i = 0; i<qTree.size(); i++){
