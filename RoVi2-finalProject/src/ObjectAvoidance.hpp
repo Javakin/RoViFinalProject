@@ -51,19 +51,6 @@
 using namespace std;
 
 
-class dummy: public QThread{
-public:
-
-    void run(){
-        cout << "thread is running" << endl;
-        while(1){
-            cout << "running\n";
-        }
-    }
-private:
-
-
-};
 
 class ObjectAvoidance: public rws::RobWorkStudioPlugin
 {
@@ -107,9 +94,7 @@ private:
     Planning* PlannerHandle;
     Robot* RobotHandle;
 
-    int robotDirection;
 
-    dummy* aDommy;
 
 
 

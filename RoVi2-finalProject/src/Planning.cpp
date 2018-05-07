@@ -34,6 +34,9 @@ Planning::Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state, 
     // setup robothandleren
     this->_RobotHandle = _RobotHandle;
 
+    // initialize the mazerunner
+    robotDirection = 0;
+    pausePlan = 0;
 
     // initialize trees
     _T = nullptr;
@@ -185,17 +188,19 @@ QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
     if (inCollision(qRobot))
         return 0;
 
-    cout << "Planning from " << qRobot << " to \n" << qGoal << endl;
+    //cout << "Planning from " << qRobot << " to \n" << qGoal << endl;
     QPath path;
     planner->query(qRobot,qGoal,path,30);
     return path;
 }
 
+void Planning::pausePlanner(int aStatus){
+    pausePlan = aStatus;
+}
 
 void Planning::run(){
     // uptimize on current tree if active
     isAlive= true;
-    int robotDirection = 0;
 
     cout << "lets get to it \n";
     while (isAlive){
@@ -203,39 +208,42 @@ void Planning::run(){
         Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
         Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
-
-
-        //cout << "hello world\n";
-        // If the route is complete make a new one
-        if (_RobotHandle->pathCompleted()){
-            rw::trajectory::QPath aPath;
-
-            cout << "in loop\n";
-            if(robotDirection == 0){
-                aPath = getConstraintPath(state, q2, _RobotHandle->getQRobot(), 0.1);
-                if (aPath.size() != 0){
-                    cout << "first" << endl;
-                    robotDirection = 1;
-                    _RobotHandle->setPath(aPath);
+        if(pausePlan == 0){
+            // If the route is complete make a new one
+            if (_RobotHandle->pathCompleted()){
+                rw::trajectory::QPath aPath;
+                cout << "hello world " << robotDirection << endl;
+                cout << "in loop\n";
+                if(robotDirection == 0){
+                    aPath = getConstraintPath(state, q2, _RobotHandle->getQRobot(), 0.1);
+                    if (aPath.size() != 0){
+                        cout << "first" << endl;
+                        robotDirection = 1;
+                        _RobotHandle->setPath(aPath);
+                    }
                 }
+
+                else if(robotDirection == 1){
+                    aPath = getConstraintPath(state, q1, _RobotHandle->getQRobot(), 0.1);
+
+                    if (aPath.size() != 0){
+                        cout << "second" << endl;
+                        robotDirection = 0;
+                        _RobotHandle->setPath(aPath);
+                    }
+                }
+                cout << aPath.size();
             }
 
-            else if(robotDirection == 1){
-                aPath = getConstraintPath(state, q1, _RobotHandle->getQRobot(), 0.1);
+            // Check if the path is still valid
 
-                if (aPath.size() != 0){
-                    cout << "second" << endl;
-                    robotDirection = 0;
-                    _RobotHandle->setPath(aPath);
-                }
-            }
-            cout << aPath.size();
+
+            // Search for a better solution
+
         }
 
-        // Check if the path is still valid
-
-
-        // Search for a better solution
+        // sleep for a duration of time
+        usleep( 500000 );
     }
 
     cout << "i am dying\n";

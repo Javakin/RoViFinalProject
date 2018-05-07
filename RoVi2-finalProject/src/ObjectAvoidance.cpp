@@ -249,7 +249,7 @@ void ObjectAvoidance::init() {
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
-        RobotHandle->start();
+
 
         // Setting up the path planner
         PlannerHandle  = new Planning(_workcell, &_state, RobotHandle);
@@ -263,8 +263,9 @@ void ObjectAvoidance::init() {
 
         RobotHandle->setPath(aPath);
 
+        // start the threads
+        RobotHandle->start();
         PlannerHandle->start();
-
 
 
         getRobWorkStudio()->setState(_state);
@@ -283,10 +284,12 @@ void ObjectAvoidance::run(){
     if(_timer->isActive()){
         cout << "stopping the timer\n";
         _timer->stop();
+        PlannerHandle->pausePlanner(1);
 
     }else{
         cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
+        PlannerHandle->pausePlanner(0);
     }
 
 }
@@ -297,8 +300,6 @@ void ObjectAvoidance::update(){
     LegoHandle->move(0.003);
 
     RobotHandle->update();
-
-    //planner();
 
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);

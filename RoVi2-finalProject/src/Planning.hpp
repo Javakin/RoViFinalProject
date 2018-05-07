@@ -99,6 +99,8 @@ public:
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
     QPath updateConstraindPath(State* _state);
 
+
+    void pausePlanner(int status);
     // for running the path planner thread
     void run();
 
@@ -125,6 +127,8 @@ private:
     Device::Ptr device;
     Device::Ptr gripper;
     bool isAlive;
+    int robotDirection;
+    int pausePlan;
 
     VelocityScrew6D<> C;
     rw::proximity::CollisionDetector::Ptr detector;
