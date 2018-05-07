@@ -92,7 +92,7 @@ class Planning : public QThread {
 public:
 
     Planning();
-    Planning(WorkCell::Ptr _workcell, Robot* _RobotHandle);
+    Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state, Robot* _RobotHandle);
     ~Planning();
 
     QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
@@ -117,7 +117,9 @@ private:
 
     bool inCollision(const Q &q);
 
-    rw::kinematics::State _state;
+    rw::kinematics::State state;
+    rw::kinematics::State::Ptr  _state;
+
     rw::models::WorkCell::Ptr _workcell;
     Robot* _RobotHandle;
     Device::Ptr device;

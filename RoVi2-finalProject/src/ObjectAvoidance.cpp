@@ -252,8 +252,8 @@ void ObjectAvoidance::init() {
         RobotHandle->start();
 
         // Setting up the path planner
-        PlannerHandle  = new Planning(_workcell, RobotHandle);
-        PlannerHandle->start();
+        PlannerHandle  = new Planning(_workcell, &_state, RobotHandle);
+
 
         // move robot to start configuration
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
@@ -262,7 +262,8 @@ void ObjectAvoidance::init() {
         rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
 
         RobotHandle->setPath(aPath);
-        robotDirection = 0;
+
+        PlannerHandle->start();
 
 
 
@@ -297,51 +298,12 @@ void ObjectAvoidance::update(){
 
     RobotHandle->update();
 
-    planner();
+    //planner();
 
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
 }
 
-
-void ObjectAvoidance::planner(){
-    // Setup
-    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
-
-    //cout << "hello world\n";
-    // If the route is complete make a new one
-    if (RobotHandle->pathCompleted()){
-        rw::trajectory::QPath aPath;
-
-        cout << "in loop\n";
-        if(robotDirection == 0){
-            aPath = PlannerHandle->getConstraintPath(_state, q2, RobotHandle->getQRobot(), 0.1);
-            if (aPath.size() != 0){
-                cout << "first" << endl;
-                robotDirection = 1;
-                RobotHandle->setPath(aPath);
-            }
-        }
-
-        else if(robotDirection == 1){
-            aPath = PlannerHandle->getConstraintPath(_state, q1, RobotHandle->getQRobot(), 0.1);
-
-            if (aPath.size() != 0){
-            cout << "second" << endl;
-                robotDirection = 0;
-                RobotHandle->setPath(aPath);
-            }
-        }
-        cout << aPath.size();
-    }
-
-    // Check if the path is still valid
-
-
-    // Search for a better solution
-
-}
 
 
 void ObjectAvoidance::simpleMazeRunner() {

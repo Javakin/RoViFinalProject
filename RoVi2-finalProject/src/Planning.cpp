@@ -14,8 +14,9 @@ Planning::Planning() {
 
 }
 
-Planning::Planning(WorkCell::Ptr _workcell, Robot* _RobotHandle) {
+Planning::Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state,  Robot* _RobotHandle) {
     this->_workcell = _workcell;
+    this->_state = _state;
     C =  VelocityScrew6D<>(0,0,1,1,1,1);
 
     device = this->_workcell->findDevice("UR1");
@@ -54,9 +55,9 @@ Planning::~Planning() {
 }
 
 
-rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobot, double eps) {
+rw::trajectory::QPath Planning::getConstraintPath(State state, Q qGoal, Q qRobot, double eps) {
     // setup variables
-    this->_state = _state;
+    this->state = state;
     rw::trajectory::QPath path;
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
 
@@ -138,7 +139,7 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     if(N <= MAX_RRT_ITERATIONS){
         cout << "Solution found \n";
         // print out the tree in the map
-        Lego* _LegoHandle = new Lego(&_state, _workcell);
+        Lego* _LegoHandle = new Lego(&state, _workcell);
 
         vector< vector< double> > v = _LegoHandle->getPoses();
         _T->exportTree("Tree", v);
@@ -150,14 +151,16 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
         _T->getRootPath(nearestNode, path);
 
         // update tree structure
-        delete _R;
+        if (_R != nullptr)
+            delete _R;
         _R = _T;
 
 
     }else{
         cout << "No soluiton found\n";
         // update the newest Tree for later use
-        delete _T;
+        if(_T != nullptr)
+            delete _T;
     }
 
 
@@ -166,12 +169,12 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
 
 
 QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
-    _state = astate;
+    state = astate;
 
     rw::math::Math::seed(time(NULL));
 
     //CollisionDetector detector(_workcell, ProximityStrategyFactory::makeDefaultCollisionStrategy());
-    PlannerConstraint constraint = PlannerConstraint::make(detector,device,_state);
+    PlannerConstraint constraint = PlannerConstraint::make(detector,device,state);
     //QSampler::Ptr sampler = QSampler::makeConstrained(QSampler::makeUniform(device),constraint.getQConstraintPtr());
     QMetric::Ptr metric = MetricFactory::makeEuclidean<Q>();
     QToQPlanner::Ptr planner = RRTPlanner::makeQToQPlanner(constraint, qSamples, metric, epsilon, RRTPlanner::RRTConnect);
@@ -192,9 +195,47 @@ QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
 void Planning::run(){
     // uptimize on current tree if active
     isAlive= true;
+    int robotDirection = 0;
+
     cout << "lets get to it \n";
     while (isAlive){
+        // Setup
+        Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+        Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
 
+
+
+        //cout << "hello world\n";
+        // If the route is complete make a new one
+        if (_RobotHandle->pathCompleted()){
+            rw::trajectory::QPath aPath;
+
+            cout << "in loop\n";
+            if(robotDirection == 0){
+                aPath = getConstraintPath(state, q2, _RobotHandle->getQRobot(), 0.1);
+                if (aPath.size() != 0){
+                    cout << "first" << endl;
+                    robotDirection = 1;
+                    _RobotHandle->setPath(aPath);
+                }
+            }
+
+            else if(robotDirection == 1){
+                aPath = getConstraintPath(state, q1, _RobotHandle->getQRobot(), 0.1);
+
+                if (aPath.size() != 0){
+                    cout << "second" << endl;
+                    robotDirection = 0;
+                    _RobotHandle->setPath(aPath);
+                }
+            }
+            cout << aPath.size();
+        }
+
+        // Check if the path is still valid
+
+
+        // Search for a better solution
     }
 
     cout << "i am dying\n";
@@ -213,13 +254,13 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
     Frame* TaskFrame = _workcell->findFrame("TaskFrame");
 
 
-    Transform3D<> wTt = TaskFrame->wTf(_state);
+    Transform3D<> wTt = TaskFrame->wTf(state);
     Transform3D<> tTw = inverse(wTt);
 
 
-    device->setQ(qSample, _state);
+    device->setQ(qSample, state);
     Frame* EndEffector = _workcell->findFrame("EndEff");
-    Transform3D<> wTe = EndEffector->wTf(_state);
+    Transform3D<> wTe = EndEffector->wTf(state);
     Transform3D<> eTt = tTw*wTe;
 
 
@@ -237,12 +278,12 @@ VelocityScrew6D<> Planning::computeTaskError(Q qSample) {
 VelocityScrew6D<> Planning::computeDisplacement(Q qSample){
     Frame* TaskFrame = _workcell->findFrame("TaskFrame");
 
-    Transform3D<> wTt = TaskFrame->wTf(_state);
+    Transform3D<> wTt = TaskFrame->wTf(state);
     Transform3D<> tTw = inverse(wTt);
 
-    device->setQ(qSample, _state);
+    device->setQ(qSample, state);
     Frame* EndEffector = _workcell->findFrame("EndEff");
-    Transform3D<> wTe = EndEffector->wTf(_state);
+    Transform3D<> wTe = EndEffector->wTf(state);
     Transform3D<> eTt = tTw*wTe;
 
 
@@ -297,9 +338,9 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // check that the solution is good
     if(dx_error.norm2() <= eps){
         rw::proximity::CollisionDetector::QueryResult data;
-        device->setQ(qs, _state);
+        device->setQ(qs, state);
 
-        bool collision = detector->inCollision(_state, &data);
+        bool collision = detector->inCollision(state, &data);
         if(collision)
         {
             //cout << "in collision" << endl;
@@ -323,8 +364,8 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
 
 bool Planning::inCollision(const Q &q) {
     rw::proximity::CollisionDetector::QueryResult data;
-    device->setQ(q, _state);
-    bool collision = detector->inCollision(_state, &data);
+    device->setQ(q, state);
+    bool collision = detector->inCollision(state, &data);
     if(collision)
     {
         return true;
@@ -345,8 +386,8 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
     unsigned int steps;
 
     // check for collision in the end
-    device->setQ(EndConf, _state);
-    if(detector->inCollision(_state, &data)){
+    device->setQ(EndConf, state);
+    if(detector->inCollision(state, &data)){
         //cout << "EndConf collision status: " <<  detector->inCollision(state, &data) << endl;
         return false;
     }
@@ -361,10 +402,10 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
         for(unsigned int j = 1; j<=steps; j++){
             qi = StartConf+(j - 0.5)*step;
 
-            device->setQ(qi, _state);
+            device->setQ(qi, state);
 
             if((qi-StartConf).norm2() < dq.norm2()){
-                if (detector->inCollision(_state, &data)){
+                if (detector->inCollision(state, &data)){
                     // collision detected
                     return false;
                 }

@@ -89,7 +89,6 @@ public:
 private:
     QWidget* createModeButtons();
     QWidget* createCamSetup();
-    void planner();
 
 
     rw::kinematics::State _state;
