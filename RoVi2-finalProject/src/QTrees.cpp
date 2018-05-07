@@ -68,8 +68,8 @@ void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
 
 }
 
-void QTrees::setC( double C) {
-    this->C = C;
+void QTrees::setC( double aC) {
+    C = aC;
 }
 
 
@@ -147,6 +147,26 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
 Node *QTrees::getRootNode() {
     return qTree[0];
+}
+
+void QTrees::setCb(double aCb) {
+    if(aCb < 0){
+        aCb = 0;
+    }
+    if(aCb > 1){
+        aCb = 1;
+    }
+
+    cb = aCb;
+    db = (1-cb);
+}
+
+double QTrees::getC() {
+    return C;
+}
+
+double QTrees::getCb() {
+    return cb;
 }
 
 

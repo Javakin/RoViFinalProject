@@ -263,10 +263,14 @@ void ObjectAvoidance::init() {
 
         RobotHandle->setPath(aPath);
 
-        // start the threads
         RobotHandle->start();
-        PlannerHandle->start();
 
+        while (!RobotHandle->update()){
+            getRobWorkStudio()->setState(_state);
+        }
+
+
+        PlannerHandle->start();
 
         getRobWorkStudio()->setState(_state);
 
@@ -297,15 +301,15 @@ void ObjectAvoidance::run(){
 void ObjectAvoidance::update(){
 
     // update workspace
-    LegoHandle->move(0.003);
+    //LegoHandle->move(0.003);
 
-    RobotHandle->update();
+    //RobotHandle->update();
 
     // check for errors in the tree
-    QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
+    //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
 
     //PlannerHandle->printTree(_state);
-
+/*
     if(robotpath.size() != 0){
         // collision detected
         RobotHandle->setPath(robotpath);
@@ -313,7 +317,7 @@ void ObjectAvoidance::update(){
 
         robotpath = PlannerHandle->repareTree();
         RobotHandle->setPath(robotpath);
-    }
+    }*/
 
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
@@ -322,23 +326,7 @@ void ObjectAvoidance::update(){
 
 
 void ObjectAvoidance::simpleMazeRunner() {
-    // draw the path
-/*    cout << "make the path" << endl;
-    getRobWorkStudio()->setState(_state);
-    rw::trajectory::QPath aPath;
-
-    aPath = PlannerHandle->getConstraintPath(_state, q2, q1, 0.1);
-    RobotHandle->setPath(aPath);
-
-    cout << "done\n";
-*/
-    //print path
-    /*for(unsigned int i = 0; i < aPath.size(); i++){
-
-        cout << i << ": " << aPath[i] << endl;
-    }
-*/
-
+    cout << "no code for simple maze runner function\n";
 }
 
 void ObjectAvoidance::printConfig() {

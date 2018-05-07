@@ -36,7 +36,7 @@ Planning::Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state, 
 
     // initialize the mazerunner
     robotDirection = 0;
-    pausePlan = 0;
+    pausePlan = 1;
 
     // initialize trees
     _R = nullptr;
@@ -218,41 +218,42 @@ void Planning::run(){
     // uptimize on current tree if active
     isAlive= true;
 
+    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
+    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+    Q qGoal;
+
     cout << "lets get to it \n";
     while (isAlive){
         // Setup
-        Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-        Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+
 
         if(pausePlan == 0){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
-                rw::trajectory::QPath aPath;
-                cout << "hello world " << robotDirection << endl;
-                cout << "in loop\n";
+
+                //cout << "hello world " << robotDirection << endl;
+                //cout << "in loop\n";
                 if(robotDirection == 0){
-                    aPath = getConstraintPath(q2, _RobotHandle->getQRobot(), RRT_EPSILON);
-                    if (aPath.size() != 0){
-                        cout << "first" << endl;
-                        robotDirection = 1;
-                        _RobotHandle->setPath(aPath);
-                    }
+                    qGoal = q2;
                 }
-
                 else if(robotDirection == 1){
-                    aPath = getConstraintPath(q1, _RobotHandle->getQRobot(), RRT_EPSILON);
-
-                    if (aPath.size() != 0){
-                        cout << "second" << endl;
-                        robotDirection = 0;
-                        _RobotHandle->setPath(aPath);
-                    }
+                    qGoal = q1;
                 }
-                cout << aPath.size();
+
+                QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON);
+                if (aPath.size() != 0){
+                    robotDirection = !robotDirection;
+                    _RobotHandle->setPath(aPath);
+                }
+
             }else{
-
                 // Search for a better solution
+                QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
+                //cout << "done updating " << aPath.size() << endl;
+                if (aPath.size() != 0){
 
+                    _RobotHandle->setPath(aPath);
+                }
             }
 
         }
@@ -332,26 +333,27 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
 
     // setup variables
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
-    QTrees* _T = new QTrees(qGoal, dx[0], dx[1]);
-    Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
+    QTrees *_T = new QTrees(qGoal, dx[0], dx[1]);
+    Q dMax = Q(6, 0.003, 0.003, 0.003, 0.003, 0.003, 0.003);
 
-    cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
+    //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Change the tree parameters
-
+    _T->setC((_R->getC() * (1 - IMPROVEMENT_FACTOR)));
+    _T->setCb(_R->getCb() + IMPROVEMENT_FACTOR);
 
     // Grow a new tree
     bool sucess = constrainedRRT(_T, qGoal, eps);
 
     // post path planning check
     rw::trajectory::QPath path;
-    if(sucess){
-        cout << "Solution found \n";
+    if (sucess) {
+        //cout << "Solution found \n";
         printTree(_T, *_state);
 
         // Fetch the path
         Q qRobot = _RobotHandle->getQRobot();
-        Node* nearestNode= _T->nearestNeighbor(qRobot);
+        Node *nearestNode = _T->nearestNeighbor(qRobot);
         _T->getRootPath(nearestNode, path);
 
 
@@ -363,10 +365,10 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
         _R = _T;
 
 
-    }else{
+    } else {
         cout << "No soluiton found\n";
         // update the newest Tree for later use
-        if(_T != nullptr)
+        if (_T != nullptr)
             delete _T;
     }
 

@@ -69,7 +69,11 @@ public:
     Node* nearestNeighbor(Q qRand);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
     Node* getRootNode();
-    void setC(double C);
+    void setC(double aC);
+    void setCb(double aCb);
+
+    double getC();
+    double getCb();
 
     void exportTree(string fileName, vector< vector<double> > vBricks);
 
