@@ -304,7 +304,7 @@ void ObjectAvoidance::update(){
     // check for errors in the tree
     QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
 
-    PlannerHandle->printTree(_state);
+    //PlannerHandle->printTree(_state);
 
     if(robotpath.size() != 0){
         // collision detected

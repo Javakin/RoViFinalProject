@@ -85,7 +85,7 @@ using namespace rwlibs::proximitystrategies;
 #define RGD_MIN_ERROR 0.001
 #define RGD_MAX_ERROR 0.01
 #define EDGE_CHECK_EBS 0.001
-#define VALIDAITON_DEPTH 1.0
+#define VALIDAITON_DEPTH 0.1
 #define RRT_EPSILON     0.1
 
 
@@ -103,8 +103,7 @@ public:
     QPath updateConstraindPath(Q qGoal, double eps);
     QPath validate(double CheckingDebth);
     QPath repareTree();
-    void printTree(QTrees* _tree, rw::kinematics::State aState);
-    void printTree(rw::kinematics::State aState);
+    void printTree();
 
 
     void pausePlanner(int status);
@@ -114,6 +113,7 @@ public:
 
 private:
 
+    void printTree(QTrees* _tree, rw::kinematics::State aState);
 
     VelocityScrew6D<> computeTaskError(Q qSample);
     VelocityScrew6D<> computeDisplacement(Q qSample);

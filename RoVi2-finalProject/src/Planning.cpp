@@ -142,7 +142,7 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
     // post path planning check
     if(status){
         cout << "Solution found \n";
-        printTree(_T, state);
+        printTree(_T, *_state);
 
         // Fetch the path
         Node* nearestNode= _T->nearestNeighbor(qRobot);
@@ -203,9 +203,9 @@ void Planning::printTree(QTrees* _tree, rw::kinematics::State aState){
 
 }
 
-void Planning::printTree(rw::kinematics::State aState){
+void Planning::printTree(){
     // print out the tree in the map
-    printTree(_R, aState);
+    printTree(_R, *_state);
 }
 
 
@@ -347,7 +347,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     rw::trajectory::QPath path;
     if(sucess){
         cout << "Solution found \n";
-        printTree(_T, state);
+        printTree(_T, *_state);
 
         // Fetch the path
         Q qRobot = _RobotHandle->getQRobot();
