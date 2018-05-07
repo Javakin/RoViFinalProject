@@ -86,6 +86,7 @@ using namespace rwlibs::proximitystrategies;
 #define RGD_MAX_ERROR 0.01
 #define EDGE_CHECK_EBS 0.001
 #define VALIDAITON_DEPTH 1.0
+#define RRT_EPSILON     0.1
 
 
 
@@ -105,7 +106,9 @@ public:
     void printTree(QTrees* _tree, rw::kinematics::State aState);
     void printTree(rw::kinematics::State aState);
 
+
     void pausePlanner(int status);
+
     // for running the path planner thread
     void run();
 
@@ -127,6 +130,8 @@ private:
     bool inCollision(const Q &q);
     bool inCollision(rw::kinematics::State::Ptr  _state, const Q &q);
 
+    bool constrainedRRT(QTrees* _T, Q qGoal, double eps);
+
     rw::kinematics::State state;
     rw::kinematics::State::Ptr  _state;
 
@@ -137,12 +142,13 @@ private:
     bool isAlive;
     int robotDirection;
     int pausePlan;
+    int InUse;
 
     VelocityScrew6D<> C;
     rw::proximity::CollisionDetector::Ptr detector;
     rw::pathplanning::QSampler::Ptr qSamples;
 
-    QTrees* _T;
+    //QTrees* _T;
     QTrees* _R;
 
 };

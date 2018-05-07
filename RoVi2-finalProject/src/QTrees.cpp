@@ -78,7 +78,6 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     double PIXEL_MM = 700;
 
     // create an image for all the nodes
-    cout << "stuff \n";
     cv::Mat res(700,1000, CV_8UC3, cv::Scalar(255,255,255));
 
 
@@ -144,6 +143,10 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
     // save the image to a file
     cv::imshow(fileName, res);
+}
+
+Node *QTrees::getRootNode() {
+    return qTree[0];
 }
 
 
