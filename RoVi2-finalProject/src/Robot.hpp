@@ -73,9 +73,12 @@ public:
 
     void moveHome();
     void moveQ(Q q);
+    bool pathCompleted();
+
+
     /// This method contains the ROS event loop. Feel free to modify
     void run();
-    bool pathCompleted();
+
 
 private:
     rw::kinematics::State* _state;

@@ -199,6 +199,7 @@ QWidget* ObjectAvoidance::createCamSetup() {
 }
 
 
+
 void ObjectAvoidance::init() {
 
     if (_workcell != NULL) {
@@ -240,17 +241,19 @@ void ObjectAvoidance::init() {
         LegoHandle = new Lego(&_state, _workcell);
         getRobWorkStudio()->setState(_state);
 
+
         //for simulation make a lego brick configuration
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
 
-        // Setting up the path planner
-        PlannerHandle  = new Planning(_workcell);
 
         // Setting up the robotHandler
         RobotHandle = new Robot(&_state, _workcell);
         RobotHandle->start();
 
+        // Setting up the path planner
+        PlannerHandle  = new Planning(_workcell, RobotHandle);
+        PlannerHandle->start();
 
         // move robot to start configuration
         Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
@@ -260,44 +263,11 @@ void ObjectAvoidance::init() {
 
         RobotHandle->setPath(aPath);
         robotDirection = 0;
-/*
-        // setting up the planner thread
-        int rc;
-        int i;
-        pthread_t threads[5];
-        pthread_attr_t attr;
-        void *status;
 
-        // Initialize and set thread joinable
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-        for( i = 0; i < 5; i++ ) {
-            cout << "main() : creating thread, " << i << endl;
-            rc = pthread_create(&threads[i], NULL, await, (void *)i );
 
-            if (rc) {
-                cout << "Error:unable to create thread," << rc << endl;
-                exit(-1);
-            }
-        }
-
-        // free attribute and wait for the other threads
-        pthread_attr_destroy(&attr);
-        for( i = 0; i < 5; i++ ) {
-            rc = pthread_join(threads[i], &status);
-            if (rc) {
-                cout << "Error:unable to join," << rc << endl;
-                exit(-1);
-            }
-
-            cout << "Main: completed thread id :" << i ;
-            cout << "  exiting with status :" << status << endl;
-        }
-
-        cout << "Main: program exiting." << endl;
-*/
         getRobWorkStudio()->setState(_state);
+
     }
 
 

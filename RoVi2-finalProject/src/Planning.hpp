@@ -38,6 +38,7 @@
 #include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
 #include "QTrees.hpp"
 #include "Lego.hpp"
+#include "Robot.hpp"
 #include <vector>
 
 // --------------------  namespaces ----------------------------
@@ -87,17 +88,19 @@ using namespace rwlibs::proximitystrategies;
 
 
 
-class Planning {
+class Planning : public QThread {
 public:
 
     Planning();
-    Planning(WorkCell::Ptr _workcell);
+    Planning(WorkCell::Ptr _workcell, Robot* _RobotHandle);
     ~Planning();
 
     QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
     QPath updateConstraindPath(State* _state);
 
+    // for running the path planner thread
+    void run();
 
 private:
 
@@ -116,8 +119,10 @@ private:
 
     rw::kinematics::State _state;
     rw::models::WorkCell::Ptr _workcell;
+    Robot* _RobotHandle;
     Device::Ptr device;
     Device::Ptr gripper;
+    bool isAlive;
 
     VelocityScrew6D<> C;
     rw::proximity::CollisionDetector::Ptr detector;

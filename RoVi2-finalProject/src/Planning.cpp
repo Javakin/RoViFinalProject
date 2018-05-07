@@ -14,7 +14,7 @@ Planning::Planning() {
 
 }
 
-Planning::Planning(WorkCell::Ptr _workcell) {
+Planning::Planning(WorkCell::Ptr _workcell, Robot* _RobotHandle) {
     this->_workcell = _workcell;
     C =  VelocityScrew6D<>(0,0,1,1,1,1);
 
@@ -25,17 +25,31 @@ Planning::Planning(WorkCell::Ptr _workcell) {
     srand (time(NULL));
 
     // set up collision detector
-    detector = new rw::proximity::CollisionDetector(_workcell, rwlibs::proximitystrategies::ProximityStrategyFactory::makeDefaultCollisionStrategy());
+    detector = new rw::proximity::CollisionDetector(this->_workcell, rwlibs::proximitystrategies::ProximityStrategyFactory::makeDefaultCollisionStrategy());
 
     // construct a QSampler
     qSamples = rw::pathplanning::QSampler::makeUniform(device);
 
+    // setup robothandleren
+    this->_RobotHandle = _RobotHandle;
+
+
+    // initialize trees
     _T = nullptr;
     _R = nullptr;
 }
 
 Planning::~Planning() {
+    // kill the thread
+    isAlive = false;
 
+    if (_T != nullptr){
+        delete _T;
+    }
+
+    if (_R != nullptr){
+        delete _R;
+    }
 
 }
 
@@ -45,104 +59,107 @@ rw::trajectory::QPath Planning::getConstraintPath(State _state, Q qGoal, Q qRobo
     this->_state = _state;
     rw::trajectory::QPath path;
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
-    if (_T != nullptr){
-        delete _T;
-    }
+
     _T = new QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
 
     // initial conditions
-    Q dommy = qRobot;
-    if(!RGDNewConfig(dommy, dMax, 500,500,RGD_MIN_ERROR))
-        return path;
+    Q qRob = qRobot;
+    Q qGol = qGoal;
 
-    dommy = qGoal;
-    if(!RGDNewConfig(qGoal, dMax, 500,500,RGD_MIN_ERROR))
-        return path;
 
-    cout << "inside the loop\n";
-    // Grow RRT tree
-    Q qS;
     unsigned int N = 0;
-    for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
+    if(RGDNewConfig(qRob, dMax, 500,500,RGD_MIN_ERROR) && RGDNewConfig(qGol, dMax, 500,500,RGD_MIN_ERROR)){
+        cout << "inside the loop\n";
+        // Grow RRT tree
+        Q qS;
+        for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
 
-        //cout << "N: " << N;
-        Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
+            //cout << "N: " << N;
+            Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
 
-        Node* nearestNode= _T->nearestNeighbor(qRand);
+            Node* nearestNode= _T->nearestNeighbor(qRand);
 
-        Q qNear = nearestNode->q;
+            Q qNear = nearestNode->q;
 
-        Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
+            Q qDir = (qRand-qNear)/((qRand-qNear).norm2());
 
-        // can the sampled point be reached
-        if ((qRand-qNear).norm2() < eps){
-            qS = qRand;
+            // can the sampled point be reached
+            if ((qRand-qNear).norm2() < eps){
+                qS = qRand;
 
-            // Has the goal been reached
-            if((qS - qRobot).norm2() < 0.01){
-                // goal is close end loop
-                cout <<  "Goal reached in interations N: " << N << endl;
-                dx = computeDisplacement(qS);
-                _T->add(qS, nearestNode, dx[0], dx[1]);
-                break;
-            }
-        }else{
-            qS = qNear + qDir*eps;
-        }
-
-
-        // constrain the point
-        if(RGDNewConfig(qS, dMax, 500,500,RGD_MIN_ERROR)){
-
-            //cout << "qS " << qS << endl;
-
-            nearestNode = _T->nearestNeighbor(qS);
-
-            qNear = nearestNode->q;
-
-            qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
-
-            if (qDir.norm2() < (qS-qNear).norm2()){
-                qS = qNear + qDir;
+                // Has the goal been reached
+                if((qS - qRobot).norm2() < 0.01){
+                    // goal is close end loop
+                    cout <<  "Goal reached in interations N: " << N << endl;
+                    dx = computeDisplacement(qS);
+                    _T->add(qS, nearestNode, dx[0], dx[1]);
+                    break;
+                }
+            }else{
+                qS = qNear + qDir*eps;
             }
 
 
-            // check for edge colliitons
-            if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
-                dx = computeDisplacement(qS);
-                _T->add(qS, nearestNode, dx[0], dx[1]);
+            // constrain the point
+            if(RGDNewConfig(qS, dMax, 500,500,RGD_MIN_ERROR)){
+
+                //cout << "qS " << qS << endl;
+
+                nearestNode = _T->nearestNeighbor(qS);
+
+                qNear = nearestNode->q;
+
+                qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
+
+                if (qDir.norm2() < (qS-qNear).norm2()){
+                    qS = qNear + qDir;
+                }
 
 
+                // check for edge colliitons
+                if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
+                    dx = computeDisplacement(qS);
+                    _T->add(qS, nearestNode, dx[0], dx[1]);
+
+
+                }
             }
         }
     }
+
+
+
+
 
     cout << "checking the max iterations" << endl;
     // post path planning check
-    if(N >= MAX_RRT_ITERATIONS){
-        cout << "No solution found \n";
-        return path;
+    if(N <= MAX_RRT_ITERATIONS){
+        cout << "Solution found \n";
+        // print out the tree in the map
+        Lego* _LegoHandle = new Lego(&_state, _workcell);
+
+        vector< vector< double> > v = _LegoHandle->getPoses();
+        _T->exportTree("Tree", v);
+        delete _LegoHandle;
+
+
+        // fetch the path
+        Node* nearestNode= _T->nearestNeighbor(qRobot);
+        _T->getRootPath(nearestNode, path);
+
+        // update tree structure
+        delete _R;
+        _R = _T;
+
+
+    }else{
+        cout << "No soluiton found\n";
+        // update the newest Tree for later use
+        delete _T;
     }
 
-
-    // print out the tree in the map
-    Lego* _LegoHandle = new Lego(&_state, _workcell);
-
-    vector< vector< double> > v = _LegoHandle->getPoses();
-    _T->exportTree("Tree", v);
-    delete _LegoHandle;
-
-
-    // fetch the path
-    Node* nearestNode= _T->nearestNeighbor(qRobot);
-    _T->getRootPath(nearestNode, path);
-
-
-    // update the newest Tree for later use
-    //T.setC(nearestNode->nodeCost);
-    _R = _T;
 
     return path;
 }
@@ -171,6 +188,18 @@ QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
     return path;
 }
 
+
+void Planning::run(){
+    // uptimize on current tree if active
+    isAlive= true;
+    cout << "lets get to it \n";
+    while (isAlive){
+
+    }
+
+    cout << "i am dying\n";
+
+}
 
 // ******************************************************************
 //
