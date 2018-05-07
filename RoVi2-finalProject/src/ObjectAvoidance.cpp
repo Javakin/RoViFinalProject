@@ -301,6 +301,16 @@ void ObjectAvoidance::update(){
 
     RobotHandle->update();
 
+    // check for errors in the tree
+    QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
+
+    if(robotpath.size() != 0){
+        // collision detected
+        //RobotHandle->setPath(robotpath);
+        cout << "Collision detected\n";
+        PlannerHandle->printTree(_state);
+    }
+
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
 }

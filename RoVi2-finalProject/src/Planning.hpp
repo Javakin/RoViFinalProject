@@ -85,6 +85,8 @@ using namespace rwlibs::proximitystrategies;
 #define RGD_MIN_ERROR 0.001
 #define RGD_MAX_ERROR 0.01
 #define EDGE_CHECK_EBS 0.001
+#define VALIDAITON_DEPTH 1.0
+
 
 
 
@@ -95,10 +97,13 @@ public:
     Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state, Robot* _RobotHandle);
     ~Planning();
 
-    QPath getConstraintPath(State _state, Q qGoal, Q qRobot, double eps);
+    QPath getConstraintPath(Q qGoal, Q qRobot, double eps);
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
-    QPath updateConstraindPath(State* _state);
-
+    QPath updateConstraindPath(Q qGoal, double eps);
+    QPath validate(double CheckingDebth);
+    QPath repareTree();
+    void printTree(QTrees* _tree, rw::kinematics::State aState);
+    void printTree(rw::kinematics::State aState);
 
     void pausePlanner(int status);
     // for running the path planner thread
@@ -116,8 +121,11 @@ private:
 
 
     bool expandedBinarySearch(Q StartConf, Q EndConf, double eps);
+    bool expandedBinarySearch(rw::kinematics::State::Ptr  _state, Q StartConf, Q EndConf, double eps);
+
 
     bool inCollision(const Q &q);
+    bool inCollision(rw::kinematics::State::Ptr  _state, const Q &q);
 
     rw::kinematics::State state;
     rw::kinematics::State::Ptr  _state;
