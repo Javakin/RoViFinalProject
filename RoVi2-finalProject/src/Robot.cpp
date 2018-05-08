@@ -95,16 +95,16 @@ void Robot::stateCallback(const caros_control_msgs::RobotState &msg)
 void Robot::moveHome()
 {
     //ROS_INFO("Called move home");
-    float speed = 0.1;
+    //float speed = 0.1;
     rw::math::Q home = rw::math::Q(6, 0, -M_PI/2.0, 0, -M_PI/2.0, 0, 0);
-    _robot->moveServoQ(home, speed);
+    _robot->moveServoQ(home, ROBOT_MAX_SPEED);
 }
 
 void Robot::moveQ(Q q)
 {
     //ROS_INFO("Called move to a configuration");
-    float speed = 0.1;
-    _robot->moveServoQ(q, speed);
+    //float speed = 0.1;
+    _robot->moveServoQ(q, ROBOT_MAX_SPEED);
 
 }
 

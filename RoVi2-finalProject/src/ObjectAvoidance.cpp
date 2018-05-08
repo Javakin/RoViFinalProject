@@ -303,7 +303,7 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    //RobotHandle->update();
+    RobotHandle->update();
 
     // check for errors in the tree
     //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);

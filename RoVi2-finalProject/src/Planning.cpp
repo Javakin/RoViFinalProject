@@ -248,12 +248,12 @@ void Planning::run(){
 
             }else{
                 // Search for a better solution
-                QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
+                /*QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
                 //cout << "done updating " << aPath.size() << endl;
                 if (aPath.size() != 0){
 
                     _RobotHandle->setPath(aPath);
-                }
+                }*/
             }
 
         }
