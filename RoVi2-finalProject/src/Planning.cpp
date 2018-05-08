@@ -67,7 +67,6 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
         Q qS;
         for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
-
             //cout << "N: " << N;
             qRobot = _RobotHandle->getQRobot();
             Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
@@ -346,12 +345,13 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     // Grow a new tree
     bool sucess = constrainedRRT(_T, qGoal, eps);
 
+    //cout << "Solution found \n";
+    printTree(_T, *_state);
+
     cout << "sucess " << endl;
     // post path planning check
     rw::trajectory::QPath path;
     if (sucess) {
-        //cout << "Solution found \n";
-        printTree(_T, *_state);
 
         // Fetch the path
         Q qRobot = _RobotHandle->getQRobot();
@@ -359,7 +359,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
         _T->getRootPath(nearestNode, path);
 
 
-        cout << "Returning path of length: " << path.size() << " and length " << nearestNode->nodeCost << endl;
+        cout << "Returning path of length: " << path.size() << " and length " << nearestNode->nodeCost << " with cost " << _T->getC() << endl;
 
         // Update tree structure
         if(_R != nullptr)

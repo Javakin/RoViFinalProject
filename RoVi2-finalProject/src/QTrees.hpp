@@ -67,7 +67,7 @@ public:
 
 
     void add(Q qNew, Node* nParent, double aX, double aY);
-    Node* nearestNeighbor(Q qRand, bool constrained);
+    Node* nearestNeighbor(Q qRand, int constrained);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
     Node* getRootNode();
     void setC(double aC);
@@ -81,7 +81,7 @@ public:
 
 private:
 
-    Node* constrainedNearestNeighbor(Q qRand);
+    Node* constrainedNearestNeighbor(Q qRand, int constrained);
     Node* nearestNeighbor(Q qRand);
 
     vector<Node*> qTree;

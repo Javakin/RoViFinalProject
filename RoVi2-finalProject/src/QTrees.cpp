@@ -36,15 +36,17 @@ QTrees::QTrees(Q qInit, double aX, double aY, double C_space, double cost_b) {
 void QTrees::add(Q qNew, Node *nParent, double aX, double aY) {
     Node* newNode = new Node(qNew, nParent, nParent->nodeCost + (qNew-nParent->q).norm2(), aX, aY);
     qTree.push_back(newNode);
+    //cout << C << " " << newNode->nodeCost << endl;
 }
 
 
-Node* QTrees::nearestNeighbor(Q qRand, bool constrained) {
+Node* QTrees::nearestNeighbor(Q qRand, int constrained) {
     Node* nearestNode;
-    if(constrained){
-        nearestNode = constrainedNearestNeighbor(qRand);
-    } else{
+
+    if(constrained <= 0){
         nearestNode = nearestNeighbor(qRand);
+    } else{
+        nearestNode = constrainedNearestNeighbor(qRand, constrained);
     }
 
     return nearestNode;
@@ -65,25 +67,58 @@ Node* QTrees::nearestNeighbor(Q qRand) {
             dMinDist = length;
         }
     }
-
+    //cout << "yay"<< endl;
     return minNode;
 }
 
-Node* QTrees::constrainedNearestNeighbor(Q qRand){
+Node* QTrees::constrainedNearestNeighbor(Q qRand, int constrained){
     // setting up initial variables
+    //cout << "hehe" << constrained<< endl;
     Q conf;
-    Node* minNode = qTree[0];
-    double dMinDist = db*(qTree[0]->q-qRand).norm2() + cb*qTree[0]->nodeCost, length;
+    vector<Node*> minNodes((unsigned int)constrained, qTree[0]);
+    double dMinDist = db*(qTree[0]->q-qRand).norm2() + cb*qTree[0]->nodeCost, length, length2;
 
-    // Find the closest neighbor
+
+
+    // Find the closest k - neighbors
+    double maxNodeDist = (qTree[0]->q-qRand).norm2();
+    int maxNodeID = 0;
     for(unsigned int i = 1; i < qTree.size(); i++){
-        length = db*(qTree[i]->q-qRand).norm2() + cb*qTree[i]->nodeCost;
+        length = (qTree[i]->q-qRand).norm2();
+
+        // add new nearest
+        if(length < maxNodeDist) {
+            minNodes[maxNodeID] = qTree[i];
+
+            //cout << length << endl;
+            // finde new maxNodeDist
+            maxNodeDist = 0;
+            for (unsigned int j = 0; j < minNodes.size(); j++) {
+                length2 = (minNodes[j]->q - qRand).norm2();
+                if (length2 > maxNodeDist) {
+                    maxNodeDist = length2;
+                    maxNodeID = j;
+                }
+            }
+        }
+    }
+
+    //cout << "Done "<< endl;
+
+    // select the best candidat
+    Node* minNode = minNodes[0];
+    dMinDist = db*(minNodes[0]->q-qRand).norm2() + cb*minNodes[0]->nodeCost;
+
+    for(unsigned int i = 0; i < (unsigned int)constrained; i++){
+        length = db*(minNodes[i]->q-qRand).norm2() + cb*minNodes[i]->nodeCost;
+        //cout << length << endl;
         if(length < dMinDist){
             // nearer neighbore found update variables
-            minNode = qTree[i];
+            minNode = minNodes[i];
             dMinDist = length;
         }
     }
+    //cout << "completed KNN" << endl;
 
     if (minNode->nodeCost < C){
         return minNode;
