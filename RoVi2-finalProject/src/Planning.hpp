@@ -113,7 +113,6 @@ public:
     void run();
 
 private:
-
     void printTree(QTrees* _tree, rw::kinematics::State aState);
 
     VelocityScrew6D<> computeTaskError(Q qSample);

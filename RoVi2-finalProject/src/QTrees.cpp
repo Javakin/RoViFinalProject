@@ -21,8 +21,16 @@ QTrees::QTrees(Q qInit, double aX, double aY) {
     qTree.clear();
     qTree.push_back(rootNode);
     C = 10000;
-    db = 1;
-    cb = 0;
+    setCb(cb);
+}
+
+QTrees::QTrees(Q qInit, double aX, double aY, double C_space, double cost_b) {
+    Node* rootNode = new Node(qInit, nullptr, 0, aX, aY);
+
+    qTree.clear();
+    qTree.push_back(rootNode);
+    C = C_space;
+    setCb(cost_b);
 }
 
 void QTrees::add(Q qNew, Node *nParent, double aX, double aY) {
@@ -31,7 +39,37 @@ void QTrees::add(Q qNew, Node *nParent, double aX, double aY) {
 }
 
 
+Node* QTrees::nearestNeighbor(Q qRand, bool constrained) {
+    Node* nearestNode;
+    if(constrained){
+        nearestNode = constrainedNearestNeighbor(qRand);
+    } else{
+        nearestNode = nearestNeighbor(qRand);
+    }
+
+    return nearestNode;
+}
+
 Node* QTrees::nearestNeighbor(Q qRand) {
+    // setting up initial variables
+    Q conf;
+    Node* minNode = qTree[0];
+    double dMinDist = (qTree[0]->q-qRand).norm2(), length;
+
+    // Find the closest neighbor
+    for(unsigned int i = 1; i < qTree.size(); i++){
+        length = (qTree[i]->q-qRand).norm2();
+        if(length < dMinDist){
+            // nearer neighbore found update variables
+            minNode = qTree[i];
+            dMinDist = length;
+        }
+    }
+
+    return minNode;
+}
+
+Node* QTrees::constrainedNearestNeighbor(Q qRand){
     // setting up initial variables
     Q conf;
     Node* minNode = qTree[0];
@@ -47,11 +85,10 @@ Node* QTrees::nearestNeighbor(Q qRand) {
         }
     }
 
-    if (dMinDist < C){
+    if (minNode->nodeCost < C){
         return minNode;
     }
     return nullptr;
-
 }
 
 void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
@@ -159,6 +196,7 @@ void QTrees::setCb(double aCb) {
 
     cb = aCb;
     db = (1-cb);
+    cout << "cb " << cb << " db " << db << endl;
 }
 
 double QTrees::getC() {

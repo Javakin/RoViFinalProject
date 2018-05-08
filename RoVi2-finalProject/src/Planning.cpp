@@ -72,7 +72,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
             qRobot = _RobotHandle->getQRobot();
             Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
 
-            Node* nearestNode= _T->nearestNeighbor(qRand);
+            Node* nearestNode= _T->nearestNeighbor(qRand, 0);
 
             Q qNear = nearestNode->q;
 
@@ -100,23 +100,24 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
 
                 //cout << "qS " << qS << endl;
 
-                nearestNode = _T->nearestNeighbor(qS);
+                nearestNode = _T->nearestNeighbor(qS, 1);
+                if(nearestNode != nullptr){
+                    qNear = nearestNode->q;
 
-                qNear = nearestNode->q;
+                    qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
 
-                qDir = (qS-qNear)/((qS-qNear).norm2())*eps;
-
-                if (qDir.norm2() < (qS-qNear).norm2()){
-                    qS = qNear + qDir;
-                }
-
-
-                // check for edge colliitons
-                if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
-                    dx = computeDisplacement(qS);
-                    _T->add(qS, nearestNode, dx[0], dx[1]);
+                    if (qDir.norm2() < (qS-qNear).norm2()){
+                        qS = qNear + qDir;
+                    }
 
 
+                    // check for edge colliitons
+                    if(expandedBinarySearch(qS, qNear, EDGE_CHECK_EBS)){
+                        dx = computeDisplacement(qS);
+                        _T->add(qS, nearestNode, dx[0], dx[1]);
+
+
+                    }
                 }
             }
         }
@@ -145,7 +146,7 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
         printTree(_T, *_state);
 
         // Fetch the path
-        Node* nearestNode= _T->nearestNeighbor(qRobot);
+        Node* nearestNode= _T->nearestNeighbor(qRobot, 0);
         _T->getRootPath(nearestNode, path);
 
         cout << "Returning path of length: " << path.size() << " and length " << nearestNode->nodeCost << endl;
@@ -271,7 +272,7 @@ QPath Planning::validate(double CheckingDebth){
     QPath path;
 
     if(_R != nullptr){
-        Node* currentNode = _R->nearestNeighbor(_RobotHandle->getQRobot());
+        Node* currentNode = _R->nearestNeighbor(_RobotHandle->getQRobot(), 0);
         double initialCost = currentNode->nodeCost;
         int collisionDetected = 0;
 
@@ -331,20 +332,21 @@ QPath Planning::repareTree(){
 
 QPath Planning::updateConstraindPath(Q qGoal, double eps) {
 
+    cout << "begining to update " << endl;
+
     // setup variables
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
-    QTrees *_T = new QTrees(qGoal, dx[0], dx[1]);
+    double C_space = _R->nearestNeighbor(_RobotHandle->getQRobot(),0)->nodeCost;
     Q dMax = Q(6, 0.003, 0.003, 0.003, 0.003, 0.003, 0.003);
 
+    // setup tree with new parameters
+    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space, _R->getCb() + IMPROVEMENT_FACTOR);
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
-
-    // Change the tree parameters
-    _T->setC((_R->getC() * (1 - IMPROVEMENT_FACTOR)));
-    _T->setCb(_R->getCb() + IMPROVEMENT_FACTOR);
 
     // Grow a new tree
     bool sucess = constrainedRRT(_T, qGoal, eps);
 
+    cout << "sucess " << endl;
     // post path planning check
     rw::trajectory::QPath path;
     if (sucess) {
@@ -353,22 +355,23 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
 
         // Fetch the path
         Q qRobot = _RobotHandle->getQRobot();
-        Node *nearestNode = _T->nearestNeighbor(qRobot);
+        Node *nearestNode = _T->nearestNeighbor(qRobot,0);
         _T->getRootPath(nearestNode, path);
 
 
         cout << "Returning path of length: " << path.size() << " and length " << nearestNode->nodeCost << endl;
 
         // Update tree structure
-        if (_R != nullptr)
+        if(_R != nullptr)
             delete _R;
         _R = _T;
+
 
 
     } else {
         cout << "No soluiton found\n";
         // update the newest Tree for later use
-        if (_T != nullptr)
+        if(_T != nullptr)
             delete _T;
     }
 
