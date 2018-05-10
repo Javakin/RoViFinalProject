@@ -33,6 +33,9 @@ public:
     Vision();
     Vision(Lego* _aLegoHandle);
     void savePoint();
+
+    void update();
+
     void run();
 
 private:

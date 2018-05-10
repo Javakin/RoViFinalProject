@@ -311,6 +311,9 @@ void ObjectAvoidance::update(){
 
     RobotHandle->update();
 
+    VisionHandle->update();
+
+
     // check for errors in the tree
     //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
 

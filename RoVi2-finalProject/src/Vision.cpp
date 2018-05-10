@@ -45,6 +45,12 @@ void Vision::savePoint(){
     _LegoHandle->cameraCalibration(legoPos);
 }
 
+void Vision::update(){
+    double timestamp;
+    vector<vector<double> > legoPos = readMsg(current_msg->data.c_str(), timestamp);
+    _LegoHandle->placeLegos(legoPos);
+}
+
 
 
 // ***************************************
@@ -55,7 +61,7 @@ void Vision::savePoint(){
 void Vision::cameraCallBack(const std_msgs::String::ConstPtr & msg){
 
     current_msg = msg;
-    //ROS_INFO("I Heard [%s]", msg->data.c_str());
+    ROS_INFO("I Heard [%s]", msg->data.c_str());
 }
 
 

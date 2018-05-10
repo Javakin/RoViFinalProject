@@ -7,12 +7,7 @@
 
 
 
-#define BRICK_BASE_NAME     "LegoYellow"
-#define NUMBER_OF_BRICKS    10
-#define NUMBER_OF_NUMBERS   2
 
-#define X_OUT_OF_VISION     1.0
-#define LEGO_SPACING        0.025
 
 Lego::Lego() {
     // set the default state of the object
@@ -50,9 +45,8 @@ void Lego::sortBricks(){
     // Initialize the lego bricks position out of camera sight and withoute collision
     for(unsigned int ID = 0; ID<NUMBER_OF_BRICKS; ID++){
         Vector3D<> vec(X_OUT_OF_VISION + ID*LEGO_SPACING,0,0);
-        RPY<> ang(0,0,0);
 
-        vLegoFrames[ID]->setTransform(Transform3D<>(vec, ang.toRotation3D()), *_state);
+        vLegoFrames[ID]->setTransform(Transform3D<>(vec), *_state);
         //isTracked[ID] = 0;
     }
 }
@@ -171,14 +165,45 @@ vector<vector< double > > Lego::getPoses() {
 }
 
 void Lego::placeLegos(vector<vector<double> > legoPos) {
+
+    Frame* cPlane = _workcell->findFrame("ConveyourPlane");
+    Frame* camera = _workcell->findFrame("Camera");
+
+    Transform3D<> wTcp = cPlane->wTf(*_state);
+    Transform3D<> wTc = camera->wTf(*_state);
+
+    Transform3D<> cpTc = inverse(wTcp)*wTc;
+
+    // Convert to points
+    Vector3D<> lego;
+    vector<Vector3D<> > vLegos;
+    for (unsigned int i = 0; i<legoPos.size(); i++){
+        lego[0] = legoPos[i][0];
+        lego[1] = legoPos[i][1];
+        lego[2] = legoPos[i][2];
+
+        vLegos.push_back(cpTc*lego);
+    }
+
+    // Place the legos on the workspace
+    for(unsigned int i = 0; i<vLegoFrames.size(); i++){
+        if(i<vLegos.size()){
+            Transform3D<> transform(vLegos[i]);
+            vLegoFrames[i]->setTransform(transform, *_state);
+        }else{
+            Vector3D<> vec(X_OUT_OF_VISION + i*LEGO_SPACING,0,0);
+            vLegoFrames[i]->setTransform(Transform3D<>(vec), *_state);
+        }
+    }
+
     // print vector of vedtor
-    cout << "Printint " << endl;
-    for(unsigned int i = 0; i < legoPos.size(); i++){
+    //cout << "Printint " << endl;
+    /*for(unsigned int i = 0; i < legoPos.size(); i++){
         for(unsigned int j = 0; j < legoPos[i].size(); j++){
             cout << legoPos[i][j] << " " ;
         }
         cout << endl;
-    }
+    }*/
 }
 
 void Lego::cameraCalibration(vector<vector<double> > legoPos){

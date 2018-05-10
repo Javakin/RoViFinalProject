@@ -57,7 +57,12 @@ using namespace rws;
 #define Y_RANGE             0.1         // max is 0.15
 #define R_RANGE             3.14
 
+#define BRICK_BASE_NAME     "LegoYellow"
+#define NUMBER_OF_BRICKS    10
+#define NUMBER_OF_NUMBERS   2
 
+#define X_OUT_OF_VISION     1.0
+#define LEGO_SPACING        0.01
 
 
 
