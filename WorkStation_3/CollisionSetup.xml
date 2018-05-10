@@ -17,5 +17,68 @@
 	<FramePair first="Conveyour" second="LegoYellow09" />
 	<FramePair first="Conveyour" second="LegoYellow10" />
 
+
+	<FramePair first="LegoYellow01" second="LegoYellow02" />
+	<FramePair first="LegoYellow01" second="LegoYellow03" />
+	<FramePair first="LegoYellow01" second="LegoYellow04" />
+	<FramePair first="LegoYellow01" second="LegoYellow05" />
+	<FramePair first="LegoYellow01" second="LegoYellow06" />
+	<FramePair first="LegoYellow01" second="LegoYellow07" />
+	<FramePair first="LegoYellow01" second="LegoYellow08" />
+	<FramePair first="LegoYellow01" second="LegoYellow09" />
+	<FramePair first="LegoYellow01" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow02" second="LegoYellow03" />
+	<FramePair first="LegoYellow02" second="LegoYellow04" />
+	<FramePair first="LegoYellow02" second="LegoYellow05" />
+	<FramePair first="LegoYellow02" second="LegoYellow06" />
+	<FramePair first="LegoYellow02" second="LegoYellow07" />
+	<FramePair first="LegoYellow02" second="LegoYellow08" />
+	<FramePair first="LegoYellow02" second="LegoYellow09" />
+	<FramePair first="LegoYellow02" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow03" second="LegoYellow04" />
+	<FramePair first="LegoYellow03" second="LegoYellow05" />
+	<FramePair first="LegoYellow03" second="LegoYellow06" />
+	<FramePair first="LegoYellow03" second="LegoYellow07" />
+	<FramePair first="LegoYellow03" second="LegoYellow08" />
+	<FramePair first="LegoYellow03" second="LegoYellow09" />
+	<FramePair first="LegoYellow03" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow04" second="LegoYellow05" />
+	<FramePair first="LegoYellow04" second="LegoYellow06" />
+	<FramePair first="LegoYellow04" second="LegoYellow07" />
+	<FramePair first="LegoYellow04" second="LegoYellow08" />
+	<FramePair first="LegoYellow04" second="LegoYellow09" />
+	<FramePair first="LegoYellow04" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow05" second="LegoYellow06" />
+	<FramePair first="LegoYellow05" second="LegoYellow07" />
+	<FramePair first="LegoYellow05" second="LegoYellow08" />
+	<FramePair first="LegoYellow05" second="LegoYellow09" />
+	<FramePair first="LegoYellow05" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow06" second="LegoYellow07" />
+	<FramePair first="LegoYellow06" second="LegoYellow08" />
+	<FramePair first="LegoYellow06" second="LegoYellow09" />
+	<FramePair first="LegoYellow06" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow07" second="LegoYellow08" />
+	<FramePair first="LegoYellow07" second="LegoYellow09" />
+	<FramePair first="LegoYellow07" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow08" second="LegoYellow09" />
+	<FramePair first="LegoYellow08" second="LegoYellow10" />
+
+
+	<FramePair first="LegoYellow09" second="LegoYellow10" />
+
     </Exclude>
 </CollisionSetup>

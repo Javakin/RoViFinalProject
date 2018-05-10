@@ -190,7 +190,12 @@ void Lego::cameraCalibration(vector<vector<double> > legoPos){
     vector<double> pointSample;
 
     // add the point from the robot frame
-    
+    Frame* Fe = _workcell->findFrame("CalibFrame");
+    Transform3D<> posFrame  = Fe->wTf(*_state);
+
+    pointSample.push_back(posFrame.P()[0]);
+    pointSample.push_back(posFrame.P()[1]);
+    pointSample.push_back(posFrame.P()[2]);
 
 
     // add the point from the camera frame
@@ -199,8 +204,23 @@ void Lego::cameraCalibration(vector<vector<double> > legoPos){
     pointSample.push_back(legoPos[0][2]);
 
 
-    cout << "adding point " << pointPairs.size() << endl;
+    //cout << "adding point " << pointPairs.size() << endl;
+    ofstream myfile;
+    myfile.open ("PointPairs.txt",  ios::app);
+    myfile << pointSample[0];
+    for (unsigned int i = 1; i<pointSample.size(); i++){
+        myfile <<", " << pointSample[i] ;
+    }
+    myfile << endl;
 
+    myfile.close();
+
+    // print
+    cout << pointSample[0];
+    for (unsigned int i = 1; i<pointSample.size(); i++){
+        cout <<", " << pointSample[i] ;
+    }
+    cout << endl;
 }
 
 

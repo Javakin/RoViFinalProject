@@ -183,6 +183,7 @@ QPath Planning::RRTC(State astate, Q qRobot, Q qGoal, double epsilon) {
 
     if (inCollision(qGoal))
         return 0;
+
     if (inCollision(qRobot))
         return 0;
 
@@ -260,7 +261,7 @@ void Planning::run(){
         }
 
         // sleep for a duration of time
-        usleep( 500000 );
+        usleep( 50000 );
     }
 
     cout << "i am dying\n";

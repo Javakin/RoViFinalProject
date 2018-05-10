@@ -11,6 +11,7 @@
 // ***************************************
 Vision::Vision(){
     _LegoHandle = nullptr;
+    current_msg = nullptr;
 
     // setup ROS
     ROS_INFO("Connected to roscore");
@@ -20,6 +21,7 @@ Vision::Vision(){
 }
 Vision::Vision(Lego* _aLegoHandle){
     _LegoHandle = _aLegoHandle;
+    current_msg = nullptr;
 
     // setup ROS
     ROS_INFO("Connected to roscore");
@@ -37,7 +39,11 @@ void Vision::run(){
     }
 }
 
-
+void Vision::savePoint(){
+    double timestamp;
+    vector<vector<double> > legoPos = readMsg(current_msg->data.c_str(), timestamp);
+    _LegoHandle->cameraCalibration(legoPos);
+}
 
 
 
@@ -47,12 +53,12 @@ void Vision::run(){
 // ***************************************
 
 void Vision::cameraCallBack(const std_msgs::String::ConstPtr & msg){
-    ROS_INFO("I Heard [%s]", msg->data.c_str());
-    double timestamp;
-    vector<vector<double> > legoPos = readMsg(msg->data.c_str(), timestamp);
 
-
+    current_msg = msg;
+    //ROS_INFO("I Heard [%s]", msg->data.c_str());
 }
+
+
 
 std::vector<std::vector<double> > Vision::readMsg(std::string msg, double &timeStamp)
 {

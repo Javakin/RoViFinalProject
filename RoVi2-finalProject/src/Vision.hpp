@@ -32,6 +32,7 @@ Q_OBJECT
 public:
     Vision();
     Vision(Lego* _aLegoHandle);
+    void savePoint();
     void run();
 
 private:
@@ -44,6 +45,8 @@ private:
     // ros
     ros::NodeHandle _nh;
     ros::Subscriber _sub;
+
+    std_msgs::String::ConstPtr current_msg;
 
 
 };

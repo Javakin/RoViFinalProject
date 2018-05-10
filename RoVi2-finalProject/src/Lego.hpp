@@ -31,6 +31,9 @@
 
 #include <vector>
 #include <stdlib.h>     /* srand, rand */
+#include <iostream>
+#include <fstream>
+
 
 // --------------------  namespaces ----------------------------
 using namespace rw::common;

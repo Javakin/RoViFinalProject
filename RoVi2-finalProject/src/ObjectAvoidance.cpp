@@ -294,12 +294,12 @@ void ObjectAvoidance::run(){
     if(_timer->isActive()){
         cout << "stopping the timer\n";
         _timer->stop();
-        PlannerHandle->pausePlanner(1);
+        //PlannerHandle->pausePlanner(1);
 
     }else{
         cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
-        PlannerHandle->pausePlanner(0);
+        //PlannerHandle->pausePlanner(0);
     }
 
 }
@@ -309,7 +309,7 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    //RobotHandle->update();
+    RobotHandle->update();
 
     // check for errors in the tree
     //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
@@ -332,17 +332,92 @@ void ObjectAvoidance::update(){
 
 
 void ObjectAvoidance::simpleMazeRunner() {
-    cout << "no code for simple maze runner function\n";
+    //cout << "Save point\n";
+    // getPath
+    string line;
+    QPath apath;
+    Q currentQ(6,0,0,0,0,0,0);
+    ifstream myfile ("Configs.txt");
+    if (myfile.is_open())
+    {
+
+        while ( getline (myfile,line) )
+        {
+
+            string temp;
+            int j = 0;
+            for(unsigned int i = 0; i<line.size(); i++){
+                if(line[i] == ' '){
+                    temp = "";
+                }else if(line[i] == ','){
+                    currentQ[j] = stod(temp);
+                    j++;
+                }
+                else{
+                    temp +=line[i];
+                }
+            }
+            currentQ[j] = stod(temp);
+            cout << currentQ << endl;
+            apath.push_back(currentQ);
+        }
+        myfile.close();
+    }
+
+
+    unsigned int i = 0;
+    while(i < apath.size()) {
+        if (RobotHandle->update()) {
+            // sleep for a duration of time
+            usleep( 2000000 );
+
+            VisionHandle->savePoint();
+
+            // move robot to start configuration
+
+            Q qGoal = apath[i];
+            Q qRobot = RobotHandle->getQRobot();
+
+            rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
+
+            RobotHandle->setPath(aPath);
+            i++;
+
+        }
+    }
+
 
 }
 
 void ObjectAvoidance::printConfig() {
     // do not use the robot clase since this isnt nesesary up to date
+
     Device::Ptr device = _workcell->findDevice("UR1");
-    cout << device->getQ(_state) << endl;
+
+    Q conf = device->getQ(getRobWorkStudio()->getState());
+
+    ofstream myfile;
+    myfile.open ("Configs.txt",  ios::app);
+    myfile << conf[0];
+    for (unsigned int i = 1; i<conf.size(); i++){
+        myfile <<", " << conf[i];
+    }
+    myfile << endl;
+
+    myfile.close();
+
+    // print
+    cout << conf[0];
+    for (unsigned int i = 1; i<conf.size(); i++){
+        cout <<", " << conf[i] ;
+    }
+    cout << endl;
 }
 
 void ObjectAvoidance::moveHome() {
     RobotHandle->moveHome();
+
+    //test Rotation3D<double> (T r11, T r12, T r13, T r21, T r22, T r23, T r31, T r32, T r33);
+
 
 }
