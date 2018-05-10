@@ -88,7 +88,7 @@ using namespace rwlibs::proximitystrategies;
 #define VALIDAITON_DEPTH    0.1
 #define RRT_EPSILON         0.1
 #define IMPROVEMENT_FACTOR  0.05
-
+#define NUM_OF_NEIGHBORS    3
 
 
 
@@ -130,7 +130,7 @@ private:
     bool inCollision(const Q &q);
     bool inCollision(rw::kinematics::State::Ptr  _state, const Q &q);
 
-    bool constrainedRRT(QTrees* _T, Q qGoal, double eps);
+    bool constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes);
 
     rw::kinematics::State state;
     rw::kinematics::State::Ptr  _state;

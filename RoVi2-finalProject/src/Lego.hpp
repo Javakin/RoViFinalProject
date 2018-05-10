@@ -75,6 +75,9 @@ public:
     vector<MovableFrame*> getFrames();
     vector<vector< double > > getPoses();
 
+    void placeLegos(vector<vector<double> > legoPos);
+    void cameraCalibration(vector<vector<double> > legoPos);
+
 
 
 private:
@@ -83,6 +86,9 @@ private:
 
     rw::kinematics::State* _state;
     rw::models::WorkCell::Ptr _workcell;
+
+    // for camera calibration
+    vector< vector< double> > pointPairs;
 };
 
 

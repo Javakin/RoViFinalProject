@@ -60,6 +60,7 @@ void ObjectAvoidance::initialize(){
     LegoHandle = NULL;
     PlannerHandle = NULL;
     RobotHandle = NULL;
+    VisionHandle = NULL;
 
     // Auto load workcell
     rw::models::WorkCell::Ptr wc = rw::loaders::WorkCellLoader::Factory::load(WORKCELL_PATH);
@@ -256,7 +257,7 @@ void ObjectAvoidance::init() {
 
 
         // move robot to start configuration
-        Q qGoal = Q(6,0.583604, -1.07356, -2.21689, -1.42175, 1.57061, 1.80533);
+        Q qGoal = Q(6,0.584, -1.065,-2.145, -1.504, 1.571, 1.805);
         Q qRobot =  RobotHandle->getQRobot();
 
         rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
@@ -271,6 +272,11 @@ void ObjectAvoidance::init() {
 
 
         PlannerHandle->start();
+
+
+        // setting up vision
+        VisionHandle = new Vision(LegoHandle);
+        VisionHandle->start();
 
         getRobWorkStudio()->setState(_state);
 
@@ -303,7 +309,7 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    RobotHandle->update();
+    //RobotHandle->update();
 
     // check for errors in the tree
     //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
@@ -327,6 +333,7 @@ void ObjectAvoidance::update(){
 
 void ObjectAvoidance::simpleMazeRunner() {
     cout << "no code for simple maze runner function\n";
+
 }
 
 void ObjectAvoidance::printConfig() {

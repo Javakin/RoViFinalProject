@@ -170,4 +170,37 @@ vector<vector< double > > Lego::getPoses() {
     return output;
 }
 
+void Lego::placeLegos(vector<vector<double> > legoPos) {
+    // print vector of vedtor
+    cout << "Printint " << endl;
+    for(unsigned int i = 0; i < legoPos.size(); i++){
+        for(unsigned int j = 0; j < legoPos[i].size(); j++){
+            cout << legoPos[i][j] << " " ;
+        }
+        cout << endl;
+    }
+}
+
+void Lego::cameraCalibration(vector<vector<double> > legoPos){
+    // preconditions only one lego found
+    if (legoPos.size() != 1){
+        return;
+    }
+
+    vector<double> pointSample;
+
+    // add the point from the robot frame
+    
+
+
+    // add the point from the camera frame
+    pointSample.push_back(legoPos[0][0]);
+    pointSample.push_back(legoPos[0][1]);
+    pointSample.push_back(legoPos[0][2]);
+
+
+    cout << "adding point " << pointPairs.size() << endl;
+
+}
+
 

@@ -53,7 +53,7 @@ Planning::~Planning() {
 
 }
 
-bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
+bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes){
     unsigned int N = 0;
     VelocityScrew6D<> dx;
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
@@ -83,11 +83,12 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
 
                 // Has the goal been reached
                 if((qS - qRobot).norm2() < 0.01){
-                    // goal is close end loop
-                    cout <<  "Goal reached in interations N: " << N << endl;
                     dx = computeDisplacement(qS);
-                    _T->add(qS, nearestNode, dx[0], dx[1]);
-                    break;
+                    if(_T->add(qS, nearestNode, dx[0], dx[1])){
+                        // goal is close end loop
+                        cout <<  "Goal reached in interations N: " << N << endl;
+                        break;
+                    }
                 }
             }else{
                 qS = qNear + qDir*eps;
@@ -99,7 +100,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps){
 
                 //cout << "qS " << qS << endl;
 
-                nearestNode = _T->nearestNeighbor(qS, 1);
+                nearestNode = _T->nearestNeighbor(qS, numOfNearestNodes);
                 if(nearestNode != nullptr){
                     qNear = nearestNode->q;
 
@@ -137,7 +138,7 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
 
 
     // Grow initial constrained RRT
-    bool status = constrainedRRT(_T, qGoal, eps);
+    bool status = constrainedRRT(_T, qGoal, eps, 1);
 
     // post path planning check
     if(status){
@@ -248,12 +249,12 @@ void Planning::run(){
 
             }else{
                 // Search for a better solution
-                /*QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
+                QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
                 //cout << "done updating " << aPath.size() << endl;
                 if (aPath.size() != 0){
 
                     _RobotHandle->setPath(aPath);
-                }*/
+                }
             }
 
         }
@@ -343,7 +344,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Grow a new tree
-    bool sucess = constrainedRRT(_T, qGoal, eps);
+    bool sucess = constrainedRRT(_T, qGoal, eps, NUM_OF_NEIGHBORS);
 
     //cout << "Solution found \n";
     printTree(_T, *_state);

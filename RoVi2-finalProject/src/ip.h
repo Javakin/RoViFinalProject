@@ -15,6 +15,8 @@ class ip {
 
 public:
      static cv::Mat toOpenCVImage(const rw::sensor::Image& img);
+
+
 };
 
 

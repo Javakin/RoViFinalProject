@@ -44,9 +44,10 @@
 #include "Lego.hpp"
 #include "Planning.hpp"
 #include "Robot.hpp"
+#include "Vision.hpp"
 
 // for multithreading
-#include <thread>
+//#include <thread>
 
 using namespace std;
 
@@ -93,6 +94,7 @@ private:
     Lego* LegoHandle;
     Planning* PlannerHandle;
     Robot* RobotHandle;
+    Vision* VisionHandle;
 
 
 

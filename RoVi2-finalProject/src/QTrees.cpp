@@ -33,10 +33,17 @@ QTrees::QTrees(Q qInit, double aX, double aY, double C_space, double cost_b) {
     setCb(cost_b);
 }
 
-void QTrees::add(Q qNew, Node *nParent, double aX, double aY) {
+bool QTrees::add(Q qNew, Node *nParent, double aX, double aY) {
+
     Node* newNode = new Node(qNew, nParent, nParent->nodeCost + (qNew-nParent->q).norm2(), aX, aY);
-    qTree.push_back(newNode);
-    //cout << C << " " << newNode->nodeCost << endl;
+    if (newNode->nodeCost < C){
+        qTree.push_back(newNode);
+        return 1;
+    }else{
+        delete newNode;
+        return 0;
+    }
+
 }
 
 

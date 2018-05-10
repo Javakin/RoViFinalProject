@@ -105,6 +105,7 @@ SET(UIS_FILES)
 QT5_WRAP_UI(UIS_OUT_H ${UIS_FILES})
 
 QT5_WRAP_CPP(MocSrcFiles src/ObjectAvoidance.hpp src/ip.h src/Lego.hpp src/Planning.hpp src/Robot.hpp src/QTrees.hpp
+		src/Vision.hpp
 		OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 		)
 # Rcc the files:
@@ -125,7 +126,8 @@ set(SrcFiles
 		src/Robot.hpp
 		src/QTrees.cpp
 		src/QTrees.hpp
-
+		src/Vision.cpp
+		src/Vision.hpp
 		${UIS_OUT_H}
 		)
 

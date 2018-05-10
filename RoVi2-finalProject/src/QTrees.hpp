@@ -66,7 +66,7 @@ public:
 
 
 
-    void add(Q qNew, Node* nParent, double aX, double aY);
+    bool add(Q qNew, Node* nParent, double aX, double aY);
     Node* nearestNeighbor(Q qRand, int constrained);
     void getRootPath(Node* lastNode, rw::trajectory::QPath& aPath);
     Node* getRootNode();
