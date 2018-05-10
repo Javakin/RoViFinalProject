@@ -80,32 +80,34 @@ Node* QTrees::nearestNeighbor(Q qRand) {
 
 Node* QTrees::constrainedNearestNeighbor(Q qRand, int constrained){
     // setting up initial variables
-    //cout << "hehe" << constrained<< endl;
+    cout << "hehe" << constrained<< endl;
     Q conf;
     vector<Node*> minNodes((unsigned int)constrained, qTree[0]);
     double dMinDist = db*(qTree[0]->q-qRand).norm2() + cb*qTree[0]->nodeCost, length, length2;
 
 
-
     // Find the closest k - neighbors
     double maxNodeDist = (qTree[0]->q-qRand).norm2();
     int maxNodeID = 0;
-    for(unsigned int i = 1; i < qTree.size(); i++){
-        length = (qTree[i]->q-qRand).norm2();
-
-        // add new nearest
-        if(length < maxNodeDist) {
-            minNodes[maxNodeID] = qTree[i];
-
+    for(unsigned int i = 0; i < qTree.size(); i++){
+        if (qTree[i]->nodeCost < C){
+            length = (qTree[i]->q-qRand).norm2();
             //cout << length << endl;
-            // finde new maxNodeDist
-            maxNodeDist = 0;
-            for (unsigned int j = 0; j < minNodes.size(); j++) {
-                length2 = (minNodes[j]->q - qRand).norm2();
-                if (length2 > maxNodeDist) {
-                    maxNodeDist = length2;
-                    maxNodeID = j;
+            // add new nearest
+            if(length < maxNodeDist) {
+                minNodes[maxNodeID] = qTree[i];
+
+                //cout << length << endl;
+                // finde new maxNodeDist
+                maxNodeDist = 0;
+                for (unsigned int j = 0; j < minNodes.size(); j++) {
+                    length2 = (minNodes[j]->q - qRand).norm2();
+                    if (length2 > maxNodeDist) {
+                        maxNodeDist = length2;
+                        maxNodeID = j;
+                    }
                 }
+                //cout << maxNodeDist << endl;
             }
         }
     }
@@ -115,9 +117,9 @@ Node* QTrees::constrainedNearestNeighbor(Q qRand, int constrained){
     // select the best candidat
     Node* minNode = minNodes[0];
     dMinDist = db*(minNodes[0]->q-qRand).norm2() + cb*minNodes[0]->nodeCost;
-
     for(unsigned int i = 0; i < (unsigned int)constrained; i++){
         length = db*(minNodes[i]->q-qRand).norm2() + cb*minNodes[i]->nodeCost;
+        //length = (minNodes[i]->q-qRand).norm2();
         //cout << length << endl;
         if(length < dMinDist){
             // nearer neighbore found update variables
@@ -125,12 +127,10 @@ Node* QTrees::constrainedNearestNeighbor(Q qRand, int constrained){
             dMinDist = length;
         }
     }
+    //cout << dMinDist << endl;
     //cout << "completed KNN" << endl;
 
-    if (minNode->nodeCost < C){
-        return minNode;
-    }
-    return nullptr;
+    return minNode;
 }
 
 void QTrees::getRootPath(Node* lastNode, rw::trajectory::QPath &aPath) {
@@ -168,7 +168,7 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
     // Draw the legoBricks
     for(unsigned int i = 0; i<vBricks.size(); i++) {
-        cv::RotatedRect rRect = cv::RotatedRect(
+        /*cv::RotatedRect rRect = cv::RotatedRect(
                 cv::Point2f(vBricks[i][0] * PIXEL_MM + res.cols / 2, vBricks[i][1] * PIXEL_MM + res.rows / 2),
                 cv::Size2f(0.016 * PIXEL_MM, 0.048 * PIXEL_MM), vBricks[i][3] * 180 / 3.1415);
         cv::Point2f vertices[4];
@@ -179,7 +179,10 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
             point.push_back(cv::Point((int)vertices[j].x, (int)vertices[j].y));  //point1
         }
 
-        cv::fillConvexPoly(res, point, cv::Scalar(0, 200, 255), 8, 0);
+        cv::fillConvexPoly(res, point, cv::Scalar(0, 200, 255), 8, 0);*/
+
+        p1= cv::Point( (unsigned int)(vBricks[i][0]*PIXEL_MM + res.cols/2),(unsigned int)(vBricks[i][1]*PIXEL_MM + res.rows/2));
+        cv::circle(res, p1, (0.04*PIXEL_MM), cv::Scalar(0, 200, 255), -1);
     }
 
     // Draw the Q Tree

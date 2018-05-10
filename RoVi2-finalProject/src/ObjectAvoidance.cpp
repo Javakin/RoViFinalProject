@@ -277,6 +277,7 @@ void ObjectAvoidance::init() {
         // setting up vision
         VisionHandle = new Vision(LegoHandle);
         VisionHandle->start();
+        //VisionHandle->update();
 
         getRobWorkStudio()->setState(_state);
 
@@ -294,12 +295,12 @@ void ObjectAvoidance::run(){
     if(_timer->isActive()){
         cout << "stopping the timer\n";
         _timer->stop();
-        //PlannerHandle->pausePlanner(1);
+        PlannerHandle->pausePlanner(1);
 
     }else{
         cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
-        //PlannerHandle->pausePlanner(0);
+        PlannerHandle->pausePlanner(0);
     }
 
 }
@@ -309,17 +310,19 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
+    VisionHandle->update();
+
     RobotHandle->update();
 
-    VisionHandle->update();
+
 
 
     // check for errors in the tree
-    //QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
+    /*QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
 
-    //PlannerHandle->printTree(_state);
+    PlannerHandle->printTree();
 
-    /*if(robotpath.size() != 0){
+    if(robotpath.size() != 0){
         // collision detected
         RobotHandle->setPath(robotpath);
         cout << "Collision detected\n";

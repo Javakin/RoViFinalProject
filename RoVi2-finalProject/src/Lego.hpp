@@ -61,8 +61,8 @@ using namespace rws;
 #define NUMBER_OF_BRICKS    10
 #define NUMBER_OF_NUMBERS   2
 
-#define X_OUT_OF_VISION     1.0
-#define LEGO_SPACING        0.01
+#define X_OUT_OF_VISION     -1.0
+#define LEGO_SPACING        -0.1
 
 
 

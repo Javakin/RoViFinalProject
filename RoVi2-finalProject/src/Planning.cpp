@@ -54,9 +54,11 @@ Planning::~Planning() {
 }
 
 bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes){
+    state = *_state;
     unsigned int N = 0;
     VelocityScrew6D<> dx;
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
+
 
     // initial conditions
     Q qRobot = _RobotHandle->getQRobot();
@@ -135,15 +137,15 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
     QTrees* _T = new QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
-
+    state = *_state;
 
     // Grow initial constrained RRT
-    bool status = constrainedRRT(_T, qGoal, eps, 1);
+    bool status = constrainedRRT(_T, qGoal, eps, 0);
 
     // post path planning check
     if(status){
         cout << "Solution found \n";
-        printTree(_T, *_state);
+        printTree(_T, state);
 
         // Fetch the path
         Node* nearestNode= _T->nearestNeighbor(qRobot, 0);
@@ -198,7 +200,7 @@ void Planning::printTree(QTrees* _tree, rw::kinematics::State aState){
     if(_tree != nullptr){
         Lego* _LegoHandle = new Lego(&aState, _workcell);
 
-        vector< vector< double> > v = _LegoHandle->getPoses();
+        vector<vector< double> > v = _LegoHandle->getPoses();
         _tree->exportTree("Tree", v);
         delete _LegoHandle;
     }
@@ -220,8 +222,8 @@ void Planning::run(){
     // uptimize on current tree if active
     isAlive= true;
 
-    Q q1 = Q(6, 0.583, -1.073, -2.216, -1.42175, 1.57061, 1.80533);
-    Q q2 = Q(6, 0.450, -2.019, -1.296, -1.4, 1.5706, 1.672);
+    Q q1 = Q(6,0.584, -1.065,-2.145, -1.504, 1.571, 1.805);
+    Q q2 = Q(6, 0.446, -2.074, -1.132, -1.504, 1.568, 1.664);
     Q qGoal;
 
     cout << "lets get to it \n";
@@ -341,14 +343,13 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     Q dMax = Q(6, 0.003, 0.003, 0.003, 0.003, 0.003, 0.003);
 
     // setup tree with new parameters
-    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space, _R->getCb() + IMPROVEMENT_FACTOR);
+    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space*(1 - IMPROVEMENT_FACTOR), _R->getCb() + IMPROVEMENT_FACTOR*5);
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Grow a new tree
     bool sucess = constrainedRRT(_T, qGoal, eps, NUM_OF_NEIGHBORS);
 
     //cout << "Solution found \n";
-    printTree(_T, *_state);
 
     cout << "sucess " << endl;
     // post path planning check
@@ -368,6 +369,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
             delete _R;
         _R = _T;
 
+        printTree();
 
 
     } else {
@@ -449,6 +451,7 @@ Q Planning::randomDisplacement(Q dMax) {
 
 bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
     // setting up variables
+
     int i = 0; int j = 0;
     VelocityScrew6D<> dx_error = computeTaskError(qs);
     VelocityScrew6D<> dx_error_prime;
@@ -476,17 +479,8 @@ bool Planning::RGDNewConfig(Q &qs, Q dMax, int MaxI, int MaxJ, double eps) {
 
     // check that the solution is good
     if(dx_error.norm2() <= eps){
-        rw::proximity::CollisionDetector::QueryResult data;
-        device->setQ(qs, state);
-
-        bool collision = detector->inCollision(state, &data);
-        if(collision)
-        {
-            //cout << "in collision" << endl;
-            return false;
-        }
-
-        return true;
+        //cout << "status " << !inCollision(_state,qs) << endl;
+        return !inCollision(_state,qs);
     }
     return false;
 }
@@ -502,9 +496,10 @@ Q Planning::sampler(Q qGoal, double goalSampleProb) {
 }
 
 bool Planning::inCollision(const Q &q) {
+    rw::kinematics::State astate = *_state;
     rw::proximity::CollisionDetector::QueryResult data;
-    device->setQ(q, state);
-    bool collision = detector->inCollision(state, &data);
+    device->setQ(q, astate);
+    bool collision = detector->inCollision(astate, &data);
     if(collision)
     {
         return true;
@@ -513,10 +508,11 @@ bool Planning::inCollision(const Q &q) {
     return false;
 }
 
-bool Planning::inCollision(rw::kinematics::State::Ptr  _state, const Q &q) {
+bool Planning::inCollision(rw::kinematics::State::Ptr  _astate, const Q &q) {
+    rw::kinematics::State astate = *_state;
     rw::proximity::CollisionDetector::QueryResult data;
-    device->setQ(q, *_state);
-    bool collision = detector->inCollision(*_state, &data);
+    device->setQ(q, astate);
+    bool collision = detector->inCollision(astate, &data);
     if(collision)
     {
         return true;

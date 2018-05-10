@@ -61,7 +61,7 @@ void Vision::update(){
 void Vision::cameraCallBack(const std_msgs::String::ConstPtr & msg){
 
     current_msg = msg;
-    ROS_INFO("I Heard [%s]", msg->data.c_str());
+    //ROS_INFO("I Heard [%s]", msg->data.c_str());
 }
 
 
