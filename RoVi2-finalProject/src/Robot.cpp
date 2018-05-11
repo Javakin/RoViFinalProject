@@ -43,7 +43,7 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
 
 
     // to initialize the robot
-    moveHome();
+    //moveHome();
 
 }
 
@@ -75,6 +75,7 @@ int Robot::update(){
 
         uiPathIterator++;
         moveQ(path[uiPathIterator]);
+
     }
 
     return pathCompleted();

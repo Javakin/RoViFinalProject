@@ -252,5 +252,11 @@ double QTrees::getCb() {
     return cb;
 }
 
+Node* QTrees::getNode(unsigned int i){
+    if(i < qTree.size())
+        return qTree[i];
+    return nullptr;
+}
+
 
 

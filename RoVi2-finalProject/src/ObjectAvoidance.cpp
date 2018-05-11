@@ -244,8 +244,8 @@ void ObjectAvoidance::init() {
 
 
         //for simulation make a lego brick configuration
-        LegoHandle->initializeTestSetup();
-        getRobWorkStudio()->setState(_state);
+        //LegoHandle->initializeTestSetup();
+        //getRobWorkStudio()->setState(_state);
 
 
         // Setting up the robotHandler
@@ -270,14 +270,13 @@ void ObjectAvoidance::init() {
             getRobWorkStudio()->setState(_state);
         }
 
-
+        // start the planner thread
         PlannerHandle->start();
 
 
         // setting up vision
         VisionHandle = new Vision(LegoHandle);
         VisionHandle->start();
-        //VisionHandle->update();
 
         getRobWorkStudio()->setState(_state);
 
@@ -312,25 +311,33 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    //VisionHandle->update();
+    VisionHandle->update();
 
-    //RobotHandle->update();
 
 
 
     // check for errors in the tree
-    /*QPath robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
+    QPath robotpath;
+    robotpath = PlannerHandle->validate(VALIDAITON_DEPTH);
 
-    PlannerHandle->printTree();
+    cout << robotpath.size() << endl;
+
 
     if(robotpath.size() != 0){
-        // collision detected
-        RobotHandle->setPath(robotpath);
+        // Collision detected
         cout << "Collision detected\n";
-
-        robotpath = PlannerHandle->repareTree();
+        PlannerHandle->printTree();
         RobotHandle->setPath(robotpath);
-    }*/
+
+        // Repare tree
+        robotpath = PlannerHandle->repareTree();
+        while(robotpath.size() == 0){
+            robotpath = PlannerHandle->repareTree();
+            VisionHandle->update();
+            getRobWorkStudio()->setState(_state);
+        }
+        RobotHandle->setPath(robotpath);
+    }
 
     // Update the workcell with the new state
     getRobWorkStudio()->setState(_state);
@@ -423,8 +430,6 @@ void ObjectAvoidance::printConfig() {
 
 void ObjectAvoidance::moveHome() {
     RobotHandle->moveHome();
-
-    //test Rotation3D<double> (T r11, T r12, T r13, T r21, T r22, T r23, T r31, T r32, T r33);
 
 
 }

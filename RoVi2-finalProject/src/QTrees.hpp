@@ -77,7 +77,7 @@ public:
     double getCb();
 
     void exportTree(string fileName, vector< vector<double> > vBricks);
-
+    Node* getNode(unsigned int i);
 
 private:
 

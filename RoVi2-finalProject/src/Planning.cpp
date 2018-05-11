@@ -256,13 +256,13 @@ void Planning::run(){
             }else{
                 // Search for a better solution
                 if(_R!= nullptr){
-                    cout << "stuff" << endl;
+                    /*cout << "stuff" << endl;
                     QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
                     //cout << "done updating " << aPath.size() << endl;
                     if (aPath.size() != 0){
 
                         _RobotHandle->setPath(aPath);
-                    }
+                    }*/
                 }
 
             }
@@ -279,7 +279,9 @@ void Planning::run(){
 
 QPath Planning::validate(double CheckingDebth){
     // setup
+    state = *_state;
     QPath path;
+    vector< Node* > nPath;
 
     if(_R != nullptr){
         Node* currentNode = _R->nearestNeighbor(_RobotHandle->getQRobot(), 0);
@@ -287,40 +289,61 @@ QPath Planning::validate(double CheckingDebth){
         int collisionDetected = 0;
 
         // Go through the final nodes
-        while(currentNode->parent != nullptr && currentNode->nodeCost - initialCost < CheckingDebth) {
-            if(inCollision(_state, currentNode->q)){
+        while(currentNode->parent != nullptr && initialCost - currentNode->nodeCost < CheckingDebth) {
+            if(inCollision(&state, currentNode->q)){
                 collisionDetected = 1;
+                //cout << "test2\n";
                 break;
             }
-            if(expandedBinarySearch(_state, currentNode->q, currentNode->parent->q, EDGE_CHECK_EBS )){
+            if(!expandedBinarySearch(&state, currentNode->q, currentNode->parent->q, EDGE_CHECK_EBS )){
                 collisionDetected = 1;
+                //cout << "test3\n";
                 break;
             }
 
-            path.push_back(currentNode->q);
+            //cout << (initialCost - currentNode->nodeCost)<< endl;
+
+            nPath.push_back(currentNode);
 
             currentNode = currentNode->parent;
         }
 
+        cout << collisionDetected  << " " <<  nPath.size() << endl;
+        // maintain a safe distance to the collition
+        if(collisionDetected){
+            if(nPath.size() != 0){
+                double initial_distance = nPath[nPath.size()-1]->nodeCost;
+                cout << (nPath[nPath.size()-1]->nodeCost-initial_distance) << "this is off" << endl;
+                while(nPath.size() > 0 && nPath[nPath.size()-1]->nodeCost-initial_distance < VALIDATION_BOUND){
+                    cout << (nPath[nPath.size()-1]->nodeCost-initial_distance) << endl;
+                    nPath.pop_back();
+                    cout << "popping\n";
+                }
+            }
+        }
+
+        cout << collisionDetected  << " " <<  nPath.size() << " test2" << endl;
         // create the new path
         if(collisionDetected){
-            QPath temp;
-            if(path.size() > 1){
+            if(nPath.size() > 1){
                 // is the closest point behinde it in the path
-                if((_RobotHandle->getQRobot() - path[1]).norm2() > (path[0] - path[1]).norm2()){
-                    temp.push_back(path[0]);
+                if((_RobotHandle->getQRobot() - nPath[1]->q).norm2() > ( nPath[0]->q -  nPath[1]->q).norm2()){
+                    path.push_back(nPath[0]->q);
                 }
                 // add the remaining points that within the clearance
-                for(unsigned int i = 1; i < path.size(); i++){
-                    temp.push_back(path[i]);
+                for(unsigned int i = 1; i < nPath.size(); i++){
+                    path.push_back(nPath[i]->q);
                 }
             }
 
-
-        }else{
-            path.clear();
         }
+
+        if(collisionDetected && path.size() == 0){
+            path.push_back(_RobotHandle->getQRobot());
+        }
+        //cout << collisionDetected  << " " <<  nPath.size() << " test1" << endl;
     }
+
 
 
     return path;
@@ -329,15 +352,117 @@ QPath Planning::validate(double CheckingDebth){
 
 // todo make a repare algorithm that uthilizes the previus tree
 QPath Planning::repareTree(){
-    QPath outputPath;
 
-    //Grow on the solution tree
-    if(_R != nullptr && !InUse){
-        outputPath = getConstraintPath(_R->getRootNode()->q, _RobotHandle->getQRobot(), RRT_EPSILON);
+    rw::trajectory::QPath path;
+    state = *_state;
+    VelocityScrew6D<> dx = computeDisplacement(_R->getRootNode()->q);
+    QTrees* _T = new QTrees(_R->getRootNode()->q, dx[0], dx[1]);
+    bool sucess;
+    if(_R != nullptr) {
+        sucess = constrainedRRT(_T, _T->getRootNode()->q, RRT_EPSILON, 0);
+
+
+        // post path planning check
+        // Fetch the path
+        Q qRobot = _RobotHandle->getQRobot();
+        Node *nearestNodeT = _T->nearestNeighbor(qRobot, 0);
+
+        printTree(_T, *_state);
+
+        if (sucess) {
+            _T->getRootPath(nearestNodeT, path);
+            cout << "Returning path of length: " << path.size() << " and length " << nearestNodeT->nodeCost
+                 << " with cost " << _T->getC() << endl;
+
+            // Update tree structure
+            if (_R != nullptr)
+                delete _R;
+            _R = _T;
+
+            printTree();
+
+
+        } else {
+            cout << "No soluiton found\n";
+            // update the newest Tree for later use
+            if (_T != nullptr)
+                delete _T;
+        }
+    }
+    return path;
+
+
+/*
+    //remove invalid nodes
+    if(_R != nullptr){
+        VelocityScrew6D<> dx = computeDisplacement(_R->getRootNode()->q);
+        QTrees* _T = new QTrees(_R->getRootNode()->q, dx[0], dx[1]);
+
+        cout << "fejl i treet\n";
+        printTree();
+        int i = 1;
+        Node* iNode = _R->getNode(i);
+        while(iNode != nullptr){
+            // check if it still have a parrent
+            if(iNode->parent == nullptr){
+                delete iNode;
+                cout << "removed node " << i << endl;
+            }else {
+                // check for collision
+                if(expandedBinarySearch(iNode->q, iNode->parent->q, EDGE_CHECK_EBS)){
+                    dx = computeDisplacement(iNode->q);
+                    _T->add(iNode->q, iNode->parent, dx[0], dx[1]);
+                }else{
+                    delete iNode;
+                }
+            }
+
+            // iterate through tree
+            i++;
+            iNode = _R->getNode(i);
+        }
+        // Update tree structure
+        if(_R != nullptr)
+            delete _R;
+        _R = _T;
+
+        cout << "så er treet renset" << endl;
+        printTree(_T, state);
+
+        // Grow a new tree
+        bool sucess = constrainedRRT(_T, _T->getRootNode()->q, RRT_EPSILON, 0);
+
+
+
+        // post path planning check
+        rw::trajectory::QPath path;
+        // Fetch the path
+        Q qRobot = _RobotHandle->getQRobot();
+        Node* nearestNodeT = _T->nearestNeighbor(qRobot,0);
+
+        if (sucess) {
+            _T->getRootPath(nearestNodeT, path);
+            cout << "Returning path of length: " << path.size() << " and length " << nearestNodeT->nodeCost << " with cost " << _T->getC() << endl;
+
+            // Update tree structure
+            if(_R != nullptr)
+                delete _R;
+            _R = _T;
+
+            printTree();
+
+
+        } else {
+            cout << "No soluiton found\n";
+            // update the newest Tree for later use
+            if(_T != nullptr)
+                delete _T;
+        }
+        return path;
     }
 
-
-    return outputPath;
+*/
+    //return outputPath;
 }
 
 QPath Planning::updateConstraindPath(Q qGoal, double eps) {
@@ -358,8 +483,6 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
 
 
 
-
-
     // post path planning check
     rw::trajectory::QPath path;
     // Fetch the path
@@ -373,7 +496,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
         _T->getRootPath(nearestNodeT, path);
 
 
-        cout << "Returning path of length: " << path.size() << " and length " << nearestNodeT->nodeCost << " with cost " << _T->getC() << endl;
+        cout << "Returning path of length: " << path.size() << " and length " << nearestNodeT->nodeCost << " with cost " << nearestNodeT->nodeCost << endl;
 
         // Update tree structure
         if(_R != nullptr)
@@ -544,6 +667,11 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
     Q dqNew = pow(2, levels)*eps*dq/dq.norm2();
     unsigned int steps;
 
+    // precondition
+    if((StartConf-EndConf).norm2() < eps){
+        return true;
+    }
+
     // check for collision in the end
     device->setQ(EndConf, state);
     if(detector->inCollision(state, &data)){
@@ -552,11 +680,14 @@ bool Planning::expandedBinarySearch(const Q StartConf, const Q EndConf, double e
     }
 
 
+
+
+
+
     // Perform algorithm
     for(unsigned int i = 1; i <= levels; i++ ){
         steps = (int)pow(2,i-1);
         step = dqNew/steps;
-
 
         for(unsigned int j = 1; j<=steps; j++){
             qi = StartConf+(j - 0.5)*step;
@@ -594,6 +725,10 @@ bool Planning::expandedBinarySearch(rw::kinematics::State::Ptr  _state, const Q 
         return false;
     }
 
+    // precondition
+    if((StartConf-EndConf).norm2() < eps){
+        return true;
+    }
 
     // Perform algorithm
     for(unsigned int i = 1; i <= levels; i++ ){
