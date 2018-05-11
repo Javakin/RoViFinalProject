@@ -79,16 +79,17 @@ using namespace rwlibs::proximitystrategies;
 #define Q4_WEIGHT           0.0955
 #define Q5_WEIGHT           0.7879
 
-#define MAX_RRT_ITERATIONS  500
+#define MAX_RRT_ITERATIONS   500
 
-#define GOAL_SAMPLE_PROB    0.1
-#define RGD_MIN_ERROR       0.001
-#define RGD_MAX_ERROR       0.01
-#define EDGE_CHECK_EBS      0.001
-#define VALIDAITON_DEPTH    0.1
-#define RRT_EPSILON         0.1
-#define IMPROVEMENT_FACTOR  0.05
-#define NUM_OF_NEIGHBORS    3
+#define GOAL_SAMPLE_PROB     0.1
+#define RGD_MIN_ERROR        0.001
+#define RGD_MAX_ERROR        0.01
+#define EDGE_CHECK_EBS       0.001
+#define VALIDAITON_DEPTH     0.1
+#define RRT_EPSILON          0.1
+#define IMPROVEMENT_FACTOR   0.05
+#define IMPROVEMENT_FACTORCB 0.05
+#define NUM_OF_NEIGHBORS     3
 
 
 
@@ -105,7 +106,6 @@ public:
     QPath validate(double CheckingDebth);
     QPath repareTree();
     void printTree();
-
 
     void pausePlanner(int status);
 

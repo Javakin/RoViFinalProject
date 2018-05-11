@@ -310,10 +310,9 @@ void ObjectAvoidance::update(){
     // update workspace
     //LegoHandle->move(0.003);
 
-    VisionHandle->update();
+    //VisionHandle->update();
 
     RobotHandle->update();
-
 
 
 

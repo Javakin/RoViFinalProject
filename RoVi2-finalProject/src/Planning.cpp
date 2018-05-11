@@ -133,18 +133,18 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
 rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps) {
     // setup variables
     rw::trajectory::QPath path;
-
+    //cout << "goocs" << endl;
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
     QTrees* _T = new QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
     state = *_state;
-
+//cout << "goos" << endl;
     // Grow initial constrained RRT
     bool status = constrainedRRT(_T, qGoal, eps, 0);
 
     // post path planning check
     if(status){
-        cout << "Solution found \n";
+        //cout << "Solution found \n";
         printTree(_T, state);
 
         // Fetch the path
@@ -235,7 +235,7 @@ void Planning::run(){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
 
-                //cout << "hello world " << robotDirection << endl;
+                cout << "hello world " << robotDirection << endl;
                 //cout << "in loop\n";
                 if(robotDirection == 0){
                     qGoal = q2;
@@ -252,12 +252,16 @@ void Planning::run(){
 
             }else{
                 // Search for a better solution
-                QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
-                //cout << "done updating " << aPath.size() << endl;
-                if (aPath.size() != 0){
+                if(_R!= nullptr){
+                    cout << "stuff" << endl;
+                    QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
+                    //cout << "done updating " << aPath.size() << endl;
+                    if (aPath.size() != 0){
 
-                    _RobotHandle->setPath(aPath);
+                        _RobotHandle->setPath(aPath);
+                    }
                 }
+
             }
 
         }
@@ -335,7 +339,7 @@ QPath Planning::repareTree(){
 
 QPath Planning::updateConstraindPath(Q qGoal, double eps) {
 
-    cout << "begining to update " << endl;
+    //cout << "begining to update " << endl;
 
     // setup variables
     VelocityScrew6D<> dx = computeDisplacement(qGoal);
@@ -343,26 +347,30 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     Q dMax = Q(6, 0.003, 0.003, 0.003, 0.003, 0.003, 0.003);
 
     // setup tree with new parameters
-    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space*(1 - IMPROVEMENT_FACTOR), _R->getCb() + IMPROVEMENT_FACTOR*5);
+    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space*(1 - IMPROVEMENT_FACTOR), _R->getCb() + IMPROVEMENT_FACTORCB);
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Grow a new tree
     bool sucess = constrainedRRT(_T, qGoal, eps, NUM_OF_NEIGHBORS);
 
-    //cout << "Solution found \n";
 
-    cout << "sucess " << endl;
+
+
+
     // post path planning check
     rw::trajectory::QPath path;
-    if (sucess) {
+    // Fetch the path
+    Q qRobot = _RobotHandle->getQRobot();
+    Node *nearestNodeT = _T->nearestNeighbor(qRobot,0);
+    Node *nearestNodeR = _R->nearestNeighbor(qRobot,0);
 
-        // Fetch the path
-        Q qRobot = _RobotHandle->getQRobot();
-        Node *nearestNode = _T->nearestNeighbor(qRobot,0);
-        _T->getRootPath(nearestNode, path);
+    if (sucess && nearestNodeT->nodeCost <nearestNodeR->nodeCost) {
 
 
-        cout << "Returning path of length: " << path.size() << " and length " << nearestNode->nodeCost << " with cost " << _T->getC() << endl;
+        _T->getRootPath(nearestNodeT, path);
+
+
+        cout << "Returning path of length: " << path.size() << " and length " << nearestNodeT->nodeCost << " with cost " << _T->getC() << endl;
 
         // Update tree structure
         if(_R != nullptr)
@@ -607,6 +615,8 @@ bool Planning::expandedBinarySearch(rw::kinematics::State::Ptr  _state, const Q 
     }
     return true;
 }
+
+
 
 
 

@@ -80,7 +80,7 @@ Node* QTrees::nearestNeighbor(Q qRand) {
 
 Node* QTrees::constrainedNearestNeighbor(Q qRand, int constrained){
     // setting up initial variables
-    cout << "hehe" << constrained<< endl;
+    //cout << "hehe" << constrained<< endl;
     Q conf;
     vector<Node*> minNodes((unsigned int)constrained, qTree[0]);
     double dMinDist = db*(qTree[0]->q-qRand).norm2() + cb*qTree[0]->nodeCost, length, length2;
