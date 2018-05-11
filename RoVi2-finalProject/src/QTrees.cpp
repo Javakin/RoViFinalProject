@@ -21,7 +21,7 @@ QTrees::QTrees(Q qInit, double aX, double aY) {
     qTree.clear();
     qTree.push_back(rootNode);
     C = 10000;
-    setCb(cb);
+    setCb(0);
 }
 
 QTrees::QTrees(Q qInit, double aX, double aY, double C_space, double cost_b) {

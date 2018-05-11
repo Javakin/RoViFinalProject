@@ -141,7 +141,7 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
     QTrees* _T = new QTrees(qGoal, dx[0], dx[1]);
     Q dMax = Q(6,0.003,0.003,0.003,0.003,0.003,0.003);
     state = *_state;
-//cout << "goos" << endl;
+
     // Grow initial constrained RRT
     bool status = constrainedRRT(_T, qGoal, eps, 0);
 
@@ -225,8 +225,8 @@ void Planning::run(){
     // uptimize on current tree if active
     isAlive= true;
 
-    Q q1 = Q(6,0.584, -1.065,-2.145, -1.504, 1.571, 1.805);
-    Q q2 = Q(6, 0.446, -2.074, -1.132, -1.504, 1.568, 1.664);
+    Q q1 = Q(6,0.584,-1.067, -2.170, -1.477, 1.571, 1.805);
+    Q q2 = Q(6,0.446, -2.076, -1.155, -1.479, 1.568, 1.664);
     Q qGoal;
 
     cout << "lets get to it \n";

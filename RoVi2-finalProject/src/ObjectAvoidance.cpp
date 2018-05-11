@@ -257,7 +257,7 @@ void ObjectAvoidance::init() {
 
 
         // move robot to start configuration
-        Q qGoal = Q(6,0.584, -1.065,-2.145, -1.504, 1.571, 1.805);
+        Q qGoal = Q(6,0.584,-1.067, -2.170, -1.477,1.571, 1.805);
         Q qRobot =  RobotHandle->getQRobot();
 
         rw::trajectory::QPath aPath = PlannerHandle->RRTC(_state, qRobot, qGoal, 0.01);
