@@ -69,6 +69,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
         Q qS;
         for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
+
             //cout << "N: " << N;
             qRobot = _RobotHandle->getQRobot();
             Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
@@ -127,6 +128,8 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
         cout << "Robot or goals is in collition\n";
         return false;
     }
+
+    cout << "ended \n";
     return N <= MAX_RRT_ITERATIONS;
 }
 
@@ -364,7 +367,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     Node *nearestNodeT = _T->nearestNeighbor(qRobot,0);
     Node *nearestNodeR = _R->nearestNeighbor(qRobot,0);
 
-    if (sucess && nearestNodeT->nodeCost <nearestNodeR->nodeCost) {
+    if (sucess && nearestNodeT->nodeCost*(1-IMPROVEMENT_FACTOR) < nearestNodeR->nodeCost) {
 
 
         _T->getRootPath(nearestNodeT, path);

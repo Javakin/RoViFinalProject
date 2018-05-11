@@ -37,7 +37,7 @@
 
 
  <Frame name="ConveyourPlane" refframe="Conveyour">
-     <RPY> 0 0 -90 </RPY> <Pos> 0 0.088 0.0 </Pos>
+     <RPY> 0 0 -90 </RPY> <Pos> 0 0.078 0.0 </Pos>
 </Frame>
 
  <Frame name="TaskFrame" refframe="ConveyourPlane">

@@ -19,6 +19,7 @@ Robot::Robot() {
     _robot = new caros::SerialDeviceSIProxy(_nh, "caros_universalrobot");
 
     quitfromgui = false;
+    isPaused = 0;
 }
 
 Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
@@ -38,6 +39,7 @@ Robot::Robot(State *_state, WorkCell::Ptr _workcell) {
     _robot = new caros::SerialDeviceSIProxy(_nh, "caros_universalrobot");
 
     quitfromgui = false;
+    isPaused = 0;
 
 
     // to initialize the robot
@@ -113,6 +115,9 @@ void Robot::run()
     while(ros::ok() && !quitfromgui)
     {
         ros::spinOnce();
+        if(!isPaused){
+            update();
+        }
 
         // Adjust the sleep to, according to how often you will check ROS for new messages
         ros::Duration(0.1).sleep();
@@ -137,4 +142,8 @@ bool Robot::pathCompleted(){
     if (uiPathIterator >= path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.01)
         return 1;
     return 0;
+}
+
+void Robot::pauseRobot(bool astatus){
+    isPaused = astatus;
 }

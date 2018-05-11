@@ -296,11 +296,13 @@ void ObjectAvoidance::run(){
         cout << "stopping the timer\n";
         _timer->stop();
         PlannerHandle->pausePlanner(1);
+        RobotHandle->pauseRobot(1);
 
     }else{
         cout << "starting the timer\n";
         _timer->start(DELTA_T_SIM);
         PlannerHandle->pausePlanner(0);
+        RobotHandle->pauseRobot(0);
     }
 
 }
@@ -312,7 +314,7 @@ void ObjectAvoidance::update(){
 
     //VisionHandle->update();
 
-    RobotHandle->update();
+    //RobotHandle->update();
 
 
 

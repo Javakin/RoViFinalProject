@@ -74,7 +74,7 @@ public:
     void moveHome();
     void moveQ(Q q);
     bool pathCompleted();
-
+    void pauseRobot(bool astatus);
 
     /// This method contains the ROS event loop. Feel free to modify
     void run();
@@ -96,6 +96,8 @@ private:
     ros::NodeHandle _nh;
     ros::Subscriber _sub;
     caros::SerialDeviceSIProxy* _robot;
+    bool isPaused;
+
 };
 
 
