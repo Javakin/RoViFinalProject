@@ -64,7 +64,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
     Q qRobot = _RobotHandle->getQRobot();
     Q qGol = qGoal;
     if(RGDNewConfig(qRobot, dMax, 500,500,RGD_MIN_ERROR) && RGDNewConfig(qGol, dMax, 500,500,RGD_MIN_ERROR)){
-        cout << "inside the loop\n";
+        //cout << "inside the loop\n";
         // Grow RRT tree
         Q qS;
         for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
@@ -89,7 +89,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
                     dx = computeDisplacement(qS);
                     if(_T->add(qS, nearestNode, dx[0], dx[1])){
                         // goal is close end loop
-                        cout <<  "Goal reached in interations N: " << N << endl;
+                        //cout <<  "Goal reached in interations N: " << N << endl;
                         break;
                     }
                 }
@@ -129,7 +129,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
         return false;
     }
 
-    cout << "ended \n";
+    //cout << "ended \n";
     return N <= MAX_RRT_ITERATIONS;
 }
 
@@ -229,6 +229,8 @@ void Planning::run(){
     Q q2 = Q(6,0.446, -2.076, -1.155, -1.479, 1.568, 1.664);
     Q qGoal;
 
+
+
     cout << "lets get to it \n";
     while (isAlive){
         // Setup
@@ -238,7 +240,7 @@ void Planning::run(){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
 
-                cout << "hello world " << robotDirection << endl;
+                //cout << "hello world " << robotDirection << endl;
                 //cout << "in loop\n";
                 if(robotDirection == 0){
                     qGoal = q2;
@@ -247,22 +249,47 @@ void Planning::run(){
                     qGoal = q1;
                 }
 
+                // for testing the algorithm
                 QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON);
+
+
                 if (aPath.size() != 0){
                     robotDirection = !robotDirection;
                     _RobotHandle->setPath(aPath);
                 }
 
             }else{
+                // check for errors in the tree
+
+                QPath robotpath;
+                robotpath = validate(VALIDAITON_DEPTH);
+
+                cout << robotpath.size() << endl;
+
+
+                if(robotpath.size() != 0){
+                    // Collision detected
+                    cout << "Collision detected\n";
+                    printTree();
+                    _RobotHandle->setPath(robotpath);
+
+                    // Repare tree
+                    robotpath = repareTree();
+                    while(robotpath.size() == 0){
+                        robotpath = repareTree();
+                    }
+                    _RobotHandle->setPath(robotpath);
+                }
+
                 // Search for a better solution
                 if(_R!= nullptr){
-                    /*cout << "stuff" << endl;
+                    cout << "stuff" << endl;
                     QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
                     //cout << "done updating " << aPath.size() << endl;
                     if (aPath.size() != 0){
 
                         _RobotHandle->setPath(aPath);
-                    }*/
+                    }
                 }
 
             }
@@ -308,7 +335,7 @@ QPath Planning::validate(double CheckingDebth){
             currentNode = currentNode->parent;
         }
 
-        cout << collisionDetected  << " " <<  nPath.size() << endl;
+        //cout << collisionDetected  << " " <<  nPath.size() << endl;
         // maintain a safe distance to the collition
         if(collisionDetected){
             if(nPath.size() != 0){
@@ -322,7 +349,7 @@ QPath Planning::validate(double CheckingDebth){
             }
         }
 
-        cout << collisionDetected  << " " <<  nPath.size() << " test2" << endl;
+        //cout << collisionDetected  << " " <<  nPath.size() << " test2" << endl;
         // create the new path
         if(collisionDetected){
             if(nPath.size() > 1){

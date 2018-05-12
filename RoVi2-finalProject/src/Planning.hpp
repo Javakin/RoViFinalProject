@@ -85,7 +85,7 @@ using namespace rwlibs::proximitystrategies;
 #define RGD_MIN_ERROR        0.001
 #define RGD_MAX_ERROR        0.01
 #define EDGE_CHECK_EBS       0.01
-#define VALIDAITON_DEPTH     0.5
+#define VALIDAITON_DEPTH     0.8
 #define VALIDATION_BOUND     0.25
 #define RRT_EPSILON          0.1
 #define IMPROVEMENT_FACTOR   0.05

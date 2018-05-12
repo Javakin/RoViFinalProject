@@ -56,9 +56,36 @@ void Robot::setQ(Q qRobot) {
 }
 
 void Robot::setPath(rw::trajectory::QPath aPath) {
+    rw::trajectory::QPath dummy;
+
+    unsigned int i = 0;
+    if(aPath.size() > 1){
+        while((getQRobot() - aPath[i]).norm2() > (aPath[i] - aPath[i+1]).norm2()){
+            //cout << "we got here" << endl;
+            i++;
+            if(aPath.size() == i+1)
+                break;
+        }
+    }
+
+    if(aPath.size() > 1){
+        if ((getQRobot() - aPath[i+1]).norm2() > (aPath[i] - aPath[i+1]).norm2()) {
+            //cout << "we got here as well" << endl;
+            i++;//path.push_back(aPath[i]);
+        }
+        for (unsigned int j = i; j < aPath.size(); j++) {
+            dummy.push_back(aPath[j]);
+        }
+    }
+
+    //cout << "path size: " << dummy.size() << endl;
+    if(dummy.empty()){
+        dummy.push_back(getQRobot());
+    }
+
     path = aPath;
     uiPathIterator = 0;
-    //cout << "path length is: " << path.size() << endl;
+
 }
 
 int Robot::update(){
@@ -72,9 +99,10 @@ int Robot::update(){
     //cout << " " << (getQRobot()-path[uiPathIterator]).norm2() << " bool exprecion result; " << ((getQRobot()-path[uiPathIterator]).norm2() < 0.2)  << endl;
     if(uiPathIterator < path.size() - 1 && (getQRobot()-path[uiPathIterator]).norm2() < 0.2){
         //cout << "next target\n";
-
         uiPathIterator++;
         moveQ(path[uiPathIterator]);
+
+
 
     }
 
@@ -121,7 +149,7 @@ void Robot::run()
         }
 
         // Adjust the sleep to, according to how often you will check ROS for new messages
-        ros::Duration(0.1).sleep();
+        ros::Duration(0.02).sleep();
     }
     if (!quitfromgui)
     {
