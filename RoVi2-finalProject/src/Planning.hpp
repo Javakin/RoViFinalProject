@@ -101,7 +101,7 @@ public:
     Planning(WorkCell::Ptr _workcell, rw::kinematics::State::Ptr  _state, Robot* _RobotHandle);
     ~Planning();
 
-    QPath getConstraintPath(Q qGoal, Q qRobot, double eps);
+    QPath getConstraintPath(Q qGoal, Q qRobot, double eps, double goalSampleProb);
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
     QPath updateConstraindPath(Q qGoal, double eps);
     QPath validate(double CheckingDebth);
@@ -112,6 +112,8 @@ public:
 
     // for running the path planner thread
     void run();
+
+    void setLegoHandle(Lego* alego);
 
 private:
     void printTree(QTrees* _tree, rw::kinematics::State aState);
@@ -131,7 +133,7 @@ private:
     bool inCollision(const Q &q);
     bool inCollision(rw::kinematics::State::Ptr  _state, const Q &q);
 
-    bool constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes);
+    bool constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes, double goalSampleProb);
 
     rw::kinematics::State state;
     rw::kinematics::State::Ptr  _state;
@@ -152,6 +154,9 @@ private:
     //QTrees* _T;
     QTrees* _R;
 
+
+    // for testing
+    Lego* myLegoPointer;
 };
 
 

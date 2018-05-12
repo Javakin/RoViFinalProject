@@ -56,7 +56,7 @@ void Robot::setQ(Q qRobot) {
 }
 
 void Robot::setPath(rw::trajectory::QPath aPath) {
-    rw::trajectory::QPath dummy;
+    /*rw::trajectory::QPath dummy;
 
     unsigned int i = 0;
     if(aPath.size() > 1){
@@ -82,7 +82,7 @@ void Robot::setPath(rw::trajectory::QPath aPath) {
     if(dummy.empty()){
         dummy.push_back(getQRobot());
     }
-
+*/
     path = aPath;
     uiPathIterator = 0;
 

@@ -244,8 +244,8 @@ void ObjectAvoidance::init() {
 
 
         //for simulation make a lego brick configuration
-        //LegoHandle->initializeTestSetup();
-        //getRobWorkStudio()->setState(_state);
+        LegoHandle->initializeTestSetup();
+        getRobWorkStudio()->setState(_state);
 
 
         // Setting up the robotHandler
@@ -254,7 +254,7 @@ void ObjectAvoidance::init() {
 
         // Setting up the path planner
         PlannerHandle  = new Planning(_workcell, &_state, RobotHandle);
-
+        PlannerHandle->setLegoHandle(LegoHandle);
 
         // move robot to start configuration
         Q qGoal = Q(6,0.584,-1.067, -2.170, -1.477,1.571, 1.805);
@@ -275,8 +275,8 @@ void ObjectAvoidance::init() {
 
 
         // setting up vision
-        VisionHandle = new Vision(LegoHandle);
-        VisionHandle->start();
+        //VisionHandle = new Vision(LegoHandle);
+        //VisionHandle->start();
 
         getRobWorkStudio()->setState(_state);
 
@@ -309,9 +309,9 @@ void ObjectAvoidance::run(){
 void ObjectAvoidance::update(){
 
     // update workspace
-    //LegoHandle->move(0.003);
+    LegoHandle->move(0.003);
 
-    VisionHandle->update();
+    //VisionHandle->update();
 
 
     // Update the workcell with the new state

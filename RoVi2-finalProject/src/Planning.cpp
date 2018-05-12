@@ -53,7 +53,7 @@ Planning::~Planning() {
 
 }
 
-bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes){
+bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestNodes, double goalSampleProb){
     state = *_state;
     unsigned int N = 0;
     VelocityScrew6D<> dx;
@@ -69,10 +69,9 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
         Q qS;
         for(N = 0; N <= MAX_RRT_ITERATIONS; N++){
 
-
             //cout << "N: " << N;
             qRobot = _RobotHandle->getQRobot();
-            Q qRand = sampler(qRobot, GOAL_SAMPLE_PROB);
+            Q qRand = sampler(qRobot, goalSampleProb);
 
             Node* nearestNode= _T->nearestNeighbor(qRand, 0);
 
@@ -133,7 +132,7 @@ bool Planning::constrainedRRT(QTrees* _T, Q qGoal, double eps, int numOfNearestN
     return N <= MAX_RRT_ITERATIONS;
 }
 
-rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps) {
+rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps,  double goalSampleProb) {
     // setup variables
     rw::trajectory::QPath path;
     //cout << "goocs" << endl;
@@ -143,7 +142,7 @@ rw::trajectory::QPath Planning::getConstraintPath(Q qGoal, Q qRobot, double eps)
     state = *_state;
 
     // Grow initial constrained RRT
-    bool status = constrainedRRT(_T, qGoal, eps, 0);
+    bool status = constrainedRRT(_T, qGoal, eps, 0, goalSampleProb);
 
     // post path planning check
     if(status){
@@ -229,6 +228,8 @@ void Planning::run(){
     Q q2 = Q(6,0.446, -2.076, -1.155, -1.479, 1.568, 1.664);
     Q qGoal;
 
+    //int ite = 0;
+    //double epsilon = 0.01;
 
 
     cout << "lets get to it \n";
@@ -249,8 +250,7 @@ void Planning::run(){
                     qGoal = q1;
                 }
 
-                // for testing the algorithm
-                QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON);
+                QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON, GOAL_SAMPLE_PROB);
 
 
                 if (aPath.size() != 0){
@@ -295,13 +295,16 @@ void Planning::run(){
             }
 
         }
-
+        //myLegoPointer->move(0.01);
         // sleep for a duration of time
         usleep( 50000 );
     }
 
     cout << "i am dying\n";
 
+}
+void Planning::setLegoHandle(Lego* alego){
+    myLegoPointer = alego;
 }
 
 QPath Planning::validate(double CheckingDebth){
@@ -386,7 +389,7 @@ QPath Planning::repareTree(){
     QTrees* _T = new QTrees(_R->getRootNode()->q, dx[0], dx[1]);
     bool sucess;
     if(_R != nullptr) {
-        sucess = constrainedRRT(_T, _T->getRootNode()->q, RRT_EPSILON, 0);
+        sucess = constrainedRRT(_T, _T->getRootNode()->q, RRT_EPSILON, 0, GOAL_SAMPLE_PROB);
 
 
         // post path planning check
@@ -506,7 +509,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Grow a new tree
-    bool sucess = constrainedRRT(_T, qGoal, eps, NUM_OF_NEIGHBORS);
+    bool sucess = constrainedRRT(_T, qGoal, eps, NUM_OF_NEIGHBORS, GOAL_SAMPLE_PROB);
 
 
 
