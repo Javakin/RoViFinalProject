@@ -103,7 +103,7 @@ public:
 
     QPath getConstraintPath(Q qGoal, Q qRobot, double eps, double goalSampleProb);
     QPath RRTC(State state, Q qRobot, Q qGoal, double epsilon);
-    QPath updateConstraindPath(Q qGoal, double eps);
+    QPath updateConstraindPath(Q qGoal, double eps, double improvementFactor);
     QPath validate(double CheckingDebth);
     QPath repareTree();
     void printTree();

@@ -228,9 +228,10 @@ void Planning::run(){
     Q q2 = Q(6,0.446, -2.076, -1.155, -1.479, 1.568, 1.664);
     Q qGoal;
 
-    //int ite = 0;
-    //double epsilon = 0.01;
+    struct timeval start, end;
+    long mtime, seconds, useconds;
 
+    double impF = 0;
 
     cout << "lets get to it \n";
     while (isAlive){
@@ -240,9 +241,14 @@ void Planning::run(){
         if(pausePlan == 0){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
+                // stopping the timer
+                gettimeofday(&end, NULL);
+                seconds  = end.tv_sec  - start.tv_sec;
+                useconds = end.tv_usec - start.tv_usec;
 
-                //cout << "hello world " << robotDirection << endl;
-                //cout << "in loop\n";
+                mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+                cout << "Impf: " << impF << " Timer: " << mtime << endl;
+
                 if(robotDirection == 0){
                     qGoal = q2;
                 }
@@ -250,20 +256,28 @@ void Planning::run(){
                     qGoal = q1;
                 }
 
+
+                myLegoPointer->move(0.114875478);
+
                 QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON, GOAL_SAMPLE_PROB);
 
+                impF +=0.02;
+                if(impF > 0.2){
+                    impF = 0;
+                }
 
                 if (aPath.size() != 0){
                     robotDirection = !robotDirection;
                     _RobotHandle->setPath(aPath);
                 }
 
+                // starting the timer
+                gettimeofday(&start, NULL);
+
             }else{
                 // check for errors in the tree
-
-                QPath robotpath;
+                /*QPath robotpath;
                 robotpath = validate(VALIDAITON_DEPTH);
-
                 cout << robotpath.size() << endl;
 
 
@@ -279,23 +293,20 @@ void Planning::run(){
                         robotpath = repareTree();
                     }
                     _RobotHandle->setPath(robotpath);
-                }
+                }*/
 
                 // Search for a better solution
                 if(_R!= nullptr){
-                    cout << "stuff" << endl;
-                    QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON);
+                    //cout << "stuff" << endl;
+                    QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON, impF);
                     //cout << "done updating " << aPath.size() << endl;
                     if (aPath.size() != 0){
 
                         _RobotHandle->setPath(aPath);
                     }
                 }
-
             }
-
         }
-        //myLegoPointer->move(0.01);
         // sleep for a duration of time
         usleep( 50000 );
     }
@@ -495,7 +506,7 @@ QPath Planning::repareTree(){
     //return outputPath;
 }
 
-QPath Planning::updateConstraindPath(Q qGoal, double eps) {
+QPath Planning::updateConstraindPath(Q qGoal, double eps, double improvementFactor) {
 
     //cout << "begining to update " << endl;
 
@@ -505,7 +516,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     Q dMax = Q(6, 0.003, 0.003, 0.003, 0.003, 0.003, 0.003);
 
     // setup tree with new parameters
-    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space*(1 - IMPROVEMENT_FACTOR), _R->getCb() + IMPROVEMENT_FACTORCB);
+    QTrees *_T = new QTrees(qGoal, dx[0], dx[1], C_space*(1 - improvementFactor), _R->getCb() + IMPROVEMENT_FACTORCB);
     //cout << "qGoal:  " << qGoal << endl << "qRobot: " << endl;
 
     // Grow a new tree
@@ -520,7 +531,7 @@ QPath Planning::updateConstraindPath(Q qGoal, double eps) {
     Node *nearestNodeT = _T->nearestNeighbor(qRobot,0);
     Node *nearestNodeR = _R->nearestNeighbor(qRobot,0);
 
-    if (sucess && nearestNodeT->nodeCost*(1-IMPROVEMENT_FACTOR) < nearestNodeR->nodeCost) {
+    if (sucess && nearestNodeT->nodeCost*(1-improvementFactor) < nearestNodeR->nodeCost) {
 
 
         _T->getRootPath(nearestNodeT, path);

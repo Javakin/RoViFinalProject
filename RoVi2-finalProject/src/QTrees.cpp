@@ -241,7 +241,7 @@ void QTrees::setCb(double aCb) {
 
     cb = aCb;
     db = (1-cb);
-    cout << "cb " << cb << " db " << db << endl;
+    //cout << "cb " << cb << " db " << db << endl;
 }
 
 double QTrees::getC() {
