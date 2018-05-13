@@ -232,6 +232,9 @@ void Planning::run(){
     long mtime, seconds, useconds;
 
     double impF = 0;
+    int repetition = 0;
+    bool newRout = 0;
+    QPath originalPath, optimizedPath;
 
     cout << "lets get to it \n";
     while (isAlive){
@@ -242,12 +245,32 @@ void Planning::run(){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
                 // stopping the timer
-                gettimeofday(&end, NULL);
-                seconds  = end.tv_sec  - start.tv_sec;
-                useconds = end.tv_usec - start.tv_usec;
+                if(newRout == 1){
+                    newRout = 0;
 
-                mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
-                cout << "Impf: " << impF << " Timer: " << mtime << endl;
+                    gettimeofday(&end, NULL);
+                    seconds  = end.tv_sec  - start.tv_sec;
+                    useconds = end.tv_usec - start.tv_usec;
+
+                    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+                    //save the data
+                    double finalPathLenght = _RobotHandle->getPathLengthForExperiment();
+                    double originalPathLength= 0;
+                    for(unsigned int p = 0; p + 1 <originalPath.size(); p++){
+                        originalPathLength += (originalPath[p] -originalPath[p+1]).norm2();
+                    }
+
+                    // Printing
+                    ofstream myfile;
+                    myfile.open ("AnytimeOptimization.txt",  ios::app);
+                    myfile << impF << ", " << originalPathLength << ", " << finalPathLenght << ", " << mtime << endl;
+                    myfile.close();
+
+                    cout << "Impf: " << impF << " rep: "<< repetition << " Timer: " << mtime  << endl;
+                    cout << "Length_orig: " << originalPathLength << ", "  << endl;
+                }
+
 
                 if(robotDirection == 0){
                     qGoal = q2;
@@ -256,19 +279,26 @@ void Planning::run(){
                     qGoal = q1;
                 }
 
-
                 myLegoPointer->move(0.114875478);
 
                 QPath aPath = getConstraintPath(qGoal, _RobotHandle->getQRobot(), RRT_EPSILON, GOAL_SAMPLE_PROB);
 
-                impF +=0.02;
-                if(impF > 0.2){
-                    impF = 0;
-                }
+
 
                 if (aPath.size() != 0){
                     robotDirection = !robotDirection;
                     _RobotHandle->setPath(aPath);
+
+                    // safe the old setup
+                    _RobotHandle->clearForExperiment();
+                    originalPath = aPath;
+
+                    impF +=0.02;
+                    if(impF > 0.2){
+                        impF = 0;
+                        repetition++;
+                    }
+                    newRout = 1;
                 }
 
                 // starting the timer

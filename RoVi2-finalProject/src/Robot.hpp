@@ -80,6 +80,8 @@ public:
     void run();
 
 
+    void clearForExperiment();
+    double getPathLengthForExperiment();
 private:
     rw::kinematics::State* _state;
     Device::Ptr device;
@@ -97,6 +99,8 @@ private:
     ros::Subscriber _sub;
     caros::SerialDeviceSIProxy* _robot;
     bool isPaused;
+
+    rw::trajectory::QPath forExperiment;
 
 };
 

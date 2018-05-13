@@ -146,6 +146,7 @@ void Robot::run()
         ros::spinOnce();
         if(!isPaused){
             update();
+            forExperiment.push_back(getQRobot());
         }
 
         // Adjust the sleep to, according to how often you will check ROS for new messages
@@ -175,4 +176,18 @@ bool Robot::pathCompleted(){
 
 void Robot::pauseRobot(bool astatus){
     isPaused = astatus;
+}
+
+void Robot::clearForExperiment(){
+    forExperiment.clear();
+}
+
+double Robot::getPathLengthForExperiment(){
+    double pathlength= 0;
+
+    for(unsigned int p = 0; p + 1 <forExperiment.size(); p++){
+        pathlength += (forExperiment[p] -forExperiment[p+1]).norm2();
+    }
+
+    return pathlength;
 }
