@@ -151,9 +151,10 @@ void QTrees::setC( double aC) {
     C = aC;
 }
 
-int PrintForRepport = 0;
+
 void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     // setup defines
+    int PrintForRepport = 0;
     double PIXEL_MM = 700;
 
     // create an image for all the nodes
