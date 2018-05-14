@@ -151,7 +151,7 @@ void QTrees::setC( double aC) {
     C = aC;
 }
 
-
+int PrintForRepport = 0;
 void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
     // setup defines
     double PIXEL_MM = 700;
@@ -225,6 +225,8 @@ void QTrees::exportTree(string fileName, vector<vector<double> > vBricks) {
 
     // save the image to a file
     cv::imshow(fileName, res);
+    cv::imwrite("PathPotimize " + to_string(PrintForRepport) + ".png", res);
+    PrintForRepport++;
 }
 
 Node *QTrees::getRootNode() {

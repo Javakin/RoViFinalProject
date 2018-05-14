@@ -243,7 +243,7 @@ void ObjectAvoidance::init() {
         getRobWorkStudio()->setState(_state);
 
 
-        //for simulation make a lego brick configuration
+        // for simulation make a lego brick configuration
         LegoHandle->initializeTestSetup();
         getRobWorkStudio()->setState(_state);
 

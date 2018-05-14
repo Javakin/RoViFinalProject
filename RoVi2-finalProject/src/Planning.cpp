@@ -228,13 +228,13 @@ void Planning::run(){
     Q q2 = Q(6,0.446, -2.076, -1.155, -1.479, 1.568, 1.664);
     Q qGoal;
 
-    struct timeval start, end;
+    /*struct timeval start, end;
     long mtime, seconds, useconds;
 
     double impF = 0;
     int repetition = 0;
     bool newRout = 0;
-    QPath originalPath, optimizedPath;
+    QPath originalPath, optimizedPath;*/
 
     cout << "lets get to it \n";
     while (isAlive){
@@ -245,7 +245,7 @@ void Planning::run(){
             // If the route is complete make a new one
             if (_RobotHandle->pathCompleted()){
                 // stopping the timer
-                if(newRout == 1){
+                /*if(newRout == 1){
                     newRout = 0;
 
                     gettimeofday(&end, NULL);
@@ -269,7 +269,7 @@ void Planning::run(){
 
                     cout << "Impf: " << impF << " rep: "<< repetition << " Timer: " << mtime  << endl;
                     cout << "Length_orig: " << originalPathLength << ", "  << endl;
-                }
+                }*/
 
 
                 if(robotDirection == 0){
@@ -291,18 +291,18 @@ void Planning::run(){
 
                     // safe the old setup
                     _RobotHandle->clearForExperiment();
-                    originalPath = aPath;
+                    /*originalPath = aPath;
 
                     impF +=0.02;
                     if(impF > 0.2){
                         impF = 0;
                         repetition++;
                     }
-                    newRout = 1;
+                    newRout = 1;*/
                 }
 
                 // starting the timer
-                gettimeofday(&start, NULL);
+                //gettimeofday(&start, NULL);
 
             }else{
                 // check for errors in the tree
@@ -328,11 +328,12 @@ void Planning::run(){
                 // Search for a better solution
                 if(_R!= nullptr){
                     //cout << "stuff" << endl;
-                    QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON, impF);
+                    QPath aPath = updateConstraindPath(qGoal, RRT_EPSILON, IMPROVEMENT_FACTOR);
                     //cout << "done updating " << aPath.size() << endl;
                     if (aPath.size() != 0){
 
                         _RobotHandle->setPath(aPath);
+
                     }
                 }
             }

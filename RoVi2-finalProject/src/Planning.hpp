@@ -88,7 +88,7 @@ using namespace rwlibs::proximitystrategies;
 #define VALIDAITON_DEPTH     0.8
 #define VALIDATION_BOUND     0.25
 #define RRT_EPSILON          0.1
-#define IMPROVEMENT_FACTOR   0.05
+#define IMPROVEMENT_FACTOR   0.1
 #define IMPROVEMENT_FACTORCB 0.05
 #define NUM_OF_NEIGHBORS     3
 
